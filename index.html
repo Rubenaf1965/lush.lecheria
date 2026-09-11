@@ -78,7 +78,7 @@
         <input 
           id="searchInput"
           type="text" 
-          oninput="renderProducts()"
+          oninput="renderProductos()"
           placeholder="Buscar accesorios, joyas..." 
           class="w-full bg-lushBg border border-gray-200 rounded-full px-5 py-2 text-sm focus:outline-none focus:border-lushGold transition"
         >
@@ -114,7 +114,7 @@
       <div class="flex gap-2 overflow-x-auto" id="categoryFilters"></div>
     </section>
 
-    <section id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></section>
+    <section id="ProductosGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></section>
   </main>
 
   <!-- SECCIÓN PANEL ADMINISTRATIVO COMPLETO -->
@@ -666,7 +666,7 @@
 
     let bcvRate = parseFloat(localStorage.getItem('lush_bcv_rate')) || 0;
 
-    let products = [];
+    let Productos = [];
     let sellers = [];
     let orders = [];
 
@@ -677,13 +677,13 @@
     async function loadData() {
       try {
         const [prodRes, sellRes, ordRes] = await Promise.all([
-          _supabase.from('products').select('*'),
+          _supabase.from('Productos').select('*'),
           _supabase.from('sellers').select('*'),
           _supabase.from('orders').select('*').order('created_at', { ascending: false })
         ]);
 
         if (prodRes.error) console.error('Error productos Supabase:', prodRes.error);
-        else products = prodRes.data.map(p => ({
+        else Productos = prodRes.data.map(p => ({
           id: p.id,
           title: p.title,
           category: p.category,
@@ -715,7 +715,7 @@
           commissionAmount: parseFloat(o.commission_amount)
         }));
 
-        renderProducts();
+        renderProductos();
         renderAdminDashboard();
         renderSellerSelectOptions();
       } catch (err) {
@@ -757,7 +757,7 @@
     function updateBcvDisplay() {
       const el = document.getElementById('bcvRateDisplay');
       if (el) el.innerText = `Bs. ${bcvRate.toFixed(2)}`;
-      renderProducts();
+      renderProductos();
       calculateCartTotal();
     }
 
@@ -776,10 +776,10 @@
       if (restoreStock) {
         // Restaurar stock en Supabase
         for (const item of order.items) {
-          const prod = products.find(p => p.id === item.id);
+          const prod = Productos.find(p => p.id === item.id);
           if (prod) {
             const newStock = prod.stock + item.qty;
-            await _supabase.from('products').update({ stock: newStock }).eq('id', prod.id);
+            await _supabase.from('Productos').update({ stock: newStock }).eq('id', prod.id);
           }
         }
 
@@ -898,13 +898,13 @@
       const stockBody = document.getElementById('inventoryStockTableBody');
       const missingBody = document.getElementById('inventoryMissingTableBody');
 
-      const availableProducts = products.filter(p => p.stock > 0);
-      const missingProducts = products.filter(p => p.stock <= 0);
+      const availableProductos = Productos.filter(p => p.stock > 0);
+      const missingProductos = Productos.filter(p => p.stock <= 0);
 
-      if (availableProducts.length === 0) {
+      if (availableProductos.length === 0) {
         stockBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos disponibles.</td></tr>`;
       } else {
-        stockBody.innerHTML = availableProducts.map(p => `
+        stockBody.innerHTML = availableProductos.map(p => `
           <tr class="border-b">
             <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
             <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
@@ -914,10 +914,10 @@
         `).join('');
       }
 
-      if (missingProducts.length === 0) {
+      if (missingProductos.length === 0) {
         missingBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos agotados.</td></tr>`;
       } else {
-        missingBody.innerHTML = missingProducts.map(p => `
+        missingBody.innerHTML = missingProductos.map(p => `
           <tr class="border-b">
             <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
             <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
@@ -946,7 +946,7 @@
     // MANEJO DE ARCHIVOS .JSON (RESPALDO LOCAL / CARGA A SUPABASE)
     function exportDataToJSON() {
       const backupData = {
-        products: products,
+        Productos: Productos,
         sellers: sellers,
         orders: orders,
         exportedAt: new Date().toISOString()
@@ -966,14 +966,14 @@
       fileReader.onload = async function(e) {
         try {
           const importedData = JSON.parse(e.target.result);
-          if (importedData.products && importedData.sellers && importedData.orders) {
+          if (importedData.Productos && importedData.sellers && importedData.orders) {
             
             // Insertar o actualizar en Supabase
-            if (importedData.products.length) {
-              const formattedProds = importedData.products.map(p => ({
+            if (importedData.Productos.length) {
+              const formattedProds = importedData.Productos.map(p => ({
                 id: p.id, title: p.title, category: p.category, price: p.price, stock: p.stock, image: p.image
               }));
-              await _supabase.from('products').upsert(formattedProds);
+              await _supabase.from('Productos').upsert(formattedProds);
             }
 
             if (importedData.sellers.length) {
@@ -1030,14 +1030,14 @@
     function setFilter(slug) {
       selectedCategory = slug;
       renderCategoryFilters();
-      renderProducts();
+      renderProductos();
     }
 
-    function renderProducts() {
+    function renderProductos() {
       const search = document.getElementById('searchInput').value.toLowerCase();
-      const grid = document.getElementById('productsGrid');
+      const grid = document.getElementById('ProductosGrid');
 
-      const filtered = products.filter(p => {
+      const filtered = Productos.filter(p => {
         const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
         const matchesSearch = p.title.toLowerCase().includes(search);
         return matchesCategory && matchesSearch;
@@ -1141,7 +1141,7 @@
           image: event.target.result
         };
 
-        const { error } = await _supabase.from('products').insert([newProduct]);
+        const { error } = await _supabase.from('Productos').insert([newProduct]);
 
         if (error) {
           alert('Error al guardar el producto en Supabase: ' + error.message);
@@ -1210,7 +1210,7 @@
 
     async function deleteProduct(id) {
       if (confirm('¿Desea eliminar este producto?')) {
-        const { error } = await _supabase.from('products').delete().eq('id', id);
+        const { error } = await _supabase.from('Productos').delete().eq('id', id);
         if (error) {
           alert("Error al eliminar producto: " + error.message);
           return;
@@ -1220,7 +1220,7 @@
     }
 
     function openUpdateProductModal(id) {
-      const prod = products.find(p => p.id === id);
+      const prod = Productos.find(p => p.id === id);
       if (!prod) return;
 
       document.getElementById('updateProdId').value = prod.id;
@@ -1240,11 +1240,11 @@
       const newPrice = parseFloat(document.getElementById('updateProdPrice').value);
       const stockToAdd = parseInt(document.getElementById('updateProdStockAdd').value) || 0;
 
-      const prod = products.find(p => p.id === id);
+      const prod = Productos.find(p => p.id === id);
       if (prod) {
         const updatedStock = prod.stock + stockToAdd;
         const { error } = await _supabase
-          .from('products')
+          .from('Productos')
           .update({ price: newPrice, stock: updatedStock })
           .eq('id', id);
 
@@ -1314,7 +1314,7 @@
       document.getElementById('metricTotalOrders').innerText = orders.length;
 
       const inventoryBody = document.getElementById('inventoryTableBody');
-      inventoryBody.innerHTML = products.map(p => `
+      inventoryBody.innerHTML = Productos.map(p => `
         <tr class="border-b hover:bg-gray-50">
           <td class="p-3 font-medium flex items-center gap-2">
             <img src="${p.image}" onerror="this.onerror=null; this.src='LUSH logo.PNG';" class="w-8 h-8 rounded-full object-cover">
@@ -1394,7 +1394,7 @@
 
     // CARRITO Y PROCESAMIENTO CON SUPABASE
     function addToCart(id) {
-      const prod = products.find(p => p.id === id);
+      const prod = Productos.find(p => p.id === id);
       if (!prod || prod.stock <= 0) return;
 
       const itemInCart = cart.find(c => c.id === id);
@@ -1500,10 +1500,10 @@
 
       // Restar Stock
       for (const cartItem of cart) {
-        const prod = products.find(p => p.id === cartItem.id);
+        const prod = Productos.find(p => p.id === cartItem.id);
         if (prod) {
           const newStock = prod.stock - cartItem.qty;
-          await _supabase.from('products').update({ stock: newStock }).eq('id', prod.id);
+          await _supabase.from('Productos').update({ stock: newStock }).eq('id', prod.id);
         }
       }
 
