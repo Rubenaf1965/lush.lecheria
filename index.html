@@ -153,7 +153,7 @@
       </div>
       <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Órdenes Procesadas</p>
-        <p id="metricTotalOrders" class="text-3xl font-bold text-emerald-600 mt-2">0</p>
+        <p id="metricTotalordenes" class="text-3xl font-bold text-emerald-600 mt-2">0</p>
       </div>
     </div>
 
@@ -301,7 +301,7 @@
               <th class="p-3 text-right">Acción</th>
             </tr>
           </thead>
-          <tbody id="ordersHistoryTableBody"></tbody>
+          <tbody id="ordenesHistoryTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -346,7 +346,7 @@
         </div>
         <div class="bg-gray-50 p-4 rounded-xl border text-center">
           <p class="text-[11px] font-bold uppercase text-gray-400">Órdenes / Unidades</p>
-          <p id="closureTotalOrdersUnits" class="text-2xl font-bold text-purple-800 mt-1">0 / 0</p>
+          <p id="closureTotalordenesUnits" class="text-2xl font-bold text-purple-800 mt-1">0 / 0</p>
         </div>
       </div>
 
@@ -361,7 +361,7 @@
               <th class="p-2.5 text-right">Comisión a Pagar ($)</th>
             </tr>
           </thead>
-          <tbody id="closureSellersTableBody"></tbody>
+          <tbody id="closurevendedoresTableBody"></tbody>
         </table>
       </div>
 
@@ -378,7 +378,7 @@
               <th class="p-2 text-right">Comisión ($)</th>
             </tr>
           </thead>
-          <tbody id="closureOrdersTableBody"></tbody>
+          <tbody id="closureordenesTableBody"></tbody>
         </table>
       </div>
 
@@ -551,7 +551,7 @@
       <div class="border-t pt-4 space-y-4">
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Vendedor Atendió (Opcional):</label>
-          <select id="cartSellerSelect" onchange="calculateCartTotal()" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+          <select id="cartvendedoreselect" onchange="calculateCartTotal()" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
             <option value="">Venta Directa en Línea</option>
           </select>
         </div>
@@ -667,8 +667,8 @@
     let bcvRate = parseFloat(localStorage.getItem('lush_bcv_rate')) || 0;
 
     let productos = [];
-    let sellers = [];
-    let orders = [];
+    let vendedores = [];
+    let ordenes = [];
 
     let cart = [];
     let selectedCategory = 'all';
@@ -678,8 +678,8 @@
       try {
         const [prodRes, sellRes, ordRes] = await Promise.all([
           _supabase.from('productos').select('*'),
-          _supabase.from('sellers').select('*'),
-          _supabase.from('orders').select('*').order('created_at', { ascending: false })
+          _supabase.from('vendedores').select('*'),
+          _supabase.from('ordenes').select('*').order('created_at', { ascending: false })
         ]);
 
         if (prodRes.error) console.error('Error productos Supabase:', prodRes.error);
@@ -693,7 +693,7 @@
         }));
 
         if (sellRes.error) console.error('Error vendedores Supabase:', sellRes.error);
-        else sellers = sellRes.data.map(s => ({
+        else vendedores = sellRes.data.map(s => ({
           id: s.id,
           name: s.name,
           commission: parseFloat(s.commission),
@@ -701,7 +701,7 @@
         }));
 
         if (ordRes.error) console.error('Error órdenes Supabase:', ordRes.error);
-        else orders = ordRes.data.map(o => ({
+        else ordenes = ordRes.data.map(o => ({
           id: o.id,
           date: o.date,
           isoDate: o.iso_date,
@@ -717,7 +717,7 @@
 
         renderproductos();
         renderAdminDashboard();
-        renderSellerSelectOptions();
+        rendervendedoreselectOptions();
       } catch (err) {
         console.error("Error al cargar desde Supabase:", err);
       }
@@ -763,10 +763,10 @@
 
     // ELIMINAR ÓRDEN EN SUPABASE
     async function deleteOrder(orderId) {
-      const orderIndex = orders.findIndex(o => o.id === orderId);
+      const orderIndex = ordenes.findIndex(o => o.id === orderId);
       if (orderIndex === -1) return;
 
-      const order = orders[orderIndex];
+      const order = ordenes[orderIndex];
       const restoreStock = confirm(
         `¿Desea eliminar la orden #${order.id}?\n\n` +
         `• 'Aceptar': Elimina la orden y RESTAURA el stock.\n` +
@@ -783,7 +783,7 @@
           }
         }
 
-        const { error } = await _supabase.from('orders').delete().eq('id', orderId);
+        const { error } = await _supabase.from('ordenes').delete().eq('id', orderId);
         if (error) {
           alert("Error al borrar la orden en Supabase: " + error.message);
           return;
@@ -820,7 +820,7 @@
       document.getElementById('closurePeriodTitle').innerText = `Cierre de Mes: ${monthLabel}`;
       document.getElementById('closureReportGeneratedAt').innerText = `Generado el: ${new Date().toLocaleString('es-VE')}`;
 
-      const filteredOrders = orders.filter(o => {
+      const filteredordenes = ordenes.filter(o => {
         if (!o.isoDate) {
           const parts = o.date ? o.date.split('/') : [];
           if (parts.length >= 3) {
@@ -834,37 +834,37 @@
         return o.isoDate.startsWith(selectedYearMonth);
       });
 
-      const totalSales = filteredOrders.reduce((acc, o) => acc + o.total, 0);
-      const totalCommissions = filteredOrders.reduce((acc, o) => acc + o.commissionAmount, 0);
-      const totalUnits = filteredOrders.reduce((acc, o) => acc + o.items.reduce((sum, item) => sum + item.qty, 0), 0);
+      const totalSales = filteredordenes.reduce((acc, o) => acc + o.total, 0);
+      const totalCommissions = filteredordenes.reduce((acc, o) => acc + o.commissionAmount, 0);
+      const totalUnits = filteredordenes.reduce((acc, o) => acc + o.items.reduce((sum, item) => sum + item.qty, 0), 0);
 
       document.getElementById('closureTotalSales').innerText = `$${totalSales.toFixed(2)}`;
       document.getElementById('closureTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
-      document.getElementById('closureTotalOrdersUnits').innerText = `${filteredOrders.length} órds. / ${totalUnits} unids.`;
+      document.getElementById('closureTotalordenesUnits').innerText = `${filteredordenes.length} órds. / ${totalUnits} unids.`;
 
-      const sellersMap = {};
-      sellers.forEach(s => {
-        sellersMap[s.id] = { name: s.name, count: 0, totalSales: 0, totalCommission: 0 };
+      const vendedoresMap = {};
+      vendedores.forEach(s => {
+        vendedoresMap[s.id] = { name: s.name, count: 0, totalSales: 0, totalCommission: 0 };
       });
-      sellersMap['direct'] = { name: 'Venta Directa', count: 0, totalSales: 0, totalCommission: 0 };
+      vendedoresMap['direct'] = { name: 'Venta Directa', count: 0, totalSales: 0, totalCommission: 0 };
 
-      filteredOrders.forEach(o => {
+      filteredordenes.forEach(o => {
         const key = o.sellerId || 'direct';
-        if (!sellersMap[key]) {
-          sellersMap[key] = { name: o.sellerName || 'Vendedor Desconocido', count: 0, totalSales: 0, totalCommission: 0 };
+        if (!vendedoresMap[key]) {
+          vendedoresMap[key] = { name: o.sellerName || 'Vendedor Desconocido', count: 0, totalSales: 0, totalCommission: 0 };
         }
-        sellersMap[key].count += 1;
-        sellersMap[key].totalSales += o.total;
-        sellersMap[key].totalCommission += o.commissionAmount;
+        vendedoresMap[key].count += 1;
+        vendedoresMap[key].totalSales += o.total;
+        vendedoresMap[key].totalCommission += o.commissionAmount;
       });
 
-      const closureSellersBody = document.getElementById('closureSellersTableBody');
-      const activeSellers = Object.values(sellersMap).filter(s => s.count > 0);
+      const closurevendedoresBody = document.getElementById('closurevendedoresTableBody');
+      const activevendedores = Object.values(vendedoresMap).filter(s => s.count > 0);
 
-      if (activeSellers.length === 0) {
-        closureSellersBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin actividad de vendedores en este mes.</td></tr>`;
+      if (activevendedores.length === 0) {
+        closurevendedoresBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin actividad de vendedores en este mes.</td></tr>`;
       } else {
-        closureSellersBody.innerHTML = activeSellers.map(s => `
+        closurevendedoresBody.innerHTML = activevendedores.map(s => `
           <tr class="border-b">
             <td class="p-2.5 font-semibold text-lushDark">${s.name}</td>
             <td class="p-2.5 text-center">${s.count} pedido(s)</td>
@@ -874,11 +874,11 @@
         `).join('');
       }
 
-      const closureOrdersBody = document.getElementById('closureOrdersTableBody');
-      if (filteredOrders.length === 0) {
-        closureOrdersBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No se encontraron órdenes en este período.</td></tr>`;
+      const closureordenesBody = document.getElementById('closureordenesTableBody');
+      if (filteredordenes.length === 0) {
+        closureordenesBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No se encontraron órdenes en este período.</td></tr>`;
       } else {
-        closureOrdersBody.innerHTML = filteredOrders.map(o => `
+        closureordenesBody.innerHTML = filteredordenes.map(o => `
           <tr class="border-b">
             <td class="p-2 font-bold text-lushDark">#${o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
             <td class="p-2">${o.customerName || 'N/A'}</td>
@@ -947,8 +947,8 @@
     function exportDataToJSON() {
       const backupData = {
         productos: productos,
-        sellers: sellers,
-        orders: orders,
+        vendedores: vendedores,
+        ordenes: ordenes,
         exportedAt: new Date().toISOString()
       };
 
@@ -966,7 +966,7 @@
       fileReader.onload = async function(e) {
         try {
           const importedData = JSON.parse(e.target.result);
-          if (importedData.productos && importedData.sellers && importedData.orders) {
+          if (importedData.productos && importedData.vendedores && importedData.ordenes) {
             
             // Insertar o actualizar en Supabase
             if (importedData.productos.length) {
@@ -976,21 +976,21 @@
               await _supabase.from('productos').upsert(formattedProds);
             }
 
-            if (importedData.sellers.length) {
-              const formattedSellers = importedData.sellers.map(s => ({
+            if (importedData.vendedores.length) {
+              const formattedvendedores = importedData.vendedores.map(s => ({
                 id: s.id, name: s.name, commission: s.commission, phone: s.phone
               }));
-              await _supabase.from('sellers').upsert(formattedSellers);
+              await _supabase.from('vendedores').upsert(formattedvendedores);
             }
 
-            if (importedData.orders.length) {
-              const formattedOrders = importedData.orders.map(o => ({
+            if (importedData.ordenes.length) {
+              const formattedordenes = importedData.ordenes.map(o => ({
                 id: o.id, date: o.date, iso_date: o.isoDate, customer_name: o.customerName,
                 items: JSON.stringify(o.items), total: o.total, payment_ref: o.paymentRef,
                 delivery_address: o.deliveryAddress, seller_id: o.sellerId, seller_name: o.sellerName,
                 commission_amount: o.commissionAmount
               }));
-              await _supabase.from('orders').upsert(formattedOrders);
+              await _supabase.from('ordenes').upsert(formattedordenes);
             }
 
             await loadData();
@@ -1164,7 +1164,7 @@
         phone: document.getElementById('sellerPhone').value
       };
 
-      const { error } = await _supabase.from('sellers').insert([newSeller]);
+      const { error } = await _supabase.from('vendedores').insert([newSeller]);
 
       if (error) {
         alert('Error al agregar vendedor en Supabase: ' + error.message);
@@ -1177,12 +1177,12 @@
     }
 
     async function editSellerCommission(id) {
-      const seller = sellers.find(s => s.id === id);
+      const seller = vendedores.find(s => s.id === id);
       if (!seller) return;
 
       const newComm = prompt(`Nuevo % de comisión para ${seller.name}:`, seller.commission);
       if (newComm !== null && !isNaN(parseFloat(newComm)) && parseFloat(newComm) >= 0) {
-        const { error } = await _supabase.from('sellers').update({ commission: parseFloat(newComm) }).eq('id', id);
+        const { error } = await _supabase.from('vendedores').update({ commission: parseFloat(newComm) }).eq('id', id);
 
         if (error) {
           alert("Error al actualizar la comisión: " + error.message);
@@ -1195,11 +1195,11 @@
     }
 
     async function deleteSeller(id) {
-      const seller = sellers.find(s => s.id === id);
+      const seller = vendedores.find(s => s.id === id);
       if (!seller) return;
 
       if (confirm(`¿Eliminar al vendedor "${seller.name}"?`)) {
-        const { error } = await _supabase.from('sellers').delete().eq('id', id);
+        const { error } = await _supabase.from('vendedores').delete().eq('id', id);
         if (error) {
           alert("Error al eliminar vendedor: " + error.message);
           return;
@@ -1262,7 +1262,7 @@
     function generateDemandReport() {
       const demandMap = {};
 
-      orders.forEach(order => {
+      ordenes.forEach(order => {
         order.items.forEach(item => {
           if (!demandMap[item.title]) {
             demandMap[item.title] = { title: item.title, qty: 0, totalAmount: 0 };
@@ -1306,12 +1306,12 @@
     }
 
     function renderAdminDashboard() {
-      const totalSales = orders.reduce((acc, o) => acc + o.total, 0);
-      const totalCommissions = orders.reduce((acc, o) => acc + o.commissionAmount, 0);
+      const totalSales = ordenes.reduce((acc, o) => acc + o.total, 0);
+      const totalCommissions = ordenes.reduce((acc, o) => acc + o.commissionAmount, 0);
 
       document.getElementById('metricTotalSales').innerText = `$${totalSales.toFixed(2)}`;
       document.getElementById('metricTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
-      document.getElementById('metricTotalOrders').innerText = orders.length;
+      document.getElementById('metricTotalordenes').innerText = ordenes.length;
 
       const inventoryBody = document.getElementById('inventoryTableBody');
       inventoryBody.innerHTML = productos.map(p => `
@@ -1337,16 +1337,16 @@
       `).join('');
 
       const sellerCommissionsBody = document.getElementById('sellerCommissionsTableBody');
-      sellerCommissionsBody.innerHTML = sellers.map(s => {
-        const sellerOrders = orders.filter(o => o.sellerId === s.id);
-        const totalVendido = sellerOrders.reduce((acc, o) => acc + o.total, 0);
-        const comisionGanada = sellerOrders.reduce((acc, o) => acc + o.commissionAmount, 0);
+      sellerCommissionsBody.innerHTML = vendedores.map(s => {
+        const sellerordenes = ordenes.filter(o => o.sellerId === s.id);
+        const totalVendido = sellerordenes.reduce((acc, o) => acc + o.total, 0);
+        const comisionGanada = sellerordenes.reduce((acc, o) => acc + o.commissionAmount, 0);
 
         return `
           <tr class="border-b hover:bg-gray-50">
             <td class="p-3 font-semibold">${s.name}</td>
             <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-xs">${s.commission}%</span></td>
-            <td class="p-3">${sellerOrders.length} pedido(s)</td>
+            <td class="p-3">${sellerordenes.length} pedido(s)</td>
             <td class="p-3 font-medium">$${totalVendido.toFixed(2)}</td>
             <td class="p-3 font-bold text-lushGold">$${comisionGanada.toFixed(2)}</td>
             <td class="p-3 text-right flex justify-end gap-2">
@@ -1361,11 +1361,11 @@
         `;
       }).join('');
 
-      const ordersHistoryBody = document.getElementById('ordersHistoryTableBody');
-      if (orders.length === 0) {
-        ordersHistoryBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-400">No hay órdenes registradas.</td></tr>`;
+      const ordenesHistoryBody = document.getElementById('ordenesHistoryTableBody');
+      if (ordenes.length === 0) {
+        ordenesHistoryBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-400">No hay órdenes registradas.</td></tr>`;
       } else {
-        ordersHistoryBody.innerHTML = orders.map(o => `
+        ordenesHistoryBody.innerHTML = ordenes.map(o => `
           <tr class="border-b hover:bg-gray-50 text-xs">
             <td class="p-3">
               <p class="font-bold text-lushDark">#${o.id}</p>
@@ -1423,14 +1423,14 @@
         </div>
       `).join('');
 
-      renderSellerSelectOptions();
+      rendervendedoreselectOptions();
       calculateCartTotal();
     }
 
-    function renderSellerSelectOptions() {
-      const select = document.getElementById('cartSellerSelect');
+    function rendervendedoreselectOptions() {
+      const select = document.getElementById('cartvendedoreselect');
       select.innerHTML = `<option value="">Venta Directa en Línea</option>` + 
-        sellers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        vendedores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
     }
 
     function calculateCartTotal() {
@@ -1469,8 +1469,8 @@
 
       const subtotalUSD = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
       const subtotalBs = bcvRate > 0 ? (subtotalUSD * bcvRate).toFixed(2) : '0.00';
-      const sellerId = document.getElementById('cartSellerSelect').value;
-      const seller = sellers.find(s => s.id === sellerId);
+      const sellerId = document.getElementById('cartvendedoreselect').value;
+      const seller = vendedores.find(s => s.id === sellerId);
       const commissionAmount = seller ? (subtotalUSD * seller.commission) / 100 : 0;
 
       const now = new Date();
@@ -1491,7 +1491,7 @@
       };
 
       // Registrar Orden
-      const { error: ordError } = await _supabase.from('orders').insert([dbOrder]);
+      const { error: ordError } = await _supabase.from('ordenes').insert([dbOrder]);
 
       if (ordError) {
         alert("Error al procesar la orden en Supabase: " + ordError.message);
