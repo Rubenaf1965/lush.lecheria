@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -78,7 +78,7 @@
         <input 
           id="searchInput"
           type="text" 
-          oninput="renderproductos()"
+          oninput="renderProductos()"
           placeholder="Buscar accesorios, joyas..." 
           class="w-full bg-lushBg border border-gray-200 rounded-full px-5 py-2 text-sm focus:outline-none focus:border-lushGold transition"
         >
@@ -153,7 +153,7 @@
       </div>
       <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Órdenes Procesadas</p>
-        <p id="metricTotalordenes" class="text-3xl font-bold text-emerald-600 mt-2">0</p>
+        <p id="metricTotalOrders" class="text-3xl font-bold text-emerald-600 mt-2">0</p>
       </div>
     </div>
 
@@ -292,7 +292,7 @@
             <tr>
               <th class="p-3">ID / Fecha</th>
               <th class="p-3">Comprador</th>
-              <th class="p-3">productos & Cantidad</th>
+              <th class="p-3">Productos & Cantidad</th>
               <th class="p-3">Ref. Pago Móvil</th>
               <th class="p-3">Dirección Delivery</th>
               <th class="p-3">Vendedor</th>
@@ -346,7 +346,7 @@
         </div>
         <div class="bg-gray-50 p-4 rounded-xl border text-center">
           <p class="text-[11px] font-bold uppercase text-gray-400">Órdenes / Unidades</p>
-          <p id="closureTotalordenesUnits" class="text-2xl font-bold text-purple-800 mt-1">0 / 0</p>
+          <p id="closureTotalOrdersUnits" class="text-2xl font-bold text-purple-800 mt-1">0 / 0</p>
         </div>
       </div>
 
@@ -361,7 +361,7 @@
               <th class="p-2.5 text-right">Comisión a Pagar ($)</th>
             </tr>
           </thead>
-          <tbody id="closurevendedoresTableBody"></tbody>
+          <tbody id="closureSellersTableBody"></tbody>
         </table>
       </div>
 
@@ -378,7 +378,7 @@
               <th class="p-2 text-right">Comisión ($)</th>
             </tr>
           </thead>
-          <tbody id="closureordenesTableBody"></tbody>
+          <tbody id="closureOrdersTableBody"></tbody>
         </table>
       </div>
 
@@ -409,7 +409,7 @@
 
       <div class="space-y-2">
         <h3 class="text-sm font-bold text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-100 flex items-center gap-2">
-          <span>✅</span> productos Disponibles en Stock
+          <span>✅</span> Productos Disponibles en Stock
         </h3>
         <table class="w-full text-left text-sm border-collapse">
           <thead>
@@ -426,7 +426,7 @@
 
       <div class="space-y-2 pt-2">
         <h3 class="text-sm font-bold text-red-700 bg-red-50 p-2.5 rounded-lg border border-red-100 flex items-center gap-2">
-          <span>⚠️</span> productos Faltantes / Agotados (Reorden Requerido)
+          <span>⚠️</span> Productos Faltantes / Agotados (Reorden Requerido)
         </h3>
         <table class="w-full text-left text-sm border-collapse">
           <thead>
@@ -485,7 +485,7 @@
           <img src="LUSH logo.PNG" class="h-12 w-12 rounded-full border" alt="Lush Logo">
           <div>
             <h2 class="text-xl font-bold text-lushDark uppercase">Lush Fine Jewelry</h2>
-            <p class="text-xs text-gray-500">Reporte de Demanda y productos Más Vendidos</p>
+            <p class="text-xs text-gray-500">Reporte de Demanda y Productos Más Vendidos</p>
           </div>
         </div>
         <div class="text-right text-xs text-gray-400">
@@ -494,7 +494,7 @@
       </div>
 
       <div>
-        <h3 class="text-sm font-bold text-lushDark mb-3 uppercase tracking-wider">Desglose de productos Vendidos</h3>
+        <h3 class="text-sm font-bold text-lushDark mb-3 uppercase tracking-wider">Desglose de Productos Vendidos</h3>
         <table class="w-full text-left text-sm border-collapse">
           <thead>
             <tr class="bg-gray-100 border-b text-xs uppercase text-gray-600">
@@ -551,7 +551,7 @@
       <div class="border-t pt-4 space-y-4">
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Vendedor Atendió (Opcional):</label>
-          <select id="cartvendedoreselect" onchange="calculateCartTotal()" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+          <select id="cartSellerSelect" onchange="calculateCartTotal()" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
             <option value="">Venta Directa en Línea</option>
           </select>
         </div>
@@ -656,8 +656,8 @@
   <!-- SCRIPT LOGIC JAVASCRIPT CON SUPABASE INTEGRADO -->
   <script>
     // CONFIGURACIÓN DE SUPABASE
-    const SUPABASE_URL = "https://cwmehnvcnqxtyllkeejw.supabase.co/"; // Reemplazar con tu URL de Supabase
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3bWVobnZjbnF4dHlsbGtlZWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMTg4MjEsImV4cCI6MjEwNDY5NDgyMX0.ln0qABX3k3lpipN_TW97FOqSbYhNwczZg6uU1cjaZMk";        // Reemplazar con tu Anon Key
+    const SUPABASE_URL = "https://cwmehnvcnqxtyllkeejw.supabase.co/";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3bWVobnZjbnF4dHlsbGtlZWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMTg4MjEsImV4cCI6MjEwNDY5NDgyMX0.ln0qABX3k3lpipN_TW97FOqSbYhNwczZg6uU1cjaZMk";
 
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -683,41 +683,41 @@
         ]);
 
         if (prodRes.error) console.error('Error productos Supabase:', prodRes.error);
-        else productos = prodRes.data.map(p => ({
+        else productos = (prodRes.data || []).map(p => ({
           id: p.id,
           title: p.title,
           category: p.category,
-          price: parseFloat(p.price),
-          stock: parseInt(p.stock),
+          price: parseFloat(p.price || 0),
+          stock: parseInt(p.stock || 0),
           image: p.image
         }));
 
         if (sellRes.error) console.error('Error vendedores Supabase:', sellRes.error);
-        else vendedores = sellRes.data.map(s => ({
+        else vendedores = (sellRes.data || []).map(s => ({
           id: s.id,
           name: s.name,
-          commission: parseFloat(s.commission),
+          commission: parseFloat(s.commission || 0),
           phone: s.phone
         }));
 
         if (ordRes.error) console.error('Error órdenes Supabase:', ordRes.error);
-        else ordenes = ordRes.data.map(o => ({
+        else ordenes = (ordRes.data || []).map(o => ({
           id: o.id,
           date: o.date,
           isoDate: o.iso_date,
           customerName: o.customer_name,
-          items: typeof o.items === 'string' ? JSON.parse(o.items) : o.items,
-          total: parseFloat(o.total),
+          items: typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []),
+          total: parseFloat(o.total || 0),
           paymentRef: o.payment_ref,
           deliveryAddress: o.delivery_address,
           sellerId: o.seller_id,
           sellerName: o.seller_name,
-          commissionAmount: parseFloat(o.commission_amount)
+          commissionAmount: parseFloat(o.commission_amount || 0)
         }));
 
-        renderproductos();
+        renderProductos();
         renderAdminDashboard();
-        rendervendedoreselectOptions();
+        renderSellerSelectOptions();
       } catch (err) {
         console.error("Error al cargar desde Supabase:", err);
       }
@@ -757,7 +757,7 @@
     function updateBcvDisplay() {
       const el = document.getElementById('bcvRateDisplay');
       if (el) el.innerText = `Bs. ${bcvRate.toFixed(2)}`;
-      renderproductos();
+      renderProductos();
       calculateCartTotal();
     }
 
@@ -774,7 +774,6 @@
       );
 
       if (restoreStock) {
-        // Restaurar stock en Supabase
         for (const item of order.items) {
           const prod = productos.find(p => p.id === item.id);
           if (prod) {
@@ -820,7 +819,7 @@
       document.getElementById('closurePeriodTitle').innerText = `Cierre de Mes: ${monthLabel}`;
       document.getElementById('closureReportGeneratedAt').innerText = `Generado el: ${new Date().toLocaleString('es-VE')}`;
 
-      const filteredordenes = ordenes.filter(o => {
+      const filteredOrders = ordenes.filter(o => {
         if (!o.isoDate) {
           const parts = o.date ? o.date.split('/') : [];
           if (parts.length >= 3) {
@@ -834,13 +833,13 @@
         return o.isoDate.startsWith(selectedYearMonth);
       });
 
-      const totalSales = filteredordenes.reduce((acc, o) => acc + o.total, 0);
-      const totalCommissions = filteredordenes.reduce((acc, o) => acc + o.commissionAmount, 0);
-      const totalUnits = filteredordenes.reduce((acc, o) => acc + o.items.reduce((sum, item) => sum + item.qty, 0), 0);
+      const totalSales = filteredOrders.reduce((acc, o) => acc + o.total, 0);
+      const totalCommissions = filteredOrders.reduce((acc, o) => acc + o.commissionAmount, 0);
+      const totalUnits = filteredOrders.reduce((acc, o) => acc + o.items.reduce((sum, item) => sum + item.qty, 0), 0);
 
       document.getElementById('closureTotalSales').innerText = `$${totalSales.toFixed(2)}`;
       document.getElementById('closureTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
-      document.getElementById('closureTotalordenesUnits').innerText = `${filteredordenes.length} órds. / ${totalUnits} unids.`;
+      document.getElementById('closureTotalOrdersUnits').innerText = `${filteredOrders.length} órds. / ${totalUnits} unids.`;
 
       const vendedoresMap = {};
       vendedores.forEach(s => {
@@ -848,7 +847,7 @@
       });
       vendedoresMap['direct'] = { name: 'Venta Directa', count: 0, totalSales: 0, totalCommission: 0 };
 
-      filteredordenes.forEach(o => {
+      filteredOrders.forEach(o => {
         const key = o.sellerId || 'direct';
         if (!vendedoresMap[key]) {
           vendedoresMap[key] = { name: o.sellerName || 'Vendedor Desconocido', count: 0, totalSales: 0, totalCommission: 0 };
@@ -858,13 +857,13 @@
         vendedoresMap[key].totalCommission += o.commissionAmount;
       });
 
-      const closurevendedoresBody = document.getElementById('closurevendedoresTableBody');
-      const activevendedores = Object.values(vendedoresMap).filter(s => s.count > 0);
+      const closureSellersBody = document.getElementById('closureSellersTableBody');
+      const activeSellers = Object.values(vendedoresMap).filter(s => s.count > 0);
 
-      if (activevendedores.length === 0) {
-        closurevendedoresBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin actividad de vendedores en este mes.</td></tr>`;
+      if (activeSellers.length === 0) {
+        closureSellersBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin actividad de vendedores en este mes.</td></tr>`;
       } else {
-        closurevendedoresBody.innerHTML = activevendedores.map(s => `
+        closureSellersBody.innerHTML = activeSellers.map(s => `
           <tr class="border-b">
             <td class="p-2.5 font-semibold text-lushDark">${s.name}</td>
             <td class="p-2.5 text-center">${s.count} pedido(s)</td>
@@ -874,11 +873,11 @@
         `).join('');
       }
 
-      const closureordenesBody = document.getElementById('closureordenesTableBody');
-      if (filteredordenes.length === 0) {
-        closureordenesBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No se encontraron órdenes en este período.</td></tr>`;
+      const closureOrdersBody = document.getElementById('closureOrdersTableBody');
+      if (filteredOrders.length === 0) {
+        closureOrdersBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No se encontraron órdenes en este período.</td></tr>`;
       } else {
-        closureordenesBody.innerHTML = filteredordenes.map(o => `
+        closureOrdersBody.innerHTML = filteredOrders.map(o => `
           <tr class="border-b">
             <td class="p-2 font-bold text-lushDark">#${o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
             <td class="p-2">${o.customerName || 'N/A'}</td>
@@ -898,13 +897,13 @@
       const stockBody = document.getElementById('inventoryStockTableBody');
       const missingBody = document.getElementById('inventoryMissingTableBody');
 
-      const availableproductos = productos.filter(p => p.stock > 0);
-      const missingproductos = productos.filter(p => p.stock <= 0);
+      const availableProductos = productos.filter(p => p.stock > 0);
+      const missingProductos = productos.filter(p => p.stock <= 0);
 
-      if (availableproductos.length === 0) {
+      if (availableProductos.length === 0) {
         stockBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos disponibles.</td></tr>`;
       } else {
-        stockBody.innerHTML = availableproductos.map(p => `
+        stockBody.innerHTML = availableProductos.map(p => `
           <tr class="border-b">
             <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
             <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
@@ -914,10 +913,10 @@
         `).join('');
       }
 
-      if (missingproductos.length === 0) {
+      if (missingProductos.length === 0) {
         missingBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos agotados.</td></tr>`;
       } else {
-        missingBody.innerHTML = missingproductos.map(p => `
+        missingBody.innerHTML = missingProductos.map(p => `
           <tr class="border-b">
             <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
             <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
@@ -966,31 +965,30 @@
       fileReader.onload = async function(e) {
         try {
           const importedData = JSON.parse(e.target.result);
-          if (importedData.productos && importedData.vendedores && importedData.ordenes) {
+          if (importedData.productos || importedData.vendedores || importedData.ordenes) {
             
-            // Insertar o actualizar en Supabase
-            if (importedData.productos.length) {
+            if (importedData.productos && importedData.productos.length) {
               const formattedProds = importedData.productos.map(p => ({
                 title: p.title, category: p.category, price: p.price, stock: p.stock, image: p.image
               }));
               await _supabase.from('productos').insert(formattedProds);
             }
 
-            if (importedData.vendedores.length) {
-              const formattedvendedores = importedData.vendedores.map(s => ({
+            if (importedData.vendedores && importedData.vendedores.length) {
+              const formattedSellers = importedData.vendedores.map(s => ({
                 name: s.name, commission: s.commission, phone: s.phone
               }));
-              await _supabase.from('vendedores').insert(formattedvendedores);
+              await _supabase.from('vendedores').insert(formattedSellers);
             }
 
-            if (importedData.ordenes.length) {
-              const formattedordenes = importedData.ordenes.map(o => ({
+            if (importedData.ordenes && importedData.ordenes.length) {
+              const formattedOrders = importedData.ordenes.map(o => ({
                 date: o.date, iso_date: o.isoDate, customer_name: o.customerName,
                 items: JSON.stringify(o.items), total: o.total, payment_ref: o.paymentRef,
                 delivery_address: o.deliveryAddress, seller_id: o.sellerId, seller_name: o.sellerName,
                 commission_amount: o.commissionAmount
               }));
-              await _supabase.from('ordenes').insert(formattedordenes);
+              await _supabase.from('ordenes').insert(formattedOrders);
             }
 
             await loadData();
@@ -1030,11 +1028,12 @@
     function setFilter(slug) {
       selectedCategory = slug;
       renderCategoryFilters();
-      renderproductos();
+      renderProductos();
     }
 
-    function renderproductos() {
-      const search = document.getElementById('searchInput').value.toLowerCase();
+    function renderProductos() {
+      const searchInput = document.getElementById('searchInput');
+      const search = searchInput ? searchInput.value.toLowerCase() : '';
       const grid = document.getElementById('productosGrid');
 
       const filtered = productos.filter(p => {
@@ -1133,7 +1132,6 @@
       const reader = new FileReader();
       reader.onload = async function(event) {
         const newProduct = {
-          id: 'prod-' + Date.now(),
           title: document.getElementById('prodTitle').value,
           category: document.getElementById('prodCategory').value,
           price: parseFloat(document.getElementById('prodPrice').value),
@@ -1158,7 +1156,6 @@
     async function handleAddSeller(e) {
       e.preventDefault();
       const newSeller = {
-        id: 'seller-' + Date.now(),
         name: document.getElementById('sellerName').value,
         commission: parseFloat(document.getElementById('sellerCommission').value),
         phone: document.getElementById('sellerPhone').value
@@ -1263,13 +1260,15 @@
       const demandMap = {};
 
       ordenes.forEach(order => {
-        order.items.forEach(item => {
-          if (!demandMap[item.title]) {
-            demandMap[item.title] = { title: item.title, qty: 0, totalAmount: 0 };
-          }
-          demandMap[item.title].qty += item.qty;
-          demandMap[item.title].totalAmount += (item.price * item.qty);
-        });
+        if (Array.isArray(order.items)) {
+          order.items.forEach(item => {
+            if (!demandMap[item.title]) {
+              demandMap[item.title] = { title: item.title, qty: 0, totalAmount: 0 };
+            }
+            demandMap[item.title].qty += item.qty;
+            demandMap[item.title].totalAmount += (item.price * item.qty);
+          });
+        }
       });
 
       const sortedDemand = Object.values(demandMap).sort((a, b) => b.qty - a.qty);
@@ -1311,7 +1310,7 @@
 
       document.getElementById('metricTotalSales').innerText = `$${totalSales.toFixed(2)}`;
       document.getElementById('metricTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
-      document.getElementById('metricTotalordenes').innerText = ordenes.length;
+      document.getElementById('metricTotalOrders').innerText = ordenes.length;
 
       const inventoryBody = document.getElementById('inventoryTableBody');
       inventoryBody.innerHTML = productos.map(p => `
@@ -1338,15 +1337,15 @@
 
       const sellerCommissionsBody = document.getElementById('sellerCommissionsTableBody');
       sellerCommissionsBody.innerHTML = vendedores.map(s => {
-        const sellerordenes = ordenes.filter(o => o.sellerId === s.id);
-        const totalVendido = sellerordenes.reduce((acc, o) => acc + o.total, 0);
-        const comisionGanada = sellerordenes.reduce((acc, o) => acc + o.commissionAmount, 0);
+        const sellerOrders = ordenes.filter(o => o.sellerId === s.id);
+        const totalVendido = sellerOrders.reduce((acc, o) => acc + o.total, 0);
+        const comisionGanada = sellerOrders.reduce((acc, o) => acc + o.commissionAmount, 0);
 
         return `
           <tr class="border-b hover:bg-gray-50">
             <td class="p-3 font-semibold">${s.name}</td>
             <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-xs">${s.commission}%</span></td>
-            <td class="p-3">${sellerordenes.length} pedido(s)</td>
+            <td class="p-3">${sellerOrders.length} pedido(s)</td>
             <td class="p-3 font-medium">$${totalVendido.toFixed(2)}</td>
             <td class="p-3 font-bold text-lushGold">$${comisionGanada.toFixed(2)}</td>
             <td class="p-3 text-right flex justify-end gap-2">
@@ -1374,7 +1373,7 @@
             <td class="p-3 font-bold text-lushDark">${o.customerName || 'N/A'}</td>
             <td class="p-3">
               <ul class="list-disc list-inside space-y-0.5">
-                ${o.items.map(i => `<li>${i.title} (x${i.qty})</li>`).join('')}
+                ${Array.isArray(o.items) ? o.items.map(i => `<li>${i.title} (x${i.qty})</li>`).join('') : ''}
               </ul>
             </td>
             <td class="p-3 font-bold text-emerald-600">${o.paymentRef}</td>
@@ -1423,12 +1422,13 @@
         </div>
       `).join('');
 
-      rendervendedoreselectOptions();
+      renderSellerSelectOptions();
       calculateCartTotal();
     }
 
-    function rendervendedoreselectOptions() {
-      const select = document.getElementById('cartvendedoreselect');
+    function renderSellerSelectOptions() {
+      const select = document.getElementById('cartSellerSelect');
+      if (!select) return;
       select.innerHTML = `<option value="">Venta Directa en Línea</option>` + 
         vendedores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
     }
@@ -1469,15 +1469,13 @@
 
       const subtotalUSD = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
       const subtotalBs = bcvRate > 0 ? (subtotalUSD * bcvRate).toFixed(2) : '0.00';
-      const sellerId = document.getElementById('cartvendedoreselect').value;
+      const sellerId = document.getElementById('cartSellerSelect').value;
       const seller = vendedores.find(s => s.id === sellerId);
       const commissionAmount = seller ? (subtotalUSD * seller.commission) / 100 : 0;
 
       const now = new Date();
-      const newOrderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
 
       const dbOrder = {
-        id: newOrderId,
         date: now.toLocaleString('es-VE'),
         iso_date: now.toISOString().slice(0, 10),
         customer_name: customerName,
@@ -1491,18 +1489,20 @@
       };
 
       // Registrar Orden
-      const { error: ordError } = await _supabase.from('ordenes').insert([dbOrder]);
+      const { data: createdOrder, error: ordError } = await _supabase.from('ordenes').insert([dbOrder]).select();
 
       if (ordError) {
         alert("Error al procesar la orden en Supabase: " + ordError.message);
         return;
       }
 
+      const newOrderId = createdOrder && createdOrder[0] ? createdOrder[0].id : 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+
       // Restar Stock
       for (const cartItem of cart) {
         const prod = productos.find(p => p.id === cartItem.id);
         if (prod) {
-          const newStock = prod.stock - cartItem.qty;
+          const newStock = Math.max(0, prod.stock - cartItem.qty);
           await _supabase.from('productos').update({ stock: newStock }).eq('id', prod.id);
         }
       }
@@ -1515,7 +1515,7 @@
         `📅 *Fecha:* ${now.toLocaleString('es-VE')}\n` +
         `👤 *Cliente:* ${customerName}\n` +
         `👩‍💼 *Vendedor:* ${seller ? seller.name : 'Venta Directa'}\n\n` +
-        `📦 *productos:*\n${itemsListText}\n\n` +
+        `📦 *Productos:*\n${itemsListText}\n\n` +
         `💵 *TOTAL USD:* $${subtotalUSD.toFixed(2)}\n` +
         `🇻🇪 *TOTAL BS (Tasa BCV ${bcvRate.toFixed(2)}):* Bs. ${subtotalBs}\n\n` +
         `💳 *DATOS DE PAGO MÓVIL:*\n` +
@@ -1542,7 +1542,7 @@
       window.open(whatsappUrl, '_blank');
     }
 
-    // Inicialización al Cargar la página
+    // Inicialización al cargar la página
     fetchBcvRate();
     renderCategoryFilters();
     loadData();
