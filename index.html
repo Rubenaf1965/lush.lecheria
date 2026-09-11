@@ -971,26 +971,26 @@
             // Insertar o actualizar en Supabase
             if (importedData.productos.length) {
               const formattedProds = importedData.productos.map(p => ({
-                id: p.id, title: p.title, category: p.category, price: p.price, stock: p.stock, image: p.image
+                title: p.title, category: p.category, price: p.price, stock: p.stock, image: p.image
               }));
-              await _supabase.from('productos').upsert(formattedProds);
+              await _supabase.from('productos').insert(formattedProds);
             }
 
             if (importedData.vendedores.length) {
               const formattedvendedores = importedData.vendedores.map(s => ({
-                id: s.id, name: s.name, commission: s.commission, phone: s.phone
+                name: s.name, commission: s.commission, phone: s.phone
               }));
-              await _supabase.from('vendedores').upsert(formattedvendedores);
+              await _supabase.from('vendedores').insert(formattedvendedores);
             }
 
             if (importedData.ordenes.length) {
               const formattedordenes = importedData.ordenes.map(o => ({
-                id: o.id, date: o.date, iso_date: o.isoDate, customer_name: o.customerName,
+                date: o.date, iso_date: o.isoDate, customer_name: o.customerName,
                 items: JSON.stringify(o.items), total: o.total, payment_ref: o.paymentRef,
                 delivery_address: o.deliveryAddress, seller_id: o.sellerId, seller_name: o.sellerName,
                 commission_amount: o.commissionAmount
               }));
-              await _supabase.from('ordenes').upsert(formattedordenes);
+              await _supabase.from('ordenes').insert(formattedordenes);
             }
 
             await loadData();
