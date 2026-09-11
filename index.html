@@ -1,0 +1,1551 @@
+<<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lush Maquillaje | Accesorios | Ropa | Tienda Virtual & Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            lushBg: '#FAF9F6',
+            lushRose: '#F7EBE8',
+            lushGold: '#D4AF37',
+            lushDark: '#1A1A1A',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #FAF9F6; color: #1A1A1A; font-family: system-ui, -apple-system, sans-serif; }
+    @media print {
+      body * { visibility: hidden; }
+      #printArea, #printArea *, #inventoryReportArea, #inventoryReportArea *, #monthlyClosureReportArea, #monthlyClosureReportArea * { visibility: visible; }
+      #printArea, #inventoryReportArea, #monthlyClosureReportArea { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- BARRA SUPERIOR DE CONTACTO Y TASA BCV -->
+  <div class="bg-lushDark text-white text-xs py-2 px-4 no-print border-b border-gray-800">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-4">
+        <a href="https://wa.me/584148957830" target="_blank" class="flex items-center gap-1.5 hover:text-lushGold transition">
+          <span>📞</span>
+          <span>+58 414-8957830</span>
+        </a>
+        <div class="flex items-center gap-1.5 bg-gray-800/80 px-2.5 py-1 rounded-full border border-gray-700">
+          <span class="text-[11px] uppercase tracking-wider text-gray-400 font-semibold">BCV:</span>
+          <span id="bcvRateDisplay" class="font-mono font-bold text-emerald-400 text-xs">Cargando...</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://www.instagram.com/lush.lecheria" target="_blank" class="flex items-center gap-1.5 hover:text-lushGold transition">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+          <span>@lush.lecheria</span>
+        </a>
+        <a href="https://www.facebook.com" target="_blank" class="flex items-center gap-1.5 hover:text-lushGold transition">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.5 5H18V0h-3.808C10.592 0 9 1.583 9 4.615V8z"/>
+          </svg>
+          <span>Facebook</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEADER / NAVBAR -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
+      <a href="#" onclick="showSection('shop')" class="flex items-center gap-3">
+        <img src="LUSH logo.png" alt="Lush Maquillaje | Accesorios | Ropa" class="h-16 w-16 md:h-20 md:w-20 object-cover rounded-full border border-gray-200 transition-all shadow-sm">
+        <div class="leading-none">
+          <span class="text-xl md:text-2xl font-light tracking-widest text-lushDark uppercase block">LUSH</span>
+          <span class="text-[10px] md:text-xs text-lushGold font-semibold tracking-wider uppercase block">Maquillaje | Accesorios | Ropa</span>
+        </div>
+      </a>
+      
+      <div class="hidden md:flex flex-1 max-w-md mx-8">
+        <input 
+          id="searchInput"
+          type="text" 
+          oninput="renderProducts()"
+          placeholder="Buscar accesorios, joyas..." 
+          class="w-full bg-lushBg border border-gray-200 rounded-full px-5 py-2 text-sm focus:outline-none focus:border-lushGold transition"
+        >
+      </div>
+
+      <div class="flex items-center gap-4">
+        <button onclick="openAdminModal()" class="text-xs uppercase tracking-wider font-semibold text-gray-500 hover:text-lushGold transition border border-gray-200 px-3 py-1.5 rounded-full">
+          🔒 Panel Admin
+        </button>
+        <button onclick="toggleCartModal()" class="relative bg-lushDark text-white px-5 py-2 rounded-full text-sm hover:bg-black transition flex items-center gap-2">
+          <span>Carrito</span>
+          <span id="cartCount" class="bg-lushGold text-lushDark text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- SECCIÓN TIENDA PÚBLICA -->
+  <main id="shopSection" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full no-print">
+    <section class="bg-lushRose rounded-3xl p-8 md:p-12 mb-12 flex flex-col md:flex-row items-center justify-between">
+      <div class="max-w-lg mb-6 md:mb-0">
+        <span class="text-xs uppercase tracking-widest text-lushGold font-bold">Nueva Colección</span>
+        <h1 class="text-4xl md:text-5xl font-light text-lushDark mt-2 mb-4">Elegancia y brillo minimalista.</h1>
+        <p class="text-gray-600 text-sm mb-6">Encuentra la mejor selección de joyería boutique, prendas y accesorios finos en Lechería.</p>
+        <a href="#catalogo" class="inline-block bg-lushDark text-white px-8 py-3 rounded-full text-sm uppercase tracking-wider hover:bg-lushGold transition">Explorar Tienda</a>
+      </div>
+      <div class="w-full md:w-1/3 aspect-square rounded-2xl overflow-hidden shadow-lg border-2 border-white">
+        <img src="LUSH logo.png" alt="Lush Banner" class="w-full h-full object-cover">
+      </div>
+    </section>
+
+    <section id="catalogo" class="mb-8 flex items-center justify-between border-b border-gray-200 pb-4">
+      <div class="flex gap-2 overflow-x-auto" id="categoryFilters"></div>
+    </section>
+
+    <section id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></section>
+  </main>
+
+  <!-- SECCIÓN PANEL ADMINISTRATIVO COMPLETO -->
+  <section id="adminSection" class="hidden flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-10 no-print">
+    <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b gap-4">
+      <div>
+        <h2 class="text-3xl font-light text-lushDark">Panel de Control & Comisiones</h2>
+        <p class="text-xs text-gray-500">Gestión integral de inventario, vendedores, respaldos locales y reportes (Sincronizado con Supabase)</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="exportDataToJSON()" class="bg-emerald-600 text-white font-bold px-3 py-2 rounded-lg text-xs hover:bg-emerald-700 transition flex items-center gap-1 shadow-sm">
+          💾 Descargar Respaldo JSON
+        </button>
+        <label class="bg-blue-600 text-white font-bold px-3 py-2 rounded-lg text-xs hover:bg-blue-700 transition cursor-pointer flex items-center gap-1 shadow-sm">
+          📂 Cargar Respaldo JSON
+          <input type="file" id="importFileInput" onchange="importDataFromJSON(event)" class="hidden" accept=".json">
+        </label>
+        <button onclick="generateDemandReport()" class="bg-lushGold text-lushDark font-bold px-3 py-2 rounded-lg text-xs hover:bg-yellow-500 transition flex items-center gap-1 shadow-sm">
+          📄 Reporte Demanda
+        </button>
+        <button onclick="showSection('shop')" class="bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-xs font-medium hover:bg-gray-300">
+          ← Tienda
+        </button>
+      </div>
+    </div>
+
+    <!-- TARJETAS DE MÉTRICAS GENERALES -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Ventas Totales</p>
+        <p id="metricTotalSales" class="text-3xl font-bold text-lushDark mt-2">$0.00</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Comisiones Totales a Pagar</p>
+        <p id="metricTotalCommissions" class="text-3xl font-bold text-lushGold mt-2">$0.00</p>
+      </div>
+      <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Órdenes Procesadas</p>
+        <p id="metricTotalOrders" class="text-3xl font-bold text-emerald-600 mt-2">0</p>
+      </div>
+    </div>
+
+    <!-- MÓDULOS DE REGISTRO -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <h3 class="text-lg font-semibold text-lushDark mb-4 flex items-center gap-2">
+          <span>🛍️</span> Registrar Producto Nuevo
+        </h3>
+        <form id="addProductForm" onsubmit="handleAddProduct(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre del Producto</label>
+            <input type="text" id="prodTitle" required placeholder="Ej. Anillo Solitario Baño Oro" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Categoría</label>
+              <select id="prodCategory" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+                <option value="prendas-accesorios">Prendas & Accesorios</option>
+                <option value="ropa">Ropa</option>
+                <option value="cosmeticos">Cosméticos</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Precio ($ USD)</label>
+              <input type="number" step="0.01" id="prodPrice" required placeholder="0.00" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Stock Inicial</label>
+              <input type="number" id="prodStock" required placeholder="10" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Imagen (JPG / PNG desde PC)</label>
+              <input type="file" id="prodImageFile" accept="image/*" required class="w-full p-1.5 border rounded-lg text-xs bg-white focus:outline-none focus:border-lushGold">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-lushDark text-white py-2.5 rounded-lg text-sm font-medium hover:bg-lushGold hover:text-lushDark transition">
+            Guardar en Supabase
+          </button>
+        </form>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <h3 class="text-lg font-semibold text-lushDark mb-4 flex items-center gap-2">
+          <span>👥</span> Vendedores y Porcentajes
+        </h3>
+        <form id="addSellerForm" onsubmit="handleAddSeller(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre Completo del Vendedor</label>
+            <input type="text" id="sellerName" required placeholder="Ej. Ana Mendoza" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">% Comisión por Venta</label>
+              <input type="number" step="0.1" id="sellerCommission" required placeholder="5.0" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-gray-600 mb-1">Teléfono</label>
+              <input type="text" id="sellerPhone" placeholder="0414-0000000" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-lushDark text-white py-2.5 rounded-lg text-sm font-medium hover:bg-lushGold hover:text-lushDark transition">
+            Registrar Vendedor
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- TABLA DE CONTROL DE INVENTARIO -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <h3 class="text-lg font-semibold text-lushDark">📦 Control de Inventario y Actualización de Stock/Precio</h3>
+        <div class="flex gap-2">
+          <button onclick="mostrarDesgloseInventario()" class="bg-blue-600 text-white font-bold px-3 py-2 rounded-lg text-xs hover:bg-blue-700 transition flex items-center gap-1 shadow-sm">
+            📋 Desglose en Pantalla
+          </button>
+          <button onclick="imprimirInventarioDirecto()" class="bg-gray-800 text-white font-bold px-3 py-2 rounded-lg text-xs hover:bg-black transition flex items-center gap-1 shadow-sm">
+            🖨️ Imprimir Stock y Faltantes
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-gray-50 border-b text-xs uppercase text-gray-500">
+            <tr>
+              <th class="p-3">Producto</th>
+              <th class="p-3">Categoría</th>
+              <th class="p-3">Precio Actual</th>
+              <th class="p-3">Stock Disponible</th>
+              <th class="p-3 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONTROL DE VENTAS Y COMISIONES POR VENDEDOR -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <h3 class="text-lg font-semibold text-lushDark mb-4">📊 Control de Ventas y Comisiones por Vendedor</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-gray-50 border-b text-xs uppercase text-gray-500">
+            <tr>
+              <th class="p-3">Vendedor</th>
+              <th class="p-3">% Comisión</th>
+              <th class="p-3">Órdenes Generadas</th>
+              <th class="p-3">Monto Total Vendido</th>
+              <th class="p-3 font-bold text-lushGold">Comisión Acumulada ($)</th>
+              <th class="p-3 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="sellerCommissionsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- HISTORIAL DE ÓRDENES -->
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <h3 class="text-lg font-semibold text-lushDark">🛒 Historial de Órdenes, Compradores y Delivery</h3>
+        <button onclick="openMonthlyClosureModal()" class="bg-purple-700 text-white font-bold px-4 py-2 rounded-lg text-xs hover:bg-purple-800 transition flex items-center gap-1 shadow-sm">
+          📅 Cierre Mensual
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="bg-gray-50 border-b text-xs uppercase text-gray-500">
+            <tr>
+              <th class="p-3">ID / Fecha</th>
+              <th class="p-3">Comprador</th>
+              <th class="p-3">Productos & Cantidad</th>
+              <th class="p-3">Ref. Pago Móvil</th>
+              <th class="p-3">Dirección Delivery</th>
+              <th class="p-3">Vendedor</th>
+              <th class="p-3">Total Orden</th>
+              <th class="p-3">Comisión</th>
+              <th class="p-3 text-right">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="ordersHistoryTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODAL: CIERRE MENSUAL DE VENTAS -->
+  <div id="monthlyClosureModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="monthlyClosureReportArea" class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
+      <div class="flex items-center justify-between border-b pb-4">
+        <div class="flex items-center gap-3">
+          <img src="LUSH logo.png" class="h-12 w-12 rounded-full border" alt="Lush Logo">
+          <div>
+            <h2 class="text-xl font-bold text-lushDark uppercase">Lush Fine Jewelry</h2>
+            <p class="text-xs text-gray-500">Reporte de Cierre Mensual de Ventas</p>
+          </div>
+        </div>
+        <div class="text-right text-xs text-gray-400">
+          <p id="closureReportGeneratedAt"></p>
+        </div>
+      </div>
+
+      <div class="bg-purple-50 p-4 rounded-xl border border-purple-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
+        <div class="flex items-center gap-3">
+          <label class="text-xs font-bold text-purple-900 uppercase">Seleccionar Período:</label>
+          <input type="month" id="closureMonthPicker" onchange="generateMonthlyClosureReport()" class="bg-white border border-purple-200 rounded-lg p-2 text-sm text-purple-900 font-semibold focus:outline-none focus:border-purple-500">
+        </div>
+        <span class="text-xs text-purple-700">Filtra automáticamente las órdenes registradas en ese mes.</span>
+      </div>
+
+      <div class="text-center py-2">
+        <h3 id="closurePeriodTitle" class="text-2xl font-light text-lushDark uppercase tracking-widest border-b pb-2">Cierre de Mes</h3>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-gray-50 p-4 rounded-xl border text-center">
+          <p class="text-[11px] font-bold uppercase text-gray-400">Total Ingresos Mes</p>
+          <p id="closureTotalSales" class="text-2xl font-bold text-lushDark mt-1">$0.00</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-xl border text-center">
+          <p class="text-[11px] font-bold uppercase text-gray-400">Total Comisiones Mes</p>
+          <p id="closureTotalCommissions" class="text-2xl font-bold text-lushGold mt-1">$0.00</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-xl border text-center">
+          <p class="text-[11px] font-bold uppercase text-gray-400">Órdenes / Unidades</p>
+          <p id="closureTotalOrdersUnits" class="text-2xl font-bold text-purple-800 mt-1">0 / 0</p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="text-xs font-bold text-lushDark uppercase tracking-wider">Desglose de Ventas y Comisiones por Vendedor</h4>
+        <table class="w-full text-left text-sm border-collapse">
+          <thead>
+            <tr class="bg-gray-100 border-b text-xs uppercase text-gray-600">
+              <th class="p-2.5">Vendedor</th>
+              <th class="p-2.5 text-center">Órdenes Atendidas</th>
+              <th class="p-2.5 text-right">Monto Vendido ($)</th>
+              <th class="p-2.5 text-right">Comisión a Pagar ($)</th>
+            </tr>
+          </thead>
+          <tbody id="closureSellersTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <h4 class="text-xs font-bold text-lushDark uppercase tracking-wider">Detalle de Órdenes del Período</h4>
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-gray-100 border-b uppercase text-gray-600">
+              <th class="p-2">ID / Fecha</th>
+              <th class="p-2">Cliente</th>
+              <th class="p-2">Vendedor</th>
+              <th class="p-2">Ref. Pago</th>
+              <th class="p-2 text-right">Monto ($)</th>
+              <th class="p-2 text-right">Comisión ($)</th>
+            </tr>
+          </thead>
+          <tbody id="closureOrdersTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-between items-center pt-4 border-t no-print">
+        <button onclick="closeMonthlyClosureModal()" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg text-sm font-medium">Cerrar</button>
+        <button onclick="window.print()" class="bg-purple-800 text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-black transition flex items-center gap-2">
+          <span>🖨️</span> Imprimir Cierre Mensual / PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DESGLOSE Y REPORTES DE INVENTARIO -->
+  <div id="inventoryReportModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="inventoryReportArea" class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
+      <div class="flex items-center justify-between border-b pb-4">
+        <div class="flex items-center gap-3">
+          <img src="LUSH logo.png" class="h-12 w-12 rounded-full border" alt="Lush Logo">
+          <div>
+            <h2 class="text-xl font-bold text-lushDark uppercase">Lush Fine Jewelry</h2>
+            <p class="text-xs text-gray-500">Desglose de Inventario: Stock Disponible y Faltantes</p>
+          </div>
+        </div>
+        <div class="text-right text-xs text-gray-400">
+          <p id="inventoryReportTimestamp"></p>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="text-sm font-bold text-emerald-700 bg-emerald-50 p-2.5 rounded-lg border border-emerald-100 flex items-center gap-2">
+          <span>✅</span> Productos Disponibles en Stock
+        </h3>
+        <table class="w-full text-left text-sm border-collapse">
+          <thead>
+            <tr class="bg-gray-100 border-b text-xs uppercase text-gray-600">
+              <th class="p-2.5">Producto</th>
+              <th class="p-2.5">Categoría</th>
+              <th class="p-2.5 text-center">Precio Unitario</th>
+              <th class="p-2.5 text-right">Stock Disponible</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryStockTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="space-y-2 pt-2">
+        <h3 class="text-sm font-bold text-red-700 bg-red-50 p-2.5 rounded-lg border border-red-100 flex items-center gap-2">
+          <span>⚠️</span> Productos Faltantes / Agotados (Reorden Requerido)
+        </h3>
+        <table class="w-full text-left text-sm border-collapse">
+          <thead>
+            <tr class="bg-gray-100 border-b text-xs uppercase text-gray-600">
+              <th class="p-2.5">Producto</th>
+              <th class="p-2.5">Categoría</th>
+              <th class="p-2.5 text-center">Precio Unitario</th>
+              <th class="p-2.5 text-right">Stock Actual</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryMissingTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-between items-center pt-4 border-t no-print">
+        <button onclick="closeInventoryReportModal()" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg text-sm font-medium">Cerrar</button>
+        <button onclick="window.print()" class="bg-lushDark text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-lushGold hover:text-lushDark transition flex items-center gap-2">
+          <span>🖨️</span> Imprimir Reporte / PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ACTUALIZAR PRODUCTO EXISTENTE -->
+  <div id="updateProductModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+      <h3 class="text-xl font-bold text-lushDark" id="updateModalTitle">Añadir Stock / Modificar Precio</h3>
+      
+      <form onsubmit="handleSaveProductUpdate(event)" class="space-y-4">
+        <input type="hidden" id="updateProdId">
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Precio Unitario ($ USD)</label>
+          <input type="number" step="0.01" id="updateProdPrice" required class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Añadir Unidades al Stock Existente (+)</label>
+          <input type="number" id="updateProdStockAdd" value="0" min="0" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+          <p class="text-[11px] text-gray-400 mt-1">Coloque la cantidad de inventario nuevo que desea ingresar al stock actual.</p>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="button" onclick="closeUpdateProductModal()" class="w-1/2 bg-gray-100 text-gray-700 py-2.5 rounded-lg text-sm font-medium">Cancelar</button>
+          <button type="submit" class="w-1/2 bg-lushDark text-white py-2.5 rounded-lg text-sm font-medium hover:bg-lushGold hover:text-lushDark transition">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL / AREA IMPRESIÓN: REPORTE DE DEMANDA -->
+  <div id="demandReportModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="printArea" class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
+      <div class="flex items-center justify-between border-b pb-4">
+        <div class="flex items-center gap-3">
+          <img src="LUSH logo.png" class="h-12 w-12 rounded-full border" alt="Lush Logo">
+          <div>
+            <h2 class="text-xl font-bold text-lushDark uppercase">Lush Fine Jewelry</h2>
+            <p class="text-xs text-gray-500">Reporte de Demanda y Productos Más Vendidos</p>
+          </div>
+        </div>
+        <div class="text-right text-xs text-gray-400">
+          <p id="reportTimestamp"></p>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-bold text-lushDark mb-3 uppercase tracking-wider">Desglose de Productos Vendidos</h3>
+        <table class="w-full text-left text-sm border-collapse">
+          <thead>
+            <tr class="bg-gray-100 border-b text-xs uppercase text-gray-600">
+              <th class="p-3">Posición / Demanda</th>
+              <th class="p-3">Producto</th>
+              <th class="p-3 text-center">Unidades Vendidas</th>
+              <th class="p-3 text-right">Ingreso Generado ($)</th>
+            </tr>
+          </thead>
+          <tbody id="demandReportTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="flex justify-between items-center pt-4 border-t no-print">
+        <button onclick="closeDemandReportModal()" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg text-sm font-medium">Cerrar</button>
+        <button onclick="window.print()" class="bg-lushDark text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-lushGold hover:text-lushDark transition flex items-center gap-2">
+          <span>🖨️</span> Imprimir Reporte / Exportar PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL AUTENTICACIÓN ADMIN -->
+  <div id="authModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+      <h3 class="text-xl font-bold text-lushDark mb-2">Acceso Administrativo</h3>
+      <p class="text-xs text-gray-500 mb-4">Ingresa la clave para acceder al panel.</p>
+      
+      <form onsubmit="verifyAdminPassword(event)" class="space-y-4">
+        <div>
+          <input type="password" id="adminPasswordInput" placeholder="Clave de acceso" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+          <p id="authError" class="text-xs text-red-500 mt-1 hidden">Clave incorrecta.</p>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" onclick="closeAdminModal()" class="w-1/2 bg-gray-100 text-gray-700 py-2 rounded-lg text-sm">Cancelar</button>
+          <button type="submit" class="w-1/2 bg-lushDark text-white py-2 rounded-lg text-sm hover:bg-lushGold hover:text-lushDark transition">Ingresar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CARRITO & PAGO MÓVIL -->
+  <div id="cartModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex justify-end no-print">
+    <div class="bg-white w-full max-w-md h-full p-6 flex flex-col justify-between overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b">
+          <h3 class="text-xl font-semibold text-lushDark">Carrito de Compras</h3>
+          <button onclick="toggleCartModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+        </div>
+
+        <div id="cartItemsList" class="py-4 space-y-4"></div>
+      </div>
+
+      <div class="border-t pt-4 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 mb-1">Vendedor Atendió (Opcional):</label>
+          <select id="cartSellerSelect" onchange="calculateCartTotal()" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+            <option value="">Venta Directa en Línea</option>
+          </select>
+        </div>
+
+        <div class="bg-rose-50/60 p-3.5 rounded-xl border border-rose-100 space-y-1 text-xs text-gray-700">
+          <p class="font-bold text-lushDark mb-1 border-b border-rose-200/60 pb-1">💳 Datos de Pago Móvil</p>
+          <p><strong>Banco:</strong> Bancamiga</p>
+          <p><strong>Teléfono:</strong> 04148957830</p>
+          <p><strong>CI / RIF:</strong> 16845600</p>
+        </div>
+
+        <div class="space-y-2">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-0.5">Nombre del Comprador *</label>
+            <input type="text" id="customerNameInput" required placeholder="Ej. Antonio Abinazar" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-0.5">Nro. Referencia de Pago Móvil *</label>
+            <input type="text" id="paymentRefInput" required placeholder="Ej. 123456" class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 mb-0.5">Dirección de Delivery *</label>
+            <input type="text" id="deliveryAddressInput" required placeholder="Ej. Av. Principal de Lechería, Edif..." class="w-full p-2 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
+          </div>
+        </div>
+
+        <div class="flex justify-between text-base font-bold bg-lushBg p-3 rounded-xl">
+          <span>Total a pagar:</span>
+          <div class="text-right">
+            <div id="cartTotal" class="text-lushDark">$0.00</div>
+            <div id="cartTotalBs" class="text-xs font-normal text-gray-500">Bs. 0,00</div>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <button onclick="cancelOrder()" class="w-1/3 bg-red-50 text-red-600 py-3 rounded-full uppercase tracking-wider text-xs font-bold hover:bg-red-600 hover:text-white transition text-center">
+            Cancelar
+          </button>
+          <button onclick="checkoutOrder()" class="w-2/3 bg-lushDark text-white py-3 rounded-full uppercase tracking-wider text-xs font-bold hover:bg-lushGold hover:text-lushDark transition flex items-center justify-center gap-2">
+            <span>📱</span> Confirmar por WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-gray-100 py-10 mt-auto no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+      <div>
+        <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
+          <img src="LUSH logo.png" alt="Lush" class="h-10 w-10 rounded-full object-cover border">
+          <span class="text-lg font-light tracking-widest text-lushDark uppercase">LUSH <span class="text-xs text-lushGold font-semibold block">Maquillaje | Accesorios | Ropa</span></span>
+        </div>
+        <p class="text-xs text-gray-500">Joyería fina, accesorios y moda boutique en Lechería, Estado Anzoátegui, Venezuela.</p>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-bold uppercase tracking-wider text-lushDark mb-3">Contacto Directo</h4>
+        <ul class="space-y-2 text-xs text-gray-600">
+          <li>
+            <a href="https://wa.me/584148957830" target="_blank" class="hover:text-lushGold transition flex items-center justify-center md:justify-start gap-2">
+              <span>📱</span> <span>WhatsApp / Teléfono: +58 414-8957830</span>
+            </a>
+          </li>
+          <li>📍 Lechería, Estado Anzoátegui, Venezuela</li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-bold uppercase tracking-wider text-lushDark mb-3">Síguenos</h4>
+        <div class="flex items-center justify-center md:justify-start gap-3 text-xs">
+          <a href="https://www.instagram.com/lush.lecheria" target="_blank" class="bg-lushBg border border-gray-200 px-3.5 py-2 rounded-full hover:border-pink-500 hover:text-pink-600 transition flex items-center gap-2 text-gray-700 shadow-sm group">
+            <svg class="w-4 h-4 transition group-hover:scale-110" viewBox="0 0 24 24">
+              <radialGradient id="rg" r="150%" cx="30%" cy="107%">
+                <stop stop-color="#fdf497" offset="0" />
+                <stop stop-color="#fdf497" offset="0.05" />
+                <stop stop-color="#fd5949" offset="0.45" />
+                <stop stop-color="#d6249f" offset="0.6" />
+                <stop stop-color="#285AEB" offset="0.9" />
+              </radialGradient>
+              <path fill="url(#rg)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            <span class="font-medium">Instagram</span>
+          </a>
+
+          <a href="https://www.facebook.com" target="_blank" class="bg-lushBg border border-gray-200 px-3.5 py-2 rounded-full hover:border-blue-600 hover:text-blue-600 transition flex items-center gap-2 text-gray-700 shadow-sm group">
+            <svg class="w-4 h-4 fill-[#1877F2] transition group-hover:scale-110" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            <span class="font-medium">Facebook</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-400 mt-8 pt-6 border-t border-gray-100">
+      <p>© 2026 Ruben Abinazar F. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT LOGIC JAVASCRIPT CON SUPABASE INTEGRADO -->
+  <script>
+    // CONFIGURACIÓN DE SUPABASE
+    const SUPABASE_URL = "https://cwmehnvcnqxtyllkeejw.supabase.co"; // Reemplazar con tu URL de Supabase
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3bWVobnZjbnF4dHlsbGtlZWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMTg4MjEsImV4cCI6MjEwNDY5NDgyMX0.ln0qABX3k3lpipN_TW97FOqSbYhNwczZg6uU1cjaZMk";        // Reemplazar con tu Anon Key
+
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const ADMIN_PASSWORD = "lush1109";
+    const STORE_WHATSAPP = "584148957830";
+
+    let bcvRate = parseFloat(localStorage.getItem('lush_bcv_rate')) || 0;
+
+    let products = [];
+    let sellers = [];
+    let orders = [];
+
+    let cart = [];
+    let selectedCategory = 'all';
+
+    // CARGA DE DATOS DESDE SUPABASE
+    async function loadData() {
+      try {
+        const [prodRes, sellRes, ordRes] = await Promise.all([
+          _supabase.from('products').select('*'),
+          _supabase.from('sellers').select('*'),
+          _supabase.from('orders').select('*').order('created_at', { ascending: false })
+        ]);
+
+        if (prodRes.error) console.error('Error productos Supabase:', prodRes.error);
+        else products = prodRes.data.map(p => ({
+          id: p.id,
+          title: p.title,
+          category: p.category,
+          price: parseFloat(p.price),
+          stock: parseInt(p.stock),
+          image: p.image
+        }));
+
+        if (sellRes.error) console.error('Error vendedores Supabase:', sellRes.error);
+        else sellers = sellRes.data.map(s => ({
+          id: s.id,
+          name: s.name,
+          commission: parseFloat(s.commission),
+          phone: s.phone
+        }));
+
+        if (ordRes.error) console.error('Error órdenes Supabase:', ordRes.error);
+        else orders = ordRes.data.map(o => ({
+          id: o.id,
+          date: o.date,
+          isoDate: o.iso_date,
+          customerName: o.customer_name,
+          items: typeof o.items === 'string' ? JSON.parse(o.items) : o.items,
+          total: parseFloat(o.total),
+          paymentRef: o.payment_ref,
+          deliveryAddress: o.delivery_address,
+          sellerId: o.seller_id,
+          sellerName: o.seller_name,
+          commissionAmount: parseFloat(o.commission_amount)
+        }));
+
+        renderProducts();
+        renderAdminDashboard();
+        renderSellerSelectOptions();
+      } catch (err) {
+        console.error("Error al cargar desde Supabase:", err);
+      }
+    }
+
+    // TASA BCV DIARIA
+    async function fetchBcvRate() {
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const cachedDate = localStorage.getItem('lush_bcv_date');
+      const cachedRate = localStorage.getItem('lush_bcv_rate');
+
+      if (cachedDate === todayStr && cachedRate) {
+        bcvRate = parseFloat(cachedRate);
+        updateBcvDisplay();
+        return;
+      }
+
+      try {
+        const response = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
+        const data = await response.json();
+        
+        if (data && data.promedio) {
+          bcvRate = parseFloat(data.promedio);
+          localStorage.setItem('lush_bcv_rate', bcvRate);
+          localStorage.setItem('lush_bcv_date', todayStr);
+          updateBcvDisplay();
+        } else {
+          throw new Error('Formato inválido');
+        }
+      } catch (error) {
+        console.warn('Uso de tasa por defecto / cache:', error);
+        bcvRate = cachedRate ? parseFloat(cachedRate) : 36.50;
+        updateBcvDisplay();
+      }
+    }
+
+    function updateBcvDisplay() {
+      const el = document.getElementById('bcvRateDisplay');
+      if (el) el.innerText = `Bs. ${bcvRate.toFixed(2)}`;
+      renderProducts();
+      calculateCartTotal();
+    }
+
+    // ELIMINAR ÓRDEN EN SUPABASE
+    async function deleteOrder(orderId) {
+      const orderIndex = orders.findIndex(o => o.id === orderId);
+      if (orderIndex === -1) return;
+
+      const order = orders[orderIndex];
+      const restoreStock = confirm(
+        `¿Desea eliminar la orden #${order.id}?\n\n` +
+        `• 'Aceptar': Elimina la orden y RESTAURA el stock.\n` +
+        `• 'Cancelar': Cancela la acción.`
+      );
+
+      if (restoreStock) {
+        // Restaurar stock en Supabase
+        for (const item of order.items) {
+          const prod = products.find(p => p.id === item.id);
+          if (prod) {
+            const newStock = prod.stock + item.qty;
+            await _supabase.from('products').update({ stock: newStock }).eq('id', prod.id);
+          }
+        }
+
+        const { error } = await _supabase.from('orders').delete().eq('id', orderId);
+        if (error) {
+          alert("Error al borrar la orden en Supabase: " + error.message);
+          return;
+        }
+
+        await loadData();
+        alert(`La orden #${orderId} ha sido eliminada y el stock devuelto.`);
+      }
+    }
+
+    // CIERRE MENSUAL
+    function openMonthlyClosureModal() {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+      
+      document.getElementById('closureMonthPicker').value = `${currentYear}-${currentMonth}`;
+      generateMonthlyClosureReport();
+      document.getElementById('monthlyClosureModal').classList.remove('hidden');
+    }
+
+    function closeMonthlyClosureModal() {
+      document.getElementById('monthlyClosureModal').classList.add('hidden');
+    }
+
+    function generateMonthlyClosureReport() {
+      const selectedYearMonth = document.getElementById('closureMonthPicker').value;
+      if (!selectedYearMonth) return;
+
+      const [year, month] = selectedYearMonth.split('-');
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const monthLabel = `${monthNames[parseInt(month, 10) - 1]} ${year}`;
+
+      document.getElementById('closurePeriodTitle').innerText = `Cierre de Mes: ${monthLabel}`;
+      document.getElementById('closureReportGeneratedAt').innerText = `Generado el: ${new Date().toLocaleString('es-VE')}`;
+
+      const filteredOrders = orders.filter(o => {
+        if (!o.isoDate) {
+          const parts = o.date ? o.date.split('/') : [];
+          if (parts.length >= 3) {
+            const day = parts[0].padStart(2, '0');
+            const m = parts[1].padStart(2, '0');
+            const y = parts[2].substring(0, 4);
+            return `${y}-${m}` === selectedYearMonth;
+          }
+          return false;
+        }
+        return o.isoDate.startsWith(selectedYearMonth);
+      });
+
+      const totalSales = filteredOrders.reduce((acc, o) => acc + o.total, 0);
+      const totalCommissions = filteredOrders.reduce((acc, o) => acc + o.commissionAmount, 0);
+      const totalUnits = filteredOrders.reduce((acc, o) => acc + o.items.reduce((sum, item) => sum + item.qty, 0), 0);
+
+      document.getElementById('closureTotalSales').innerText = `$${totalSales.toFixed(2)}`;
+      document.getElementById('closureTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
+      document.getElementById('closureTotalOrdersUnits').innerText = `${filteredOrders.length} órds. / ${totalUnits} unids.`;
+
+      const sellersMap = {};
+      sellers.forEach(s => {
+        sellersMap[s.id] = { name: s.name, count: 0, totalSales: 0, totalCommission: 0 };
+      });
+      sellersMap['direct'] = { name: 'Venta Directa', count: 0, totalSales: 0, totalCommission: 0 };
+
+      filteredOrders.forEach(o => {
+        const key = o.sellerId || 'direct';
+        if (!sellersMap[key]) {
+          sellersMap[key] = { name: o.sellerName || 'Vendedor Desconocido', count: 0, totalSales: 0, totalCommission: 0 };
+        }
+        sellersMap[key].count += 1;
+        sellersMap[key].totalSales += o.total;
+        sellersMap[key].totalCommission += o.commissionAmount;
+      });
+
+      const closureSellersBody = document.getElementById('closureSellersTableBody');
+      const activeSellers = Object.values(sellersMap).filter(s => s.count > 0);
+
+      if (activeSellers.length === 0) {
+        closureSellersBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin actividad de vendedores en este mes.</td></tr>`;
+      } else {
+        closureSellersBody.innerHTML = activeSellers.map(s => `
+          <tr class="border-b">
+            <td class="p-2.5 font-semibold text-lushDark">${s.name}</td>
+            <td class="p-2.5 text-center">${s.count} pedido(s)</td>
+            <td class="p-2.5 text-right font-medium">$${s.totalSales.toFixed(2)}</td>
+            <td class="p-2.5 text-right font-bold text-lushGold">$${s.totalCommission.toFixed(2)}</td>
+          </tr>
+        `).join('');
+      }
+
+      const closureOrdersBody = document.getElementById('closureOrdersTableBody');
+      if (filteredOrders.length === 0) {
+        closureOrdersBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No se encontraron órdenes en este período.</td></tr>`;
+      } else {
+        closureOrdersBody.innerHTML = filteredOrders.map(o => `
+          <tr class="border-b">
+            <td class="p-2 font-bold text-lushDark">#${o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
+            <td class="p-2">${o.customerName || 'N/A'}</td>
+            <td class="p-2 text-gray-600">${o.sellerName}</td>
+            <td class="p-2 font-mono text-emerald-700">${o.paymentRef}</td>
+            <td class="p-2 text-right font-bold text-lushDark">$${o.total.toFixed(2)}</td>
+            <td class="p-2 text-right font-bold text-lushGold">$${o.commissionAmount.toFixed(2)}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // REPORTES E IMPRESIÓN DE INVENTARIO
+    function renderInventoryReportData() {
+      document.getElementById('inventoryReportTimestamp').innerText = `Fecha: ${new Date().toLocaleString('es-VE')}`;
+
+      const stockBody = document.getElementById('inventoryStockTableBody');
+      const missingBody = document.getElementById('inventoryMissingTableBody');
+
+      const availableProducts = products.filter(p => p.stock > 0);
+      const missingProducts = products.filter(p => p.stock <= 0);
+
+      if (availableProducts.length === 0) {
+        stockBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos disponibles.</td></tr>`;
+      } else {
+        stockBody.innerHTML = availableProducts.map(p => `
+          <tr class="border-b">
+            <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
+            <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
+            <td class="p-2.5 text-center font-medium">$${p.price.toFixed(2)}</td>
+            <td class="p-2.5 text-right font-bold text-emerald-600">${p.stock} unids.</td>
+          </tr>
+        `).join('');
+      }
+
+      if (missingProducts.length === 0) {
+        missingBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos agotados.</td></tr>`;
+      } else {
+        missingBody.innerHTML = missingProducts.map(p => `
+          <tr class="border-b">
+            <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
+            <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
+            <td class="p-2.5 text-center font-medium">$${p.price.toFixed(2)}</td>
+            <td class="p-2.5 text-right font-bold text-red-600">AGOTADO (0)</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function mostrarDesgloseInventario() {
+      renderInventoryReportData();
+      document.getElementById('inventoryReportModal').classList.remove('hidden');
+    }
+
+    function closeInventoryReportModal() {
+      document.getElementById('inventoryReportModal').classList.add('hidden');
+    }
+
+    function imprimirInventarioDirecto() {
+      renderInventoryReportData();
+      document.getElementById('inventoryReportModal').classList.remove('hidden');
+      window.print();
+    }
+
+    // MANEJO DE ARCHIVOS .JSON (RESPALDO LOCAL / CARGA A SUPABASE)
+    function exportDataToJSON() {
+      const backupData = {
+        products: products,
+        sellers: sellers,
+        orders: orders,
+        exportedAt: new Date().toISOString()
+      };
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `lush_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    async function importDataFromJSON(event) {
+      const fileReader = new FileReader();
+      fileReader.onload = async function(e) {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (importedData.products && importedData.sellers && importedData.orders) {
+            
+            // Insertar o actualizar en Supabase
+            if (importedData.products.length) {
+              const formattedProds = importedData.products.map(p => ({
+                id: p.id, title: p.title, category: p.category, price: p.price, stock: p.stock, image: p.image
+              }));
+              await _supabase.from('products').upsert(formattedProds);
+            }
+
+            if (importedData.sellers.length) {
+              const formattedSellers = importedData.sellers.map(s => ({
+                id: s.id, name: s.name, commission: s.commission, phone: s.phone
+              }));
+              await _supabase.from('sellers').upsert(formattedSellers);
+            }
+
+            if (importedData.orders.length) {
+              const formattedOrders = importedData.orders.map(o => ({
+                id: o.id, date: o.date, iso_date: o.isoDate, customer_name: o.customerName,
+                items: JSON.stringify(o.items), total: o.total, payment_ref: o.paymentRef,
+                delivery_address: o.deliveryAddress, seller_id: o.sellerId, seller_name: o.sellerName,
+                commission_amount: o.commissionAmount
+              }));
+              await _supabase.from('orders').upsert(formattedOrders);
+            }
+
+            await loadData();
+            alert('¡Datos cargados con éxito y sincronizados en Supabase!');
+          } else {
+            alert('El archivo no posee un formato válido.');
+          }
+        } catch (err) {
+          alert('Error al leer e importar el archivo JSON.');
+        }
+      };
+      if (event.target.files[0]) {
+        fileReader.readAsText(event.target.files[0]);
+      }
+    }
+
+    // TIENDA PÚBLICA Y FILTROS
+    function renderCategoryFilters() {
+      const categories = [
+        { name: 'Todos', slug: 'all' },
+        { name: 'Prendas & Accesorios', slug: 'prendas-accesorios' },
+        { name: 'Ropa', slug: 'ropa' },
+        { name: 'Cosméticos', slug: 'cosmeticos' }
+      ];
+
+      const container = document.getElementById('categoryFilters');
+      container.innerHTML = categories.map(cat => `
+        <button 
+          onclick="setFilter('${cat.slug}')"
+          class="px-5 py-2 rounded-full text-sm transition whitespace-nowrap ${selectedCategory === cat.slug ? 'bg-lushDark text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-lushGold'}"
+        >
+          ${cat.name}
+        </button>
+      `).join('');
+    }
+
+    function setFilter(slug) {
+      selectedCategory = slug;
+      renderCategoryFilters();
+      renderProducts();
+    }
+
+    function renderProducts() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const grid = document.getElementById('productsGrid');
+
+      const filtered = products.filter(p => {
+        const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+        const matchesSearch = p.title.toLowerCase().includes(search);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-8">No hay productos disponibles.</p>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => {
+        const isOut = p.stock <= 0;
+        const priceBs = bcvRate > 0 ? (p.price * bcvRate).toFixed(2) : '0.00';
+        return `
+          <article class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition relative">
+            <div class="aspect-square rounded-xl overflow-hidden mb-4 bg-lushBg relative">
+              <img 
+                src="${p.image}" 
+                alt="${p.title}" 
+                onerror="this.onerror=null; this.src='LUSH logo.png';"
+                class="w-full h-full object-cover ${isOut ? 'grayscale opacity-60' : ''}"
+              >
+              
+              <span class="absolute top-2 right-2 bg-white/90 backdrop-blur-md px-2 py-1 rounded-md text-[10px] font-bold text-gray-600">
+                Stock: ${p.stock}
+              </span>
+
+              ${isOut ? `
+                <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
+                  <span class="bg-red-600 text-white text-xs font-black uppercase px-3 py-1.5 rounded-md tracking-widest shadow-lg">
+                    AGOTADO
+                  </span>
+                </div>
+              ` : ''}
+            </div>
+
+            <span class="text-xs text-gray-400 uppercase tracking-wider">${p.category}</span>
+            <h3 class="font-medium text-lushDark mt-1">${p.title}</h3>
+            <div class="flex items-center justify-between mt-4">
+              <div>
+                <span class="text-lg font-semibold text-lushDark block">$${parseFloat(p.price).toFixed(2)}</span>
+                <span class="text-xs text-gray-500 font-mono">Bs. ${priceBs}</span>
+              </div>
+              <button 
+                onclick="addToCart('${p.id}')"
+                ${isOut ? 'disabled' : ''}
+                class="bg-lushRose text-lushDark hover:bg-lushGold hover:text-white px-4 py-2 rounded-lg text-sm transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ${!isOut ? 'Agregar' : 'Agotado'}
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // PANEL ADMIN Y LOGIN
+    function openAdminModal() { document.getElementById('authModal').classList.remove('hidden'); }
+    function closeAdminModal() { 
+      document.getElementById('authModal').classList.add('hidden'); 
+      document.getElementById('authError').classList.add('hidden');
+    }
+
+    function verifyAdminPassword(e) {
+      e.preventDefault();
+      const pass = document.getElementById('adminPasswordInput').value;
+      if (pass === ADMIN_PASSWORD) {
+        closeAdminModal();
+        showSection('admin');
+        renderAdminDashboard();
+      } else {
+        document.getElementById('authError').classList.remove('hidden');
+      }
+    }
+
+    function showSection(section) {
+      if (section === 'admin') {
+        document.getElementById('shopSection').classList.add('hidden');
+        document.getElementById('adminSection').classList.remove('hidden');
+      } else {
+        document.getElementById('adminSection').classList.add('hidden');
+        document.getElementById('shopSection').classList.remove('hidden');
+      }
+    }
+
+    async function handleAddProduct(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('prodImageFile');
+      const file = fileInput.files[0];
+
+      if (!file) return alert('Selecciona una imagen.');
+
+      const reader = new FileReader();
+      reader.onload = async function(event) {
+        const newProduct = {
+          id: 'prod-' + Date.now(),
+          title: document.getElementById('prodTitle').value,
+          category: document.getElementById('prodCategory').value,
+          price: parseFloat(document.getElementById('prodPrice').value),
+          stock: parseInt(document.getElementById('prodStock').value),
+          image: event.target.result
+        };
+
+        const { error } = await _supabase.from('products').insert([newProduct]);
+
+        if (error) {
+          alert('Error al guardar el producto en Supabase: ' + error.message);
+          return;
+        }
+
+        await loadData();
+        document.getElementById('addProductForm').reset();
+        alert('¡Producto guardado exitosamente en Supabase!');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function handleAddSeller(e) {
+      e.preventDefault();
+      const newSeller = {
+        id: 'seller-' + Date.now(),
+        name: document.getElementById('sellerName').value,
+        commission: parseFloat(document.getElementById('sellerCommission').value),
+        phone: document.getElementById('sellerPhone').value
+      };
+
+      const { error } = await _supabase.from('sellers').insert([newSeller]);
+
+      if (error) {
+        alert('Error al agregar vendedor en Supabase: ' + error.message);
+        return;
+      }
+
+      await loadData();
+      document.getElementById('addSellerForm').reset();
+      alert('¡Vendedor registrado!');
+    }
+
+    async function editSellerCommission(id) {
+      const seller = sellers.find(s => s.id === id);
+      if (!seller) return;
+
+      const newComm = prompt(`Nuevo % de comisión para ${seller.name}:`, seller.commission);
+      if (newComm !== null && !isNaN(parseFloat(newComm)) && parseFloat(newComm) >= 0) {
+        const { error } = await _supabase.from('sellers').update({ commission: parseFloat(newComm) }).eq('id', id);
+
+        if (error) {
+          alert("Error al actualizar la comisión: " + error.message);
+          return;
+        }
+
+        await loadData();
+        alert(`Comisión actualizada a ${newComm}%.`);
+      }
+    }
+
+    async function deleteSeller(id) {
+      const seller = sellers.find(s => s.id === id);
+      if (!seller) return;
+
+      if (confirm(`¿Eliminar al vendedor "${seller.name}"?`)) {
+        const { error } = await _supabase.from('sellers').delete().eq('id', id);
+        if (error) {
+          alert("Error al eliminar vendedor: " + error.message);
+          return;
+        }
+        await loadData();
+      }
+    }
+
+    async function deleteProduct(id) {
+      if (confirm('¿Desea eliminar este producto?')) {
+        const { error } = await _supabase.from('products').delete().eq('id', id);
+        if (error) {
+          alert("Error al eliminar producto: " + error.message);
+          return;
+        }
+        await loadData();
+      }
+    }
+
+    function openUpdateProductModal(id) {
+      const prod = products.find(p => p.id === id);
+      if (!prod) return;
+
+      document.getElementById('updateProdId').value = prod.id;
+      document.getElementById('updateModalTitle').innerText = `Editar: ${prod.title}`;
+      document.getElementById('updateProdPrice').value = prod.price;
+      document.getElementById('updateProdStockAdd').value = 0;
+      document.getElementById('updateProductModal').classList.remove('hidden');
+    }
+
+    function closeUpdateProductModal() {
+      document.getElementById('updateProductModal').classList.add('hidden');
+    }
+
+    async function handleSaveProductUpdate(e) {
+      e.preventDefault();
+      const id = document.getElementById('updateProdId').value;
+      const newPrice = parseFloat(document.getElementById('updateProdPrice').value);
+      const stockToAdd = parseInt(document.getElementById('updateProdStockAdd').value) || 0;
+
+      const prod = products.find(p => p.id === id);
+      if (prod) {
+        const updatedStock = prod.stock + stockToAdd;
+        const { error } = await _supabase
+          .from('products')
+          .update({ price: newPrice, stock: updatedStock })
+          .eq('id', id);
+
+        if (error) {
+          alert('Error al actualizar en Supabase: ' + error.message);
+          return;
+        }
+
+        await loadData();
+        closeUpdateProductModal();
+        alert('¡Producto y stock actualizados en Supabase!');
+      }
+    }
+
+    function generateDemandReport() {
+      const demandMap = {};
+
+      orders.forEach(order => {
+        order.items.forEach(item => {
+          if (!demandMap[item.title]) {
+            demandMap[item.title] = { title: item.title, qty: 0, totalAmount: 0 };
+          }
+          demandMap[item.title].qty += item.qty;
+          demandMap[item.title].totalAmount += (item.price * item.qty);
+        });
+      });
+
+      const sortedDemand = Object.values(demandMap).sort((a, b) => b.qty - a.qty);
+      const tableBody = document.getElementById('demandReportTableBody');
+      document.getElementById('reportTimestamp').innerText = `Generado el: ${new Date().toLocaleString('es-VE')}`;
+
+      if (sortedDemand.length === 0) {
+        tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400">Sin datos de ventas disponibles.</td></tr>`;
+      } else {
+        tableBody.innerHTML = sortedDemand.map((item, index) => {
+          let badgeClass = "bg-gray-100 text-gray-600";
+          let label = `#${index + 1}`;
+
+          if (index === 0) { badgeClass = "bg-yellow-100 text-yellow-800 font-bold"; label = "🥇 Alta Demanda (N°1)"; }
+          else if (index === 1) { badgeClass = "bg-gray-200 text-gray-800 font-bold"; label = "🥈 Alta Demanda (N°2)"; }
+          else if (index === 2) { badgeClass = "bg-amber-100 text-amber-800 font-bold"; label = "🥉 Alta Demanda (N°3)"; }
+
+          return `
+            <tr class="border-b">
+              <td class="p-3"><span class="px-2.5 py-1 rounded-md text-xs ${badgeClass}">${label}</span></td>
+              <td class="p-3 font-semibold text-lushDark">${item.title}</td>
+              <td class="p-3 text-center font-bold text-emerald-600">${item.qty} unids.</td>
+              <td class="p-3 text-right font-bold text-lushDark">$${item.totalAmount.toFixed(2)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('demandReportModal').classList.remove('hidden');
+    }
+
+    function closeDemandReportModal() {
+      document.getElementById('demandReportModal').classList.add('hidden');
+    }
+
+    function renderAdminDashboard() {
+      const totalSales = orders.reduce((acc, o) => acc + o.total, 0);
+      const totalCommissions = orders.reduce((acc, o) => acc + o.commissionAmount, 0);
+
+      document.getElementById('metricTotalSales').innerText = `$${totalSales.toFixed(2)}`;
+      document.getElementById('metricTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
+      document.getElementById('metricTotalOrders').innerText = orders.length;
+
+      const inventoryBody = document.getElementById('inventoryTableBody');
+      inventoryBody.innerHTML = products.map(p => `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="p-3 font-medium flex items-center gap-2">
+            <img src="${p.image}" onerror="this.onerror=null; this.src='LUSH logo.png';" class="w-8 h-8 rounded-full object-cover">
+            <span>${p.title}</span>
+          </td>
+          <td class="p-3 uppercase text-xs text-gray-500">${p.category}</td>
+          <td class="p-3 font-semibold text-lushDark">$${p.price.toFixed(2)}</td>
+          <td class="p-3 font-semibold ${p.stock <= 0 ? 'text-red-500 font-bold' : 'text-emerald-600'}">
+            ${p.stock <= 0 ? '0 (AGOTADO)' : p.stock + ' unids.'}
+          </td>
+          <td class="p-3 text-right flex justify-end gap-2">
+            <button onclick="openUpdateProductModal('${p.id}')" class="text-xs bg-gray-100 hover:bg-lushDark hover:text-white text-gray-800 px-3 py-1 rounded font-semibold transition">
+              ➕ Añadir / Edit
+            </button>
+            <button onclick="deleteProduct('${p.id}')" class="text-xs bg-red-50 hover:bg-red-600 hover:text-white text-red-600 px-2.5 py-1 rounded font-semibold transition">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      const sellerCommissionsBody = document.getElementById('sellerCommissionsTableBody');
+      sellerCommissionsBody.innerHTML = sellers.map(s => {
+        const sellerOrders = orders.filter(o => o.sellerId === s.id);
+        const totalVendido = sellerOrders.reduce((acc, o) => acc + o.total, 0);
+        const comisionGanada = sellerOrders.reduce((acc, o) => acc + o.commissionAmount, 0);
+
+        return `
+          <tr class="border-b hover:bg-gray-50">
+            <td class="p-3 font-semibold">${s.name}</td>
+            <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-xs">${s.commission}%</span></td>
+            <td class="p-3">${sellerOrders.length} pedido(s)</td>
+            <td class="p-3 font-medium">$${totalVendido.toFixed(2)}</td>
+            <td class="p-3 font-bold text-lushGold">$${comisionGanada.toFixed(2)}</td>
+            <td class="p-3 text-right flex justify-end gap-2">
+              <button onclick="editSellerCommission('${s.id}')" class="text-xs bg-gray-100 hover:bg-lushDark hover:text-white text-gray-700 px-3 py-1 rounded transition">
+                ✏️ Modificar %
+              </button>
+              <button onclick="deleteSeller('${s.id}')" class="text-xs bg-red-50 hover:bg-red-600 hover:text-white text-red-600 px-3 py-1 rounded font-semibold transition">
+                🗑️ Eliminar
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      const ordersHistoryBody = document.getElementById('ordersHistoryTableBody');
+      if (orders.length === 0) {
+        ordersHistoryBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-400">No hay órdenes registradas.</td></tr>`;
+      } else {
+        ordersHistoryBody.innerHTML = orders.map(o => `
+          <tr class="border-b hover:bg-gray-50 text-xs">
+            <td class="p-3">
+              <p class="font-bold text-lushDark">#${o.id}</p>
+              <p class="text-gray-400">${o.date}</p>
+            </td>
+            <td class="p-3 font-bold text-lushDark">${o.customerName || 'N/A'}</td>
+            <td class="p-3">
+              <ul class="list-disc list-inside space-y-0.5">
+                ${o.items.map(i => `<li>${i.title} (x${i.qty})</li>`).join('')}
+              </ul>
+            </td>
+            <td class="p-3 font-bold text-emerald-600">${o.paymentRef}</td>
+            <td class="p-3 text-gray-600">${o.deliveryAddress}</td>
+            <td class="p-3 font-medium text-gray-700">${o.sellerName}</td>
+            <td class="p-3 font-bold text-lushDark">$${o.total.toFixed(2)}</td>
+            <td class="p-3 font-bold text-lushGold">$${o.commissionAmount.toFixed(2)}</td>
+            <td class="p-3 text-right">
+              <button onclick="deleteOrder('${o.id}')" class="text-xs bg-red-50 hover:bg-red-600 hover:text-white text-red-600 px-2.5 py-1 rounded font-semibold transition">
+                🗑️ Borrar
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    // CARRITO Y PROCESAMIENTO CON SUPABASE
+    function addToCart(id) {
+      const prod = products.find(p => p.id === id);
+      if (!prod || prod.stock <= 0) return;
+
+      const itemInCart = cart.find(c => c.id === id);
+      if (itemInCart) {
+        if (itemInCart.qty < prod.stock) itemInCart.qty++;
+        else alert('Supera el stock disponible.');
+      } else {
+        cart.push({ ...prod, qty: 1 });
+      }
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      document.getElementById('cartCount').innerText = cart.reduce((acc, c) => acc + c.qty, 0);
+      const container = document.getElementById('cartItemsList');
+      container.innerHTML = cart.map(item => `
+        <div class="flex items-center justify-between border-b pb-3">
+          <div class="flex items-center gap-3">
+            <img src="${item.image}" onerror="this.onerror=null; this.src='LUSH logo.png';" class="w-12 h-12 object-cover rounded-lg" alt="">
+            <div>
+              <p class="text-sm font-semibold">${item.title}</p>
+              <p class="text-xs text-gray-500">$${item.price.toFixed(2)} x ${item.qty}</p>
+            </div>
+          </div>
+          <span class="font-bold text-sm">$${(item.price * item.qty).toFixed(2)}</span>
+        </div>
+      `).join('');
+
+      renderSellerSelectOptions();
+      calculateCartTotal();
+    }
+
+    function renderSellerSelectOptions() {
+      const select = document.getElementById('cartSellerSelect');
+      select.innerHTML = `<option value="">Venta Directa en Línea</option>` + 
+        sellers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+
+    function calculateCartTotal() {
+      const subtotalUSD = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      const subtotalBs = bcvRate > 0 ? (subtotalUSD * bcvRate).toFixed(2) : '0.00';
+      
+      document.getElementById('cartTotal').innerText = `$${subtotalUSD.toFixed(2)}`;
+      document.getElementById('cartTotalBs').innerText = `Bs. ${subtotalBs}`;
+    }
+
+    function toggleCartModal() { document.getElementById('cartModal').classList.toggle('hidden'); }
+
+    function cancelOrder() {
+      if (cart.length === 0) return toggleCartModal();
+
+      if (confirm('¿Vaciar carrito y cancelar el pedido?')) {
+        cart = [];
+        document.getElementById('customerNameInput').value = '';
+        document.getElementById('paymentRefInput').value = '';
+        document.getElementById('deliveryAddressInput').value = '';
+        updateCartUI();
+        toggleCartModal();
+      }
+    }
+
+    async function checkoutOrder() {
+      if (cart.length === 0) return alert('El carrito está vacío.');
+
+      const customerName = document.getElementById('customerNameInput').value.trim();
+      const paymentRef = document.getElementById('paymentRefInput').value.trim();
+      const deliveryAddress = document.getElementById('deliveryAddressInput').value.trim();
+
+      if (!customerName || !paymentRef || !deliveryAddress) {
+        return alert('Por favor completa todos los campos requeridos (*).');
+      }
+
+      const subtotalUSD = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      const subtotalBs = bcvRate > 0 ? (subtotalUSD * bcvRate).toFixed(2) : '0.00';
+      const sellerId = document.getElementById('cartSellerSelect').value;
+      const seller = sellers.find(s => s.id === sellerId);
+      const commissionAmount = seller ? (subtotalUSD * seller.commission) / 100 : 0;
+
+      const now = new Date();
+      const newOrderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+
+      const dbOrder = {
+        id: newOrderId,
+        date: now.toLocaleString('es-VE'),
+        iso_date: now.toISOString().slice(0, 10),
+        customer_name: customerName,
+        items: JSON.stringify(cart),
+        total: subtotalUSD,
+        payment_ref: paymentRef,
+        delivery_address: deliveryAddress,
+        seller_id: seller ? seller.id : null,
+        seller_name: seller ? seller.name : 'Venta Directa',
+        commission_amount: commissionAmount
+      };
+
+      // Registrar Orden
+      const { error: ordError } = await _supabase.from('orders').insert([dbOrder]);
+
+      if (ordError) {
+        alert("Error al procesar la orden en Supabase: " + ordError.message);
+        return;
+      }
+
+      // Restar Stock
+      for (const cartItem of cart) {
+        const prod = products.find(p => p.id === cartItem.id);
+        if (prod) {
+          const newStock = prod.stock - cartItem.qty;
+          await _supabase.from('products').update({ stock: newStock }).eq('id', prod.id);
+        }
+      }
+
+      const itemsListText = cart.map(i => `• ${i.title} (x${i.qty}) - $${(i.price * i.qty).toFixed(2)}`).join('\n');
+      
+      const rawText = `🛍️ *NUEVA ÓRDEN DE COMPRA - LUSH LECHERIA*\n` +
+        `----------------------------------------\n` +
+        `🆔 *Orden:* #${newOrderId}\n` +
+        `📅 *Fecha:* ${now.toLocaleString('es-VE')}\n` +
+        `👤 *Cliente:* ${customerName}\n` +
+        `👩‍💼 *Vendedor:* ${seller ? seller.name : 'Venta Directa'}\n\n` +
+        `📦 *PRODUCTOS:*\n${itemsListText}\n\n` +
+        `💵 *TOTAL USD:* $${subtotalUSD.toFixed(2)}\n` +
+        `🇻🇪 *TOTAL BS (Tasa BCV ${bcvRate.toFixed(2)}):* Bs. ${subtotalBs}\n\n` +
+        `💳 *DATOS DE PAGO MÓVIL:*\n` +
+        `• Banco: Bancamiga\n` +
+        `• Teléfono: 04148957830\n` +
+        `• CI/RIF: V-16.845.600\n` +
+        `• *N° Referencia:* ${paymentRef}\n\n` +
+        `📍 *DIRECCIÓN DE DELIVERY:*\n` +
+        `${deliveryAddress}\n` +
+        `----------------------------------------\n` +
+        `Adjunto comprobante de pago. ¡Quedo atento a la confirmación!`;
+
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${STORE_WHATSAPP}&text=${encodeURIComponent(rawText)}`;
+
+      cart = [];
+      document.getElementById('customerNameInput').value = '';
+      document.getElementById('paymentRefInput').value = '';
+      document.getElementById('deliveryAddressInput').value = '';
+
+      await loadData();
+      updateCartUI();
+      toggleCartModal();
+
+      window.open(whatsappUrl, '_blank');
+    }
+
+    // Inicialización al Cargar la página
+    fetchBcvRate();
+    renderCategoryFilters();
+    loadData();
+  </script>
+</body>
+</html>
