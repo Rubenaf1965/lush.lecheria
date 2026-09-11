@@ -25,8 +25,11 @@
     body { background-color: #FAF9F6; color: #1A1A1A; font-family: system-ui, -apple-system, sans-serif; }
     @media print {
       body * { visibility: hidden; }
-      #printArea, #printArea *, #inventoryReportArea, #inventoryReportArea *, #monthlyClosureReportArea, #monthlyClosureReportArea * { visibility: visible; }
-      #printArea, #inventoryReportArea, #monthlyClosureReportArea { position: absolute; left: 0; top: 0; width: 100%; }
+      #printArea, #printArea *, 
+      #inventoryReportArea, #inventoryReportArea *, 
+      #monthlyClosureReportArea, #monthlyClosureReportArea *,
+      #invoiceArea, #invoiceArea * { visibility: visible; }
+      #printArea, #inventoryReportArea, #monthlyClosureReportArea, #invoiceArea { position: absolute; left: 0; top: 0; width: 100%; }
       .no-print { display: none !important; }
     }
   </style>
@@ -298,7 +301,7 @@
               <th class="p-3">Vendedor</th>
               <th class="p-3">Total Orden</th>
               <th class="p-3">Comisión</th>
-              <th class="p-3 text-right">Acción</th>
+              <th class="p-3 text-right">Acciones</th>
             </tr>
           </thead>
           <tbody id="ordenesHistoryTableBody"></tbody>
@@ -306,6 +309,75 @@
       </div>
     </div>
   </section>
+
+  <!-- MODAL: FACTURA DE LA ORDEN DE COMPRA -->
+  <div id="invoiceModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div id="invoiceArea" class="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
+      <div class="flex items-center justify-between border-b pb-4">
+        <div class="flex items-center gap-3">
+          <img src="LUSH logo.PNG" class="h-14 w-14 rounded-full border object-cover" alt="Lush Logo">
+          <div>
+            <h2 class="text-xl font-bold text-lushDark uppercase tracking-widest">LUSH LECHERIA</h2>
+            <p class="text-xs text-gray-500">Maquillaje | Accesorios | Ropa</p>
+            <p class="text-[11px] text-gray-400">RIF: V-16845600-0 | Lechería, Anzoátegui, Venezuela</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="bg-lushRose text-lushDark px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Factura de Entrega</span>
+          <p id="invoiceNumber" class="text-lg font-bold text-lushDark mt-1">#0000</p>
+          <p id="invoiceDate" class="text-xs text-gray-400"></p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 text-xs bg-gray-50 p-4 rounded-xl border border-gray-100">
+        <div>
+          <p class="font-bold uppercase text-gray-400 text-[10px] tracking-wider mb-1">Datos del Cliente</p>
+          <p id="invoiceCustomerName" class="font-semibold text-lushDark text-sm"></p>
+          <p id="invoiceDeliveryAddress" class="text-gray-600 mt-1 leading-relaxed"></p>
+        </div>
+        <div class="border-l pl-4 border-gray-200">
+          <p class="font-bold uppercase text-gray-400 text-[10px] tracking-wider mb-1">Detalles de Pago y Venta</p>
+          <p class="text-gray-600"><strong>Método:</strong> Pago Móvil (Bancamiga)</p>
+          <p class="text-gray-600"><strong>Ref. Pago:</strong> <span id="invoicePaymentRef" class="font-mono font-bold text-emerald-600"></span></p>
+          <p class="text-gray-600"><strong>Vendedor:</strong> <span id="invoiceSellerName"></span></p>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="text-xs font-bold text-lushDark uppercase tracking-wider mb-2">Detalle de Productos</h4>
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-gray-100 border-b uppercase text-gray-600">
+              <th class="p-2.5">Cant.</th>
+              <th class="p-2.5">Descripción</th>
+              <th class="p-2.5 text-right">P. Unit ($)</th>
+              <th class="p-2.5 text-right">Total ($)</th>
+            </tr>
+          </thead>
+          <tbody id="invoiceItemsTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="border-t pt-4 flex justify-between items-end">
+        <div class="text-[11px] text-gray-400 max-w-xs">
+          <p>¡Gracias por tu compra en Lush Lechería!</p>
+          <p>Conserva esta factura para el recibo de tu paquete de delivery.</p>
+        </div>
+        <div class="text-right space-y-1">
+          <div class="text-xs text-gray-500">Tasa BCV aplicable: <span id="invoiceBcvRate" class="font-mono"></span></div>
+          <div class="text-base font-bold text-lushDark">Total USD: <span id="invoiceTotalUsd" class="text-xl"></span></div>
+          <div class="text-xs font-semibold text-emerald-600">Total Bs: <span id="invoiceTotalBs" class="font-mono"></span></div>
+        </div>
+      </div>
+
+      <div class="flex justify-between items-center pt-4 border-t no-print">
+        <button onclick="closeInvoiceModal()" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg text-sm font-medium hover:bg-gray-300">Cerrar</button>
+        <button onclick="window.print()" class="bg-lushDark text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-lushGold hover:text-lushDark transition flex items-center gap-2">
+          <span>🖨️</span> Imprimir / Guardar PDF
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- MODAL: CIERRE MENSUAL DE VENTAS -->
   <div id="monthlyClosureModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -759,6 +831,47 @@
       if (el) el.innerText = `Bs. ${bcvRate.toFixed(2)}`;
       renderProductos();
       calculateCartTotal();
+    }
+
+    // VER FACTURA DE ORDEN
+    function openInvoiceModal(orderId) {
+      const order = ordenes.find(o => String(o.id) === String(orderId));
+      if (!order) return;
+
+      document.getElementById('invoiceNumber').innerText = `#${order.id}`;
+      document.getElementById('invoiceDate').innerText = order.date;
+      document.getElementById('invoiceCustomerName').innerText = order.customerName || 'Cliente General';
+      document.getElementById('invoiceDeliveryAddress').innerText = order.deliveryAddress;
+      document.getElementById('invoicePaymentRef').innerText = order.paymentRef;
+      document.getElementById('invoiceSellerName').innerText = order.sellerName || 'Venta Directa';
+
+      const itemsBody = document.getElementById('invoiceItemsTableBody');
+      itemsBody.innerHTML = Array.isArray(order.items) ? order.items.map(item => `
+        <tr class="border-b">
+          <td class="p-2.5 font-bold">${item.qty}</td>
+          <td class="p-2.5">${item.title}</td>
+          <td class="p-2.5 text-right font-mono">$${parseFloat(item.price).toFixed(2)}</td>
+          <td class="p-2.5 text-right font-bold text-lushDark">$${(parseFloat(item.price) * item.qty).toFixed(2)}</td>
+        </tr>
+      `).join('') : '';
+
+      const totalBs = bcvRate > 0 ? (order.total * bcvRate).toFixed(2) : '0.00';
+      document.getElementById('invoiceBcvRate').innerText = bcvRate > 0 ? `Bs. ${bcvRate.toFixed(2)}` : 'N/A';
+      document.getElementById('invoiceTotalUsd').innerText = `$${order.total.toFixed(2)}`;
+      document.getElementById('invoiceTotalBs').innerText = `Bs. ${totalBs}`;
+
+      document.getElementById('invoiceModal').classList.remove('hidden');
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('invoiceModal').classList.add('hidden');
+    }
+
+    function printInvoiceDirect(orderId) {
+      openInvoiceModal(orderId);
+      setTimeout(() => {
+        window.print();
+      }, 300);
     }
 
     // ELIMINAR ÓRDEN EN SUPABASE
@@ -1382,9 +1495,17 @@
             <td class="p-3 font-bold text-lushDark">$${o.total.toFixed(2)}</td>
             <td class="p-3 font-bold text-lushGold">$${o.commissionAmount.toFixed(2)}</td>
             <td class="p-3 text-right">
-              <button onclick="deleteOrder('${o.id}')" class="text-xs bg-red-50 hover:bg-red-600 hover:text-white text-red-600 px-2.5 py-1 rounded font-semibold transition">
-                🗑️ Borrar
-              </button>
+              <div class="flex justify-end gap-1.5">
+                <button onclick="openInvoiceModal('${o.id}')" class="text-xs bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 px-2.5 py-1 rounded font-semibold transition flex items-center gap-1" title="Ver Factura">
+                  📄 Factura
+                </button>
+                <button onclick="printInvoiceDirect('${o.id}')" class="text-xs bg-gray-100 hover:bg-lushDark hover:text-white text-gray-700 px-2.5 py-1 rounded font-semibold transition" title="Imprimir / Guardar PDF">
+                  🖨️
+                </button>
+                <button onclick="deleteOrder('${o.id}')" class="text-xs bg-red-50 hover:bg-red-600 hover:text-white text-red-600 px-2 py-1 rounded font-semibold transition" title="Borrar">
+                  🗑️
+                </button>
+              </div>
             </td>
           </tr>
         `).join('');
