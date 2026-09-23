@@ -95,26 +95,104 @@
     </div>
   </header>
 
-  <!-- SECCIÓN TIENDA PÚBLICA -->
-  <main id="shopSection" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full no-print">
-    <section class="bg-lushRose rounded-3xl p-8 md:p-12 mb-12 flex flex-col md:flex-row items-center justify-between">
-      <div class="max-w-lg mb-6 md:mb-0">
-        <span class="text-xs uppercase tracking-widest text-lushGold font-bold">Nueva Colección</span>
-        <h1 class="text-4xl md:text-5xl font-light text-lushDark mt-2 mb-4">Elegancia y brillo minimalista.</h1>
-        <p class="text-gray-600 text-sm mb-6">Encuentra la mejor selección de joyería boutique, prendas y accesorios finos en Lechería.</p>
-        <a href="#catalogo" class="inline-block bg-lushDark text-white px-8 py-3 rounded-full text-sm uppercase tracking-wider hover:bg-lushGold transition">Explorar Tienda</a>
-      </div>
-      <div class="w-full md:w-1/3 aspect-square rounded-2xl overflow-hidden shadow-lg border-2 border-white">
-        <img src="LUSH logo.PNG" alt="Lush Banner" class="w-full h-full object-cover">
-      </div>
-    </section>
+  <!-- SECCIÓN TIENDA PÚBLICA REDISEÑADA - LUSH LECHERÍA -->
+<main id="shopSection" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full no-print relative overflow-hidden">
+  
+  <!-- Efecto de Fondo de Agua Interactivo / Ondas Dinámicas -->
+  <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-30">
+    <div class="absolute -inset-[50%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-sky-200 via-transparent to-transparent animate-pulse duration-1000"></div>
+    <div class="water-ripple-bg absolute inset-0 bg-gradient-to-b from-blue-50/20 via-transparent to-cyan-50/10 backdrop-blur-[1px]"></div>
+  </div>
 
-    <section id="catalogo" class="mb-8 flex items-center justify-between border-b border-gray-200 pb-4">
-      <div class="flex gap-2 overflow-x-auto" id="categoryFilters"></div>
-    </section>
+  <!-- Hero Banner Interactivo (Inspirado en la nueva colección de maquillaje y estilo elegante) -->
+  <section class="relative bg-gradient-to-r from-pink-50 via-rose-100 to-amber-50 rounded-3xl p-8 md:p-14 mb-14 flex flex-col md:flex-row items-center justify-between shadow-xl border border-white/60 backdrop-blur-md overflow-hidden z-10">
+    
+    <!-- Elementos decorativos estilo lazo / coquette / agua -->
+    <div class="absolute -top-10 -right-10 w-48 h-48 bg-pink-200 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+    <div class="absolute -bottom-10 -left-10 w-48 h-48 bg-blue-200 rounded-full blur-3xl opacity-40 pointer-events-none"></div>
 
-    <section id="productosGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></section>
-  </main>
+    <div class="max-w-xl mb-8 md:mb-0 relative z-10">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 shadow-sm mb-3">
+        <span class="w-2 h-2 rounded-full bg-lushGold animate-ping"></span>
+        <span class="text-xs uppercase tracking-widest text-lushGold font-bold">Nueva Colección • XOXO</span>
+      </div>
+      <h1 class="text-4xl md:text-6xl font-serif text-lushDark mt-2 mb-4 leading-tight">
+        Tus favoritos de <span class="italic font-light text-rose-600">Maquillaje</span> ya llegaron.
+      </h1>
+      <p class="text-gray-600 text-base mb-6 font-light">
+        Eleva tu estilo con nuestra selección exclusiva de belleza, alta cosmética y accesorios finos en Lechería. Sumergite en el lujo minimalista.
+      </p>
+      <div class="flex items-center gap-4">
+        <a href="#catalogo" class="inline-flex items-center gap-2 bg-lushDark text-white px-8 py-3.5 rounded-full text-sm uppercase tracking-wider hover:bg-lushGold transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+          Explorar Tienda
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Contenedor Visual con la imagen adjunta e integración elegante -->
+    <div class="w-full md:w-2/5 relative z-10 group">
+      <div class="aspect-square rounded-2xl overflow-hidden shadow-2xl border-4 border-white/80 bg-white/40 backdrop-blur-sm transition-transform duration-500 group-hover:scale-[1.02]">
+        <!-- Imagen basada en tu banner de productos -->
+        <img src="productos.kush.jpeg" alt="Lush Maquillaje Favoritos" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+      </div>
+      <!-- Sutil insignia flotante -->
+      <div class="absolute -bottom-4 -left-4 bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl shadow-lg border border-pink-100 flex items-center gap-3">
+        <span class="text-2xl">🎀</span>
+        <div>
+          <p class="text-xs font-bold text-gray-800">Edición Especial</p>
+          <p class="text-[10px] text-gray-500">Stock Limitado Lechería</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filtros de Categoría Interactivos -->
+  <section id="catalogo" class="mb-8 flex items-center justify-between border-b border-gray-200/60 pb-4 relative z-10">
+    <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none" id="categoryFilters">
+      <!-- Los botones de filtro se inyectan dinámicamente o se estilizan aquí -->
+    </div>
+  </section>
+
+  <!-- Grid de Productos con Efecto Interactivo y Sensación de Fluidez -->
+  <section id="productosGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
+    <!-- Las tarjetas de productos se renderizan aquí con efectos de profundidad y hover de agua -->
+  </section>
+</main>
+
+<style>
+  /* Estilos adicionales para animaciones de agua y tarjetas interactivas */
+  @keyframes waterRipple {
+    0% { transform: scale(1); opacity: 0.3; }
+    50% { transform: scale(1.05); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 0.3; }
+  }
+  .water-ripple-bg {
+    animation: waterRipple 8s ease-in-out infinite;
+  }
+  /* Estilo para tarjetas de producto con efecto flotante */
+  .product-card-interactive {
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .product-card-interactive:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<script>
+  // Script opcional para generar ondas interactivas con el movimiento del mouse sobre el banner principal
+  const heroBanner = document.querySelector('#shopSection');
+  heroBanner.addEventListener('mousemove', (e) => {
+    const { clientX, clientY } = e;
+    const xPos = (clientX / window.innerWidth) * 20;
+    const yPos = (clientY / window.innerHeight) * 20;
+    const rippleBg = heroBanner.querySelector('.water-ripple-bg');
+    if(rippleBg) {
+      rippleBg.style.transform = `translate(${xPos}px, ${yPos}px)`;
+    }
+  });
+</script>
 
   <!-- SECCIÓN PANEL ADMINISTRATIVO COMPLETO -->
   <section id="adminSection" class="hidden flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-10 no-print">
@@ -387,7 +465,7 @@
         <div class="flex items-center gap-3">
           <img src="LUSH logo.PNG" class="h-12 w-12 rounded-full border" alt="Lush Logo">
           <div>
-            <h2 class="text-xl font-bold text-lushDark uppercase">Lush Fine Jewelry</h2>
+            <h2 class="text-xl font-bold text-lushDark uppercase">Lush Lecheria</h2>
             <p class="text-xs text-gray-500">Reporte de Cierre Mensual de Ventas</p>
           </div>
         </div>
@@ -471,7 +549,7 @@
         <div class="flex items-center gap-3">
           <img src="LUSH logo.PNG" class="h-12 w-12 rounded-full border" alt="Lush Logo">
           <div>
-            <h2 class="text-xl font-bold text-lushDark uppercase">Lush Fine Jewelry</h2>
+            <h2 class="text-xl font-bold text-lushDark uppercase">Lush Lecheria</h2>
             <p class="text-xs text-gray-500">Desglose de Inventario: Stock Disponible y Faltantes</p>
           </div>
         </div>
@@ -580,7 +658,7 @@
         <div class="flex items-center gap-3">
           <img src="LUSH logo.PNG" class="h-12 w-12 rounded-full border" alt="Lush Logo">
           <div>
-            <h2 class="text-xl font-bold text-lushDark uppercase">Lush Fine Jewelry</h2>
+            <h2 class="text-xl font-bold text-lushDark uppercase">Lush Lecheria</h2>
             <p class="text-xs text-gray-500">Reporte de Demanda y Productos Más Vendidos</p>
           </div>
         </div>
@@ -702,7 +780,7 @@
           <img src="LUSH logo.PNG" alt="Lush" class="h-10 w-10 rounded-full object-cover border">
           <span class="text-lg font-light tracking-widest text-lushDark uppercase">LUSH LECHERIA <span class="text-xs text-lushGold font-semibold block">Maquillaje | Accesorios</span></span>
         </div>
-        <p class="text-xs text-gray-500">Joyería fina, accesorios y moda boutique en Lechería, Estado Anzoátegui, Venezuela.</p>
+        <p class="text-xs text-gray-500">Eleva tu estilo con nuestros cosméticos y accesorios finos en Lechería, Estado Anzoátegui, Venezuela.</p>
       </div>
 
       <div>
@@ -748,7 +826,8 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-400 mt-8 pt-6 border-t border-gray-100">
-      <p>© 2026 Ruben Abinazar F. Todos los derechos reservados.</p>
+      <p>© 2026 Lush.lecheria. Todos los derechos reservados.</p>
+      <p>Creador de la Web, Ruben Abinazar Figarella.</p>
     </div>
   </footer>
 
