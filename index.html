@@ -95,59 +95,120 @@
     </div>
   </header>
 
- <!-- SECCIÓN TIENDA PÚBLICA CON VIDEO INTERACTIVO DE AGUA -->
-<main id="shopSection" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full no-print relative overflow-hidden">
+ <!-- SECCIÓN TIENDA PÚBLICA: DISEÑO LUSH LECHERÍA (GRADIENTE ROSA A GRIS VERDOSO) -->
+<main id="shopSection" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full no-print relative overflow-hidden bg-[#f4ecee]">
   
-  <!-- Hero Banner con Video de Fondo Estilo Acuático y Elegante -->
-  <section class="relative rounded-3xl p-8 md:p-16 mb-14 flex flex-col md:flex-row items-center justify-between shadow-2xl overflow-hidden z-10 border border-white/20">
+  <!-- Fondo ambiental con degradado del centro rosado hacia gris verdoso -->
+  <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden opacity-80">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#f5d6dc] via-[#e2dede] to-[#c7cfcc]"></div>
+    <div class="water-ripple-bg absolute inset-0 bg-gradient-to-b from-transparent via-[#d6dedb]/30 to-[#b8c4c0]/20 backdrop-blur-[1px]"></div>
+  </div>
+
+  <!-- Hero Carrusel / Showcase Interactivo con el nuevo degradado y bordes refinados -->
+  <section class="relative rounded-3xl p-8 md:p-16 mb-16 overflow-hidden z-10 border-2 border-[#b8c4c0] shadow-2xl bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#fae1e8] via-[#e6e8e6] to-[#cfd7d3] backdrop-blur-md">
     
-    <!-- Video de Fondo en Bucle (Simulando agua cristalina y lujo) -->
-    <div class="absolute inset-0 z-0 overflow-hidden">
-      <video autoplay muted loop playsinline class="w-full h-full object-cover filter brightness-75 scale-105">
-        <!-- Puedes reemplazar este enlace por un video propio alojado en Supabase Storage o tu servidor -->
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-underwater-sun-rays-4161-large.mp4" type="video/mp4">
-      </video>
-      <!-- Capa de gradiente oscuro/rosado translúcido para asegurar legibilidad del texto -->
-      <div class="absolute inset-0 bg-gradient-to-r from-black/50 via-rose-950/30 to-black/40 backdrop-blur-[2px]"></div>
-    </div>
+    <!-- Elementos de luz ambiental sutil -->
+    <div class="absolute top-0 right-1/4 w-96 h-96 bg-pink-200/40 rounded-full blur-[100px] pointer-events-none"></div>
+    <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-[#b8c4c0]/30 rounded-full blur-[100px] pointer-events-none"></div>
 
-    <!-- Contenido de Texto del Banner -->
-    <div class="max-w-xl mb-8 md:mb-0 relative z-10 text-white">
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 backdrop-blur-md shadow-lg mb-4 border border-white/30">
-        <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
-        <span class="text-xs uppercase tracking-widest text-white font-bold">Nueva Colección • XOXO</span>
-      </div>
-      <h1 class="text-4xl md:text-6xl font-serif text-white mt-2 mb-4 leading-tight drop-shadow-md">
-        Tus favoritos de <span class="italic font-light text-rose-300">Maquillaje</span> ya llegaron.
-      </h1>
-      <p class="text-gray-200 text-base mb-6 font-light drop-shadow">
-        Encuentra la mejor selección de cosméticos y accesorios finos en Lechería. Sumérgete en el lujo minimalista.
-      </p>
-      <div class="flex items-center gap-4">
-        <a href="#catalogo" class="inline-flex items-center gap-2 bg-white text-lushDark px-8 py-3.5 rounded-full text-sm uppercase tracking-wider hover:bg-rose-100 transition-all duration-300 shadow-xl hover:-translate-y-0.5 font-medium">
-          Explorar Tienda
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </a>
-      </div>
-    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+      
+      <!-- Columna Izquierda: Textos y Botón -->
+      <div class="lg:col-span-6 text-slate-800 space-y-6">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-[#b8c4c0] shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
+          <span class="text-xs uppercase tracking-[0.2em] text-rose-700 font-medium">NUEVA COLECCIÓN • XOXO</span>
+        </div>
+        
+        <h1 class="text-4xl md:text-6xl font-serif font-light leading-tight tracking-wide text-slate-900">
+          Tus favoritos de <span class="italic font-normal text-rose-700">Maquillaje</span> ya llegaron.
+        </h1>
+        
+        <p class="text-slate-600 text-sm md:text-base font-light leading-relaxed max-w-lg">
+          Encuentra la mejor selección de cosméticos y accesorios finos en Lechería. Sumérgete en el lujo minimalista.
+        </p>
 
-    <!-- Tarjeta Visual Interactiva / Imagen Destacada -->
-    <div class="w-full md:w-2/5 relative z-10 group">
-      <div class="aspect-square rounded-2xl overflow-hidden shadow-2xl border-2 border-white/40 bg-white/10 backdrop-blur-md transition-transform duration-500 group-hover:scale-105">
-        <!-- Aquí puedes colocar la imagen de los productos de maquillaje de Lush -->
-        <img src="productos.kush.jpeg" alt="Lush Maquillaje Favoritos" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+        <div class="flex items-center gap-6 pt-2">
+          <a href="#catalogo" class="group inline-flex items-center gap-3 bg-slate-900 text-white px-8 py-3.5 rounded-full text-xs uppercase tracking-[0.2em] font-semibold hover:bg-rose-800 transition-all duration-300 shadow-lg">
+            <span>Explorar Tienda</span>
+            <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-y-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Imagen Flotante Interactiva Estilo Tarjeta -->
+      <div class="lg:col-span-6 relative flex justify-center">
+        <div class="relative w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border-2 border-[#b8c4c0] bg-white/90 backdrop-blur-xl p-4 group">
+          
+          <!-- Contenedor de la imagen con efecto flotante -->
+          <div id="interactiveShowcase" class="relative aspect-square rounded-2xl overflow-hidden shadow-md bg-white">
+            <img src="productos.kush.jpeg" alt="Lush Maquillaje Favoritos" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+          </div>
+
+          <!-- Tarjeta inferior flotante -->
+          <div class="mt-4 p-4 rounded-2xl bg-white border border-[#b8c4c0] flex items-center justify-between text-slate-800 shadow-md">
+            <div>
+              <p class="text-[10px] uppercase font-bold tracking-wider text-rose-700">Selección Destacada</p>
+              <p class="text-sm font-serif font-semibold text-slate-900">Boutique Lechería</p>
+            </div>
+            <span class="px-4 py-1.5 rounded-full bg-rose-50 border border-rose-300 text-xs tracking-widest text-rose-800 font-bold shadow-sm">XOXO</span>
+          </div>
+
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Catálogo y Filtros -->
-  <section id="catalogo" class="mb-8 flex items-center justify-between border-b border-gray-200/60 pb-4 relative z-10">
-    <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none" id="categoryFilters"></div>
+  <!-- Filtros de Categoría -->
+  <section id="catalogo" class="mb-10 flex items-center justify-between border-b border-[#b8c4c0] pb-4 relative z-10">
+    <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-none" id="categoryFilters">
+      <!-- Los filtros se inyectan dinámicamente -->
+    </div>
   </section>
 
   <!-- Grid de Productos -->
-  <section id="productosGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10"></section>
+  <section id="productosGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
+    <!-- Las tarjetas dinámicas se renderizan aquí -->
+  </section>
 </main>
+
+<style>
+  /* Animación de flotación suave simulando el agua */
+  @keyframes floatSlow {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+  #interactiveShowcase {
+    animation: floatSlow 5s ease-in-out infinite;
+  }
+  @keyframes waterRipple {
+    0% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.05); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 0.4; }
+  }
+  .water-ripple-bg {
+    animation: waterRipple 8s ease-in-out infinite;
+  }
+</style>
+
+<style>
+  /* Animación de flotación suave simulando el agua */
+  @keyframes floatSlow {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+  #interactiveShowcase {
+    animation: floatSlow 5s ease-in-out infinite;
+  }
+  @keyframes waterRipple {
+    0% { transform: scale(1); opacity: 0.4; }
+    50% { transform: scale(1.05); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 0.4; }
+  }
+  .water-ripple-bg {
+    animation: waterRipple 8s ease-in-out infinite;
+  }
+</style>
 
 
 <style>
@@ -847,56 +908,64 @@
     let currentLightboxTitle = '';
 
     // CARGA DE DATOS DESDE SUPABASE
-    async function loadData() {
-      try {
-        const [prodRes, sellRes, ordRes] = await Promise.all([
-          _supabase.from('productos').select('*'),
-          _supabase.from('vendedores').select('*'),
-          _supabase.from('ordenes').select('*').order('created_at', { ascending: false })
-        ]);
+async function loadData() {
+    try {
+        // 1. Cargar Productos (Independiente)
+        const prodRes = await _supabase.from('productos').select('*');
+        if (prodRes.error) {
+            console.error('Error productos Supabase:', prodRes.error);
+        } else {
+            productos = (prodRes.data || []).map(p => ({
+                id: p.id,
+                title: p.title,
+                category: p.category,
+                price: parseFloat(p.price || 0),
+                stock: parseInt(p.stock || 0),
+                image: p.image,
+                image2: p.image2 || null
+            }));
+        }
 
-        if (prodRes.error) console.error('Error productos Supabase:', prodRes.error);
-        else productos = (prodRes.data || []).map(p => ({
-          id: p.id,
-          title: p.title,
-          category: p.category,
-          price: parseFloat(p.price || 0),
-          stock: parseInt(p.stock || 0),
-          image: p.image,
-          image2: p.image2 || null // Mapeo de la segunda imagen opcional
-        }));
+        // 2. Cargar Vendedores (Independiente)
+        const sellRes = await _supabase.from('vendedores').select('*');
+        if (sellRes.error) {
+            console.error('Error vendedores Supabase:', sellRes.error);
+        } else {
+            vendedores = (sellRes.data || []).map(s => ({
+                id: s.id,
+                name: s.name,
+                commission: parseFloat(s.commission || 0),
+                phone: s.phone
+            }));
+        }
 
-        if (sellRes.error) console.error('Error vendedores Supabase:', sellRes.error);
-        else vendedores = (sellRes.data || []).map(s => ({
-          id: s.id,
-          name: s.name,
-          commission: parseFloat(s.commission || 0),
-          phone: s.phone
-        }));
-
-        if (ordRes.error) console.error('Error órdenes Supabase:', ordRes.error);
-        else ordenes = (ordRes.data || []).map(o => ({
-          id: o.id,
-          date: o.date,
-          isoDate: o.iso_date,
-          customerName: o.customer_name,
-          items: typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []),
-          total: parseFloat(o.total || 0),
-          paymentRef: o.payment_ref,
-          deliveryAddress: o.delivery_address,
-          sellerId: o.seller_id,
-          sellerName: o.seller_name,
-          commissionAmount: parseFloat(o.commission_amount || 0)
-        }));
+        // 3. Cargar Órdenes (Independiente, por si falla la fecha o índice)
+        const ordRes = await _supabase.from('ordenes').select('*');
+        if (ordRes.error) {
+            console.error('Error órdenes Supabase:', ordRes.error);
+        } else {
+            ordenes = (ordRes.data || []).map(o => ({
+                id: o.id,
+                date: o.date,
+                isoDate: o.iso_date,
+                customerName: o.customer_name,
+                items: typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []),
+                total: parseFloat(o.total || 0),
+                paymentRef: o.payment_ref,
+                deliveryAddress: o.delivery_address,
+                sellerId: o.seller_id,
+                sellerName: o.seller_name,
+                commissionAmount: parseFloat(o.commission_amount || 0)
+            }));
+        }
 
         renderProductos();
-        renderAdminDashboard();
-        renderSellerSelectOptions();
-      } catch (err) {
-        console.error("Error al cargar desde Supabase:", err);
-      }
-    }
+        if (typeof renderAdmin === 'function') renderAdmin();
 
+    } catch (err) {
+        console.error('Error general cargando datos:', err);
+    }
+}
     // TASA BCV DIARIA
     async function fetchBcvRate() {
       const todayStr = new Date().toISOString().slice(0, 10);
