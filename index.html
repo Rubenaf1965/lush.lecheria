@@ -907,16 +907,14 @@
     let currentLightboxIndex = 0;
     let currentLightboxTitle = '';
 
-    // CARGA DE DATOS DESDE SUPABASE OPTIMIZADA
+    // CARGA DE DATOS DESDE SUPABASE (Asegúrate de que la función sea async)
 async function loadData() {
     try {
-        // Seleccionamos solo los campos ligeros necesarios para la tarjeta principal,
-        // evitando sobrecargar la red con el Base64 pesado de golpe.
         const prodRes = await _supabase
             .from('productos')
-            .select('id, title, category, price, stock, image') // Omitimos image2 si es muy pesada o la cargamos bajo demanda
+            .select('id, title, category, price, stock, image')
             .order('created_at', { ascending: false })
-            .limit(30); // Limita la cantidad de productos por tanda
+            .limit(50);
 
         if (prodRes.error) {
             console.error('Error productos Supabase:', prodRes.error);
@@ -931,7 +929,7 @@ async function loadData() {
                 image2: null
             }));
             
-            // Llama a tu función que pinta los productos en el DOM (ej. renderProducts())
+            // Llama a tu función para renderizar los productos en pantalla
             if (typeof renderProducts === 'function') {
                 renderProducts();
             }
@@ -940,6 +938,9 @@ async function loadData() {
         console.error('Error crítico cargando datos:', err);
     }
 }
+
+// Ejecuta la función de manera segura al cargar la página
+loadData();
 
         // 2. Cargar Vendedores (Independiente)
         const sellRes = await _supabase.from('vendedores').select('*');
