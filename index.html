@@ -910,8 +910,13 @@
     // CARGA DE DATOS DESDE SUPABASE
 async function loadData() {
     try {
-        // 1. Cargar Productos (Independiente)
-        const prodRes = await _supabase.from('productos').select('*');
+        // 1. Cargar Productos optimizado (con .limit() y .order() para evitar timeouts)
+        const prodRes = await _supabase
+            .from('productos')
+            .select('*')
+            .order('id', { ascending: false }) // Ordena por ID de forma rápida
+            .limit(100); // Limita la carga inicial para evitar sobrecargar la respuesta
+
         if (prodRes.error) {
             console.error('Error productos Supabase:', prodRes.error);
         } else {
@@ -924,7 +929,14 @@ async function loadData() {
                 image: p.image,
                 image2: p.image2 || null
             }));
+            
+            // Si tienes una función para renderizar los productos en pantalla, invócala aquí:
+            // renderProductos(); 
         }
+    } catch (err) {
+        console.error('Error crítico cargando datos:', err);
+    }
+}
 
         // 2. Cargar Vendedores (Independiente)
         const sellRes = await _supabase.from('vendedores').select('*');
