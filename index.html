@@ -852,7 +852,7 @@ async function loadData() {
     // 1. Cargar productos primero para renderizar la tienda de inmediato
     const prodRes = await _supabase
       .from('productos')
-      .select('id, title, category, price, stock, image, image2');
+      .select('id, title, category, price');
 
     if (prodRes.error) {
       console.error('Error productos Supabase:', prodRes.error);
