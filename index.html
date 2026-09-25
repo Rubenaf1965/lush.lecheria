@@ -846,56 +846,74 @@
     let currentLightboxIndex = 0;
     let currentLightboxTitle = '';
 
-    // CARGA DE DATOS DESDE SUPABASE
-    async function loadData() {
-      try {
-        const [prodRes, sellRes, ordRes] = await Promise.all([
-          _supabase.from('productos').select('*'),
-          _supabase.from('vendedores').select('*'),
-          _supabase.from('ordenes').select('*').order('created_at', { ascending: false })
-        ]);
+    // CARGA DE DATOS DESDE SUPABASE OPTIMIZADA
+async function loadData() {
+  try {
+    // 1. Cargar productos primero para renderizar la tienda de inmediato
+    const prodRes = await _supabase
+      .from('productos')
+      .select('id, title, category, price, stock, image, image2');
 
-        if (prodRes.error) console.error('Error productos Supabase:', prodRes.error);
-        else productos = (prodRes.data || []).map(p => ({
-          id: p.id,
-          title: p.title,
-          category: p.category,
-          price: parseFloat(p.price || 0),
-          stock: parseInt(p.stock || 0),
-          image: p.image,
-          image2: p.image2 || null // Mapeo de la segunda imagen opcional
-        }));
-
-        if (sellRes.error) console.error('Error vendedores Supabase:', sellRes.error);
-        else vendedores = (sellRes.data || []).map(s => ({
-          id: s.id,
-          name: s.name,
-          commission: parseFloat(s.commission || 0),
-          phone: s.phone
-        }));
-
-        if (ordRes.error) console.error('Error órdenes Supabase:', ordRes.error);
-        else ordenes = (ordRes.data || []).map(o => ({
-          id: o.id,
-          date: o.date,
-          isoDate: o.iso_date,
-          customerName: o.customer_name,
-          items: typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []),
-          total: parseFloat(o.total || 0),
-          paymentRef: o.payment_ref,
-          deliveryAddress: o.delivery_address,
-          sellerId: o.seller_id,
-          sellerName: o.seller_name,
-          commissionAmount: parseFloat(o.commission_amount || 0)
-        }));
-
-        renderProductos();
-        renderAdminDashboard();
-        renderSellerSelectOptions();
-      } catch (err) {
-        console.error("Error al cargar desde Supabase:", err);
-      }
+    if (prodRes.error) {
+      console.error('Error productos Supabase:', prodRes.error);
+    } else {
+      productos = (prodRes.data || []).map(p => ({
+        id: p.id,
+        title: p.title,
+        category: p.category,
+        price: parseFloat(p.price || 0),
+        stock: parseInt(p.stock || 0),
+        image: p.image,
+        image2: p.image2 || null
+      }));
+      // Renderizar catálogo inmediatamente
+      renderProductos();
     }
+
+    // 2. Cargar vendedores y órdenes de forma secuencial
+    const sellRes = await _supabase.from('vendedores').select('id, name, commission, phone');
+    if (sellRes.error) {
+      console.error('Error vendedores Supabase:', sellRes.error);
+    } else {
+      vendedores = (sellRes.data || []).map(s => ({
+        id: s.id,
+        name: s.name,
+        commission: parseFloat(s.commission || 0),
+        phone: s.phone
+      }));
+      renderSellerSelectOptions();
+    }
+
+    // Limitar las órdenes a las últimas 100 para no sobrecargar el payload
+    const ordRes = await _supabase
+      .from('ordenes')
+      .select('id, date, iso_date, customer_name, items, total, payment_ref, delivery_address, seller_id, seller_name, commission_amount')
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (ordRes.error) {
+      console.error('Error órdenes Supabase:', ordRes.error);
+    } else {
+      ordenes = (ordRes.data || []).map(o => ({
+        id: o.id,
+        date: o.date,
+        isoDate: o.iso_date,
+        customerName: o.customer_name,
+        items: typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []),
+        total: parseFloat(o.total || 0),
+        paymentRef: o.payment_ref,
+        deliveryAddress: o.delivery_address,
+        sellerId: o.seller_id,
+        sellerName: o.seller_name,
+        commissionAmount: parseFloat(o.commission_amount || 0)
+      }));
+      renderAdminDashboard();
+    }
+
+  } catch (err) {
+    console.error("Error al cargar desde Supabase:", err);
+  }
+}
 
     // TASA BCV DIARIA
     async function fetchBcvRate() {
