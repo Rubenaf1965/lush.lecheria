@@ -1390,60 +1390,76 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
     }
 
 // ✅ SOLUCIÓN: Subir archivo a Storage y guardar la URL
-async function guardarProducto(evento) {
-  evento.preventDefault();
-  
-  const fileInput = document.querySelector('#input-file-imagen');
-  const file = fileInput.files[0];
-  
-  if (!file) return;
+async function guardarProducto(event) {
+  event.preventDefault();
 
-  // 1. Sanitizar el nombre del archivo para evitar rechazos
-  const fileExt = file.name.split('.').pop();
-  const rawName = file.name.substring(0, file.name.lastIndexOf('.'));
-  const cleanName = rawName
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9_-]/g, '-')
-    .toLowerCase();
+  // 1. Obtener la referencia al archivo seleccionado
+  const fileInput = document.querySelector('#input-imagen'); // Ajusta el ID según tu HTML
+  const file = fileInput?.files[0];
 
-  const fileName = `${Date.now()}-${cleanName}.${fileExt}`;
-
-  // 2. Subir la imagen al bucket 'productos' en Storage
-  const { data: storageData, error: storageError } = await supabase.storage
-    .from('productos')
-    .upload(fileName, file, {
-      contentType: file.type,
-      upsert: false
-    });
-
-  if (storageError) {
-    console.error('Error subiendo a Storage:', storageError.message);
+  if (!file) {
+    alert('Por favor selecciona una imagen para el producto.');
     return;
   }
 
-  // 3. Obtener la URL pública de la imagen subida
-  const { data: urlData } = supabase.storage
-    .from('productos')
-    .getPublicUrl(fileName);
+  try {
+    // 2. Sanitizar el nombre del archivo (elimina espacios y tildes)
+    const fileExt = file.name.split('.').pop();
+    const rawName = file.name.substring(0, file.name.lastIndexOf('.'));
+    const cleanName = rawName
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9_-]/g, '-')
+      .toLowerCase();
 
-  const publicUrl = urlData.publicUrl;
+    const fileName = `${Date.now()}-${cleanName}.${fileExt}`;
 
-  // 4. Guardar en la tabla SQL 'productos' solo la URL ligera
-  const { error: dbError } = await supabase
-    .from('productos')
-    .insert([{
-      title: document.querySelector('#title-input').value,
-      category: document.querySelector('#category-input').value,
-      price: parseFloat(document.querySelector('#price-input').value),
-      stock: parseInt(document.querySelector('#stock-input').value),
-      image: publicUrl // <--- Guarda un texto corto: "https://.../productos/123-gel.png"
-    }]);
+    // 3. Subir el archivo binario a Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('productos') // Debe ser en minúsculas como tu bucket
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type
+      });
 
-  if (dbError) {
-    console.error('Error guardando producto:', dbError.message);
-  } else {
-    console.log('¡Producto e imagen guardados correctamente!');
+    if (uploadError) {
+      console.error('Error al subir a Storage:', uploadError);
+      alert(`Error en Storage: ${uploadError.message}`);
+      return;
+    }
+
+    // 4. Obtener la URL Pública de la imagen subida
+    const { data: urlData } = supabase.storage
+      .from('productos')
+      .getPublicUrl(fileName);
+
+    const publicUrl = urlData.publicUrl;
+
+    // 5. Insertar los datos en la tabla 'productos' usando la URL pública
+    const { data: dbData, error: dbError } = await supabase
+      .from('productos')
+      .insert([
+        {
+          title: document.querySelector('#input-titulo').value,
+          category: document.querySelector('#input-categoria').value,
+          price: parseFloat(document.querySelector('#input-precio').value),
+          stock: parseInt(document.querySelector('#input-stock').value),
+          image: publicUrl // Guarda la URL corta: "https://.../productos/123-nombre.png"
+        }
+      ]);
+
+    if (dbError) {
+      console.error('Error al insertar en la base de datos:', dbError);
+      alert(`Error en BD: ${dbError.message}`);
+      return;
+    }
+
+    alert('¡Producto guardado e imagen subida al Storage con éxito!');
+    location.reload(); // Recargar para refrescar el catálogo
+
+  } catch (err) {
+    console.error('Error inesperado:', err);
   }
 }
 
