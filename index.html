@@ -1389,7 +1389,59 @@ async function loadData() {
         `;
       }).join('');
     }
+	
+	// EJEMPLO DE CÓMO INTEGRARLA EN TU FUNCIÓN DE GUARDAR PRODUCTO
+async function guardarProducto(event) {
+  event.preventDefault();
 
+  const id = document.getElementById('prodId').value || crypto.randomUUID();
+  const title = document.getElementById('prodTitle').value;
+  const category = document.getElementById('prodCategory').value;
+  const price = parseFloat(document.getElementById('prodPrice').value);
+  const stock = parseInt(document.getElementById('prodStock').value);
+
+  // Capturar los archivos seleccionados en los <input type="file">
+  const inputImagen1 = document.getElementById('inputImagen1').files[0];
+  const inputImagen2 = document.getElementById('inputImagen2').files[0];
+
+  let imageUrl = null;
+  let image2Url = null;
+
+  // Función para el input <input type="file" id="inputImagen"> en el Admin
+async function handleSubirImagenProducto(file, productoId) {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${productoId}_${Date.now()}.${fileExt}`;
+
+  // 1. Subir directamente a Supabase Storage
+  const { data, error } = await _supabase.storage
+    .from('productos')
+    .upload(fileName, file);
+
+  if (error) {
+    console.error('Error al subir la imagen:', error);
+    return null;
+  }
+
+  // 2. Obtener y retornar solo la URL pública corta
+  const { data: urlData } = _supabase.storage
+    .from('productos')
+    .getPublicUrl(fileName);
+
+  return urlData.publicUrl; // Guardar este string corto en la BD
+}
+
+  // 3. Guardar en la tabla 'productos' de Supabase
+  const { error } = await _supabase
+    .from('productos')
+    .upsert(productoData);
+
+  if (error) {
+    console.error("Error al guardar producto:", error);
+  } else {
+    alert("Producto guardado exitosamente");
+    loadData(); // Recargar la lista
+  }
+}
     // PANEL ADMIN Y LOGIN
     function openAdminModal() { document.getElementById('authModal').classList.remove('hidden'); }
     function closeAdminModal() { 
