@@ -32,6 +32,8 @@
       #printArea, #inventoryReportArea, #monthlyClosureReportArea, #invoiceArea { position: absolute; left: 0; top: 0; width: 100%; }
       .no-print { display: none !important; }
     }
+    .scrollbar-none::-webkit-scrollbar { display: none; }
+    .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -66,7 +68,7 @@
   <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-24 flex items-center justify-between">
       <a href="#" onclick="showSection('shop')" class="flex items-center gap-3">
-        <img src="LUSH logo.PNG" alt="Lush Maquillaje | Accesorios" class="h-16 w-16 md:h-20 md:w-20 object-cover rounded-full border border-gray-200 transition-all shadow-sm">
+        <img src="LUSH logo.PNG" alt="Lush Maquillaje | Accesorios" class="h-16 w-16 md:h-20 md:w-20 object-cover rounded-full border border-gray-200 transition-all shadow-sm" onerror="this.src='https://via.placeholder.com/80?text=LUSH'">
         <div class="leading-none">
           <span class="text-xl md:text-2xl font-light tracking-widest text-lushDark uppercase block">LUSH LECHERIA</span>
           <span class="text-[10px] md:text-xs text-lushGold font-semibold tracking-wider uppercase block">Maquillaje | Accesorios</span>
@@ -95,94 +97,51 @@
     </div>
   </header>
 
- <!-- SECCIÓN TIENDA PÚBLICA CON VIDEO INTERACTIVO DE AGUA -->
-<main id="shopSection" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full no-print relative overflow-hidden">
-  
-  <!-- Hero Banner con Video de Fondo Estilo Acuático y Elegante -->
-  <section class="relative rounded-3xl p-8 md:p-16 mb-14 flex flex-col md:flex-row items-center justify-between shadow-2xl overflow-hidden z-10 border border-white/20">
-    
-    <!-- Video de Fondo en Bucle (Simulando agua cristalina y lujo) -->
-    <div class="absolute inset-0 z-0 overflow-hidden">
-      <video autoplay muted loop playsinline class="w-full h-full object-cover filter brightness-75 scale-105">
-        <!-- Puedes reemplazar este enlace por un video propio alojado en Supabase Storage o tu servidor -->
-        <source src="https://assets.mixkit.co/videos/preview/mixkit-underwater-sun-rays-4161-large.mp4" type="video/mp4">
-      </video>
-      <!-- Capa de gradiente oscuro/rosado translúcido para asegurar legibilidad del texto -->
-      <div class="absolute inset-0 bg-gradient-to-r from-black/50 via-rose-950/30 to-black/40 backdrop-blur-[2px]"></div>
-    </div>
-
-    <!-- Contenido de Texto del Banner -->
-    <div class="max-w-xl mb-8 md:mb-0 relative z-10 text-white">
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 backdrop-blur-md shadow-lg mb-4 border border-white/30">
-        <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
-        <span class="text-xs uppercase tracking-widest text-white font-bold">Nueva Colección • XOXO</span>
+  <!-- SECCIÓN TIENDA PÚBLICA -->
+  <main id="shopSection" class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full no-print relative overflow-hidden">
+    <!-- Hero Banner -->
+    <section class="relative rounded-3xl p-8 md:p-16 mb-14 flex flex-col md:flex-row items-center justify-between shadow-2xl overflow-hidden z-10 border border-white/20">
+      <div class="absolute inset-0 z-0 overflow-hidden">
+        <video autoplay muted loop playsinline class="w-full h-full object-cover filter brightness-75 scale-105">
+          <source src="https://assets.mixkit.co/videos/preview/mixkit-underwater-sun-rays-4161-large.mp4" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/50 via-rose-950/30 to-black/40 backdrop-blur-[2px]"></div>
       </div>
-      <h1 class="text-4xl md:text-6xl font-serif text-white mt-2 mb-4 leading-tight drop-shadow-md">
-        Tus favoritos de <span class="italic font-light text-rose-300">Maquillaje</span> ya llegaron.
-      </h1>
-      <p class="text-gray-200 text-base mb-6 font-light drop-shadow">
-        Encuentra la mejor selección de cosméticos y accesorios finos en Lechería. Sumérgete en el lujo minimalista.
-      </p>
-      <div class="flex items-center gap-4">
-        <a href="#catalogo" class="inline-flex items-center gap-2 bg-white text-lushDark px-8 py-3.5 rounded-full text-sm uppercase tracking-wider hover:bg-rose-100 transition-all duration-300 shadow-xl hover:-translate-y-0.5 font-medium">
-          Explorar Tienda
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </a>
+
+      <div class="max-w-xl mb-8 md:mb-0 relative z-10 text-white">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 backdrop-blur-md shadow-lg mb-4 border border-white/30">
+          <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+          <span class="text-xs uppercase tracking-widest text-white font-bold">Nueva Colección • XOXO</span>
+        </div>
+        <h1 class="text-4xl md:text-6xl font-serif text-white mt-2 mb-4 leading-tight drop-shadow-md">
+          Tus favoritos de <span class="italic font-light text-rose-300">Maquillaje</span> ya llegaron.
+        </h1>
+        <p class="text-gray-200 text-base mb-6 font-light drop-shadow">
+          Encuentra la mejor selección de cosméticos y accesorios finos en Lechería. Sumérgete en el lujo minimalista.
+        </p>
+        <div class="flex items-center gap-4">
+          <a href="#catalogo" class="inline-flex items-center gap-2 bg-white text-lushDark px-8 py-3.5 rounded-full text-sm uppercase tracking-wider hover:bg-rose-100 transition-all duration-300 shadow-xl hover:-translate-y-0.5 font-medium">
+            Explorar Tienda
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+          </a>
+        </div>
       </div>
-    </div>
 
-    <!-- Tarjeta Visual Interactiva / Imagen Destacada -->
-    <div class="w-full md:w-2/5 relative z-10 group">
-      <div class="aspect-square rounded-2xl overflow-hidden shadow-2xl border-2 border-white/40 bg-white/10 backdrop-blur-md transition-transform duration-500 group-hover:scale-105">
-        <!-- Aquí puedes colocar la imagen de los productos de maquillaje de Lush -->
-        <img src="productos.kush.jpeg" alt="Lush Maquillaje Favoritos" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+      <div class="w-full md:w-2/5 relative z-10 group">
+        <div class="aspect-square rounded-2xl overflow-hidden shadow-2xl border-2 border-white/40 bg-white/10 backdrop-blur-md transition-transform duration-500 group-hover:scale-105">
+          <img src="productos.kush.jpeg" alt="Lush Maquillaje Favoritos" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" onerror="this.src='https://via.placeholder.com/400?text=Lush+Productos'">
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Catálogo y Filtros -->
-  <section id="catalogo" class="mb-8 flex items-center justify-between border-b border-gray-200/60 pb-4 relative z-10">
-    <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none" id="categoryFilters"></div>
-  </section>
+    <!-- Catálogo y Filtros -->
+    <section id="catalogo" class="mb-8 flex items-center justify-between border-b border-gray-200/60 pb-4 relative z-10">
+      <div class="flex gap-3 overflow-x-auto pb-2 scrollbar-none" id="categoryFilters"></div>
+    </section>
 
-  <!-- Grid de Productos -->
-  <section id="productosGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10"></section>
-</main>
-
-
-<style>
-  /* Estilos adicionales para animaciones de agua y tarjetas interactivas */
-  @keyframes waterRipple {
-    0% { transform: scale(1); opacity: 0.3; }
-    50% { transform: scale(1.05); opacity: 0.5; }
-    100% { transform: scale(1); opacity: 0.3; }
-  }
-  .water-ripple-bg {
-    animation: waterRipple 8s ease-in-out infinite;
-  }
-  /* Estilo para tarjetas de producto con efecto flotante */
-  .product-card-interactive {
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .product-card-interactive:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.1);
-  }
-</style>
-
-<script>
-  // Script opcional para generar ondas interactivas con el movimiento del mouse sobre el banner principal
-  const heroBanner = document.querySelector('#shopSection');
-  heroBanner.addEventListener('mousemove', (e) => {
-    const { clientX, clientY } = e;
-    const xPos = (clientX / window.innerWidth) * 20;
-    const yPos = (clientY / window.innerHeight) * 20;
-    const rippleBg = heroBanner.querySelector('.water-ripple-bg');
-    if(rippleBg) {
-      rippleBg.style.transform = `translate(${xPos}px, ${yPos}px)`;
-    }
-  });
-</script>
+    <!-- Grid de Productos -->
+    <section id="productosGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10"></section>
+  </main>
 
   <!-- SECCIÓN PANEL ADMINISTRATIVO COMPLETO -->
   <section id="adminSection" class="hidden flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-10 no-print">
@@ -240,7 +199,7 @@
             <div>
               <label class="block text-xs font-semibold text-gray-600 mb-1">Categoría</label>
               <select id="prodCategory" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
-                <option value="accesorios"> Accesorios</option>
+                <option value="accesorios">Accesorios</option>
                 <option value="cosmeticos">Cosméticos</option>
               </select>
             </div>
@@ -261,7 +220,6 @@
             </div>
           </div>
 
-          <!-- CAMBIO CLAVE 1: Campo opcional para segunda imagen -->
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">2da Imagen (Opcional)</label>
             <input type="file" id="prodImageFile2" accept="image/*" class="w-full p-1.5 border rounded-lg text-xs bg-white focus:outline-none focus:border-lushGold">
@@ -384,7 +342,7 @@
     <div id="invoiceArea" class="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
       <div class="flex items-center justify-between border-b pb-4">
         <div class="flex items-center gap-3">
-          <img src="LUSH logo.PNG" class="h-14 w-14 rounded-full border object-cover" alt="Lush Logo">
+          <img src="LUSH logo.PNG" class="h-14 w-14 rounded-full border object-cover" alt="Lush Logo" onerror="this.src='https://via.placeholder.com/60?text=LUSH'">
           <div>
             <h2 class="text-xl font-bold text-lushDark uppercase tracking-widest">LUSH LECHERIA</h2>
             <p class="text-xs text-gray-500">Maquillaje | Accesorios</p>
@@ -453,7 +411,7 @@
     <div id="monthlyClosureReportArea" class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
       <div class="flex items-center justify-between border-b pb-4">
         <div class="flex items-center gap-3">
-          <img src="LUSH logo.PNG" class="h-12 w-12 rounded-full border" alt="Lush Logo">
+          <img src="LUSH logo.PNG" class="h-12 w-12 rounded-full border" alt="Lush Logo" onerror="this.src='https://via.placeholder.com/50?text=LUSH'">
           <div>
             <h2 class="text-xl font-bold text-lushDark uppercase">Lush Lecheria</h2>
             <p class="text-xs text-gray-500">Reporte de Cierre Mensual de Ventas</p>
@@ -537,7 +495,7 @@
     <div id="inventoryReportArea" class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
       <div class="flex items-center justify-between border-b pb-4">
         <div class="flex items-center gap-3">
-          <img src="LUSH logo.PNG" class="h-12 w-12 rounded-full border" alt="Lush Logo">
+          <img src="LUSH logo.PNG" class="h-12 w-12 rounded-full border" alt="Lush Logo" onerror="this.src='https://via.placeholder.com/50?text=LUSH'">
           <div>
             <h2 class="text-xl font-bold text-lushDark uppercase">Lush Lecheria</h2>
             <p class="text-xs text-gray-500">Desglose de Inventario: Stock Disponible y Faltantes</p>
@@ -618,22 +576,18 @@
     </div>
   </div>
 
-  <!-- CAMBIO CLAVE 2: MODAL VISOR FLOTANTE (LIGHTBOX) PARA MULTI-FOTOS -->
+  <!-- MODAL VISOR FLOTANTE (LIGHTBOX) -->
   <div id="lightboxModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 no-print">
     <div class="relative max-w-3xl w-full flex flex-col items-center">
-      <!-- Botón cerrar -->
       <button onclick="closeLightbox()" class="absolute -top-12 right-0 text-white text-2xl font-bold bg-white/20 hover:bg-white/40 w-10 h-10 rounded-full flex items-center justify-center transition">✕</button>
       
-      <!-- Contenedor imagen -->
       <div class="relative w-full max-h-[75vh] flex items-center justify-center overflow-hidden rounded-2xl bg-black/40">
         <img id="lightboxImg" src="" alt="Vista previa producto" class="max-h-[75vh] max-w-full object-contain transition-all duration-300">
         
-        <!-- Botones de navegación (Anterior / Siguiente) -->
         <button id="lightboxPrev" onclick="prevLightboxImage()" class="absolute left-3 bg-black/50 hover:bg-black/80 text-white p-3 rounded-full text-lg transition flex items-center justify-center">❮</button>
         <button id="lightboxNext" onclick="nextLightboxImage()" class="absolute right-3 bg-black/50 hover:bg-black/80 text-white p-3 rounded-full text-lg transition flex items-center justify-center">❯</button>
       </div>
 
-      <!-- Título y Conteo en tiempo real -->
       <div class="mt-4 text-center text-white space-y-1">
         <h4 id="lightboxTitle" class="text-lg font-semibold tracking-wide"></h4>
         <p id="lightboxCounter" class="text-xs text-lushGold font-mono tracking-wider"></p>
@@ -646,7 +600,7 @@
     <div id="printArea" class="bg-white rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-6">
       <div class="flex items-center justify-between border-b pb-4">
         <div class="flex items-center gap-3">
-          <img src="LUSH logo.PNG" class="h-12 w-12 rounded-full border" alt="Lush Logo">
+          <img src="LUSH logo.PNG" class="h-12 w-12 rounded-full border" alt="Lush Logo" onerror="this.src='https://via.placeholder.com/50?text=LUSH'">
           <div>
             <h2 class="text-xl font-bold text-lushDark uppercase">Lush Lecheria</h2>
             <p class="text-xs text-gray-500">Reporte de Demanda y Productos Más Vendidos</p>
@@ -767,7 +721,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
       <div>
         <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
-          <img src="LUSH logo.PNG" alt="Lush" class="h-10 w-10 rounded-full object-cover border">
+          <img src="LUSH logo.PNG" alt="Lush" class="h-10 w-10 rounded-full object-cover border" onerror="this.src='https://via.placeholder.com/40?text=LUSH'">
           <span class="text-lg font-light tracking-widest text-lushDark uppercase">LUSH LECHERIA <span class="text-xs text-lushGold font-semibold block">Maquillaje | Accesorios</span></span>
         </div>
         <p class="text-xs text-gray-500">Eleva tu estilo con nuestros cosméticos y accesorios finos en Lechería, Estado Anzoátegui, Venezuela.</p>
@@ -823,7 +777,6 @@
 
   <!-- SCRIPT LOGIC JAVASCRIPT CON SUPABASE INTEGRADO -->
   <script>
-    // CONFIGURACIÓN DE SUPABASE
     const SUPABASE_URL = "https://cwmehnvcnqxtyllkeejw.supabase.co/";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3bWVobnZjbnF4dHlsbGtlZWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMTg4MjEsImV4cCI6MjEwNDY5NDgyMX0.ln0qABX3k3lpipN_TW97FOqSbYhNwczZg6uU1cjaZMk";
 
@@ -841,81 +794,67 @@
     let cart = [];
     let selectedCategory = 'all';
 
-    // Variables de estado para el Lightbox
     let currentLightboxImages = [];
     let currentLightboxIndex = 0;
     let currentLightboxTitle = '';
 
-    // CARGA DE DATOS DESDE SUPABASE OPTIMIZADA
-async function loadData() {
-  try {
-    // 1. Cargar productos primero para renderizar la tienda de inmediato
-    const prodRes = await _supabase
-      .from('productos')
-      .select('id, title, category, price');
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchBcvRate();
+      loadData();
+      renderCategoryFilters();
+    });
 
-    if (prodRes.error) {
-      console.error('Error productos Supabase:', prodRes.error);
-    } else {
-      productos = (prodRes.data || []).map(p => ({
-        id: p.id,
-        title: p.title,
-        category: p.category,
-        price: parseFloat(p.price || 0),
-        stock: parseInt(p.stock || 0),
-        image: p.image,
-        image2: p.image2 || null
-      }));
-      // Renderizar catálogo inmediatamente
-      renderProductos();
+    async function loadData() {
+      try {
+        const [prodRes, sellRes, ordRes] = await Promise.all([
+          _supabase.from('productos').select('*'),
+          _supabase.from('vendedores').select('*'),
+          _supabase.from('ordenes').select('*').order('created_at', { ascending: false })
+        ]);
+
+        if (prodRes.error) throw prodRes.error;
+        productos = (prodRes.data || []).map(p => ({
+          id: p.id,
+          title: p.title,
+          category: p.category,
+          price: parseFloat(p.price || 0),
+          stock: parseInt(p.stock || 0),
+          image: p.image,
+          image2: p.image2 || null
+        }));
+
+        if (sellRes.error) throw sellRes.error;
+        vendedores = (sellRes.data || []).map(s => ({
+          id: s.id,
+          name: s.name,
+          commission: parseFloat(s.commission || 0),
+          phone: s.phone
+        }));
+
+        if (ordRes.error) throw ordRes.error;
+        ordenes = (ordRes.data || []).map(o => ({
+          id: o.id,
+          date: o.date,
+          isoDate: o.iso_date,
+          customerName: o.customer_name,
+          items: typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []),
+          total: parseFloat(o.total || 0),
+          paymentRef: o.payment_ref,
+          deliveryAddress: o.delivery_address,
+          sellerId: o.seller_id,
+          sellerName: o.seller_name,
+          commissionAmount: parseFloat(o.commission_amount || 0)
+        }));
+
+        renderProductos();
+        renderSellerSelectOptions();
+        renderAdminDashboard();
+
+      } catch (err) {
+        console.error("Error al cargar datos desde Supabase:", err);
+      }
     }
 
-    // 2. Cargar vendedores y órdenes de forma secuencial
-    const sellRes = await _supabase.from('vendedores').select('id, name, commission, phone');
-    if (sellRes.error) {
-      console.error('Error vendedores Supabase:', sellRes.error);
-    } else {
-      vendedores = (sellRes.data || []).map(s => ({
-        id: s.id,
-        name: s.name,
-        commission: parseFloat(s.commission || 0),
-        phone: s.phone
-      }));
-      renderSellerSelectOptions();
-    }
-
-    // Limitar las órdenes a las últimas 100 para no sobrecargar el payload
-    const ordRes = await _supabase
-      .from('ordenes')
-      .select('id, date, iso_date, customer_name, items, total, payment_ref, delivery_address, seller_id, seller_name, commission_amount')
-      .order('created_at', { ascending: false })
-      .limit(100);
-
-    if (ordRes.error) {
-      console.error('Error órdenes Supabase:', ordRes.error);
-    } else {
-      ordenes = (ordRes.data || []).map(o => ({
-        id: o.id,
-        date: o.date,
-        isoDate: o.iso_date,
-        customerName: o.customer_name,
-        items: typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []),
-        total: parseFloat(o.total || 0),
-        paymentRef: o.payment_ref,
-        deliveryAddress: o.delivery_address,
-        sellerId: o.seller_id,
-        sellerName: o.seller_name,
-        commissionAmount: parseFloat(o.commission_amount || 0)
-      }));
-      renderAdminDashboard();
-    }
-
-  } catch (err) {
-    console.error("Error al cargar desde Supabase:", err);
-  }
-}
-
-    // TASA BCV DIARIA
     async function fetchBcvRate() {
       const todayStr = new Date().toISOString().slice(0, 10);
       const cachedDate = localStorage.getItem('lush_bcv_date');
@@ -953,292 +892,7 @@ async function loadData() {
       calculateCartTotal();
     }
 
-    // VER FACTURA DE ORDEN
-    function openInvoiceModal(orderId) {
-      const order = ordenes.find(o => String(o.id) === String(orderId));
-      if (!order) return;
-
-      document.getElementById('invoiceNumber').innerText = `#${order.id}`;
-      document.getElementById('invoiceDate').innerText = order.date;
-      document.getElementById('invoiceCustomerName').innerText = order.customerName || 'Cliente General';
-      document.getElementById('invoiceDeliveryAddress').innerText = order.deliveryAddress;
-      document.getElementById('invoicePaymentRef').innerText = order.paymentRef;
-      document.getElementById('invoiceSellerName').innerText = order.sellerName || 'Venta Directa';
-
-      const itemsBody = document.getElementById('invoiceItemsTableBody');
-      itemsBody.innerHTML = Array.isArray(order.items) ? order.items.map(item => `
-        <tr class="border-b">
-          <td class="p-2.5 font-bold">${item.qty}</td>
-          <td class="p-2.5">${item.title}</td>
-          <td class="p-2.5 text-right font-mono">$${parseFloat(item.price).toFixed(2)}</td>
-          <td class="p-2.5 text-right font-bold text-lushDark">$${(parseFloat(item.price) * item.qty).toFixed(2)}</td>
-        </tr>
-      `).join('') : '';
-
-      const totalBs = bcvRate > 0 ? (order.total * bcvRate).toFixed(2) : '0.00';
-      document.getElementById('invoiceBcvRate').innerText = bcvRate > 0 ? `Bs. ${bcvRate.toFixed(2)}` : 'N/A';
-      document.getElementById('invoiceTotalUsd').innerText = `$${order.total.toFixed(2)}`;
-      document.getElementById('invoiceTotalBs').innerText = `Bs. ${totalBs}`;
-
-      document.getElementById('invoiceModal').classList.remove('hidden');
-    }
-
-    function closeInvoiceModal() {
-      document.getElementById('invoiceModal').classList.add('hidden');
-    }
-
-    function printInvoiceDirect(orderId) {
-      openInvoiceModal(orderId);
-      setTimeout(() => {
-        window.print();
-      }, 300);
-    }
-
-    // ELIMINAR ÓRDEN EN SUPABASE
-    async function deleteOrder(orderId) {
-      const orderIndex = ordenes.findIndex(o => o.id === orderId);
-      if (orderIndex === -1) return;
-
-      const order = ordenes[orderIndex];
-      const restoreStock = confirm(
-        `¿Desea eliminar la orden #${order.id}?\n\n` +
-        `• 'Aceptar': Elimina la orden y RESTAURA el stock.\n` +
-        `• 'Cancelar': Cancela la acción.`
-      );
-
-      if (restoreStock) {
-        for (const item of order.items) {
-          const prod = productos.find(p => p.id === item.id);
-          if (prod) {
-            const newStock = prod.stock + item.qty;
-            await _supabase.from('productos').update({ stock: newStock }).eq('id', prod.id);
-          }
-        }
-
-        const { error } = await _supabase.from('ordenes').delete().eq('id', orderId);
-        if (error) {
-          alert("Error al borrar la orden en Supabase: " + error.message);
-          return;
-        }
-
-        await loadData();
-        alert(`La orden #${orderId} ha sido eliminada y el stock devuelto.`);
-      }
-    }
-
-    // CIERRE MENSUAL
-    function openMonthlyClosureModal() {
-      const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
-      
-      document.getElementById('closureMonthPicker').value = `${currentYear}-${currentMonth}`;
-      generateMonthlyClosureReport();
-      document.getElementById('monthlyClosureModal').classList.remove('hidden');
-    }
-
-    function closeMonthlyClosureModal() {
-      document.getElementById('monthlyClosureModal').classList.add('hidden');
-    }
-
-    function generateMonthlyClosureReport() {
-      const selectedYearMonth = document.getElementById('closureMonthPicker').value;
-      if (!selectedYearMonth) return;
-
-      const [year, month] = selectedYearMonth.split('-');
-      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-      const monthLabel = `${monthNames[parseInt(month, 10) - 1]} ${year}`;
-
-      document.getElementById('closurePeriodTitle').innerText = `Cierre de Mes: ${monthLabel}`;
-      document.getElementById('closureReportGeneratedAt').innerText = `Generado el: ${new Date().toLocaleString('es-VE')}`;
-
-      const filteredOrders = ordenes.filter(o => {
-        if (!o.isoDate) {
-          const parts = o.date ? o.date.split('/') : [];
-          if (parts.length >= 3) {
-            const day = parts[0].padStart(2, '0');
-            const m = parts[1].padStart(2, '0');
-            const y = parts[2].substring(0, 4);
-            return `${y}-${m}` === selectedYearMonth;
-          }
-          return false;
-        }
-        return o.isoDate.startsWith(selectedYearMonth);
-      });
-
-      const totalSales = filteredOrders.reduce((acc, o) => acc + o.total, 0);
-      const totalCommissions = filteredOrders.reduce((acc, o) => acc + o.commissionAmount, 0);
-      const totalUnits = filteredOrders.reduce((acc, o) => acc + o.items.reduce((sum, item) => sum + item.qty, 0), 0);
-
-      document.getElementById('closureTotalSales').innerText = `$${totalSales.toFixed(2)}`;
-      document.getElementById('closureTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
-      document.getElementById('closureTotalOrdersUnits').innerText = `${filteredOrders.length} órds. / ${totalUnits} unids.`;
-
-      const vendedoresMap = {};
-      vendedores.forEach(s => {
-        vendedoresMap[s.id] = { name: s.name, count: 0, totalSales: 0, totalCommission: 0 };
-      });
-      vendedoresMap['direct'] = { name: 'Venta Directa', count: 0, totalSales: 0, totalCommission: 0 };
-
-      filteredOrders.forEach(o => {
-        const key = o.sellerId || 'direct';
-        if (!vendedoresMap[key]) {
-          vendedoresMap[key] = { name: o.sellerName || 'Vendedor Desconocido', count: 0, totalSales: 0, totalCommission: 0 };
-        }
-        vendedoresMap[key].count += 1;
-        vendedoresMap[key].totalSales += o.total;
-        vendedoresMap[key].totalCommission += o.commissionAmount;
-      });
-
-      const closureSellersBody = document.getElementById('closureSellersTableBody');
-      const activeSellers = Object.values(vendedoresMap).filter(s => s.count > 0);
-
-      if (activeSellers.length === 0) {
-        closureSellersBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin actividad de vendedores en este mes.</td></tr>`;
-      } else {
-        closureSellersBody.innerHTML = activeSellers.map(s => `
-          <tr class="border-b">
-            <td class="p-2.5 font-semibold text-lushDark">${s.name}</td>
-            <td class="p-2.5 text-center">${s.count} pedido(s)</td>
-            <td class="p-2.5 text-right font-medium">$${s.totalSales.toFixed(2)}</td>
-            <td class="p-2.5 text-right font-bold text-lushGold">$${s.totalCommission.toFixed(2)}</td>
-          </tr>
-        `).join('');
-      }
-
-      const closureOrdersBody = document.getElementById('closureOrdersTableBody');
-      if (filteredOrders.length === 0) {
-        closureOrdersBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No se encontraron órdenes en este período.</td></tr>`;
-      } else {
-        closureOrdersBody.innerHTML = filteredOrders.map(o => `
-          <tr class="border-b">
-            <td class="p-2 font-bold text-lushDark">#${o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
-            <td class="p-2">${o.customerName || 'N/A'}</td>
-            <td class="p-2 text-gray-600">${o.sellerName}</td>
-            <td class="p-2 font-mono text-emerald-700">${o.paymentRef}</td>
-            <td class="p-2 text-right font-bold text-lushDark">$${o.total.toFixed(2)}</td>
-            <td class="p-2 text-right font-bold text-lushGold">$${o.commissionAmount.toFixed(2)}</td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    // REPORTES E IMPRESIÓN DE INVENTARIO
-    function renderInventoryReportData() {
-      document.getElementById('inventoryReportTimestamp').innerText = `Fecha: ${new Date().toLocaleString('es-VE')}`;
-
-      const stockBody = document.getElementById('inventoryStockTableBody');
-      const missingBody = document.getElementById('inventoryMissingTableBody');
-
-      const availableProductos = productos.filter(p => p.stock > 0);
-      const missingProductos = productos.filter(p => p.stock <= 0);
-
-      if (availableProductos.length === 0) {
-        stockBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos disponibles.</td></tr>`;
-      } else {
-        stockBody.innerHTML = availableProductos.map(p => `
-          <tr class="border-b">
-            <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
-            <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
-            <td class="p-2.5 text-center font-medium">$${p.price.toFixed(2)}</td>
-            <td class="p-2.5 text-right font-bold text-emerald-600">${p.stock} unids.</td>
-          </tr>
-        `).join('');
-      }
-
-      if (missingProductos.length === 0) {
-        missingBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos agotados.</td></tr>`;
-      } else {
-        missingBody.innerHTML = missingProductos.map(p => `
-          <tr class="border-b">
-            <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
-            <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
-            <td class="p-2.5 text-center font-medium">$${p.price.toFixed(2)}</td>
-            <td class="p-2.5 text-right font-bold text-red-600">AGOTADO (0)</td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    function mostrarDesgloseInventario() {
-      renderInventoryReportData();
-      document.getElementById('inventoryReportModal').classList.remove('hidden');
-    }
-
-    function closeInventoryReportModal() {
-      document.getElementById('inventoryReportModal').classList.add('hidden');
-    }
-
-    function imprimirInventarioDirecto() {
-      renderInventoryReportData();
-      document.getElementById('inventoryReportModal').classList.remove('hidden');
-      window.print();
-    }
-
-    // MANEJO DE ARCHIVOS .JSON (RESPALDO LOCAL / CARGA A SUPABASE)
-    function exportDataToJSON() {
-      const backupData = {
-        productos: productos,
-        vendedores: vendedores,
-        ordenes: ordenes,
-        exportedAt: new Date().toISOString()
-      };
-
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `lush_backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
-
-    async function importDataFromJSON(event) {
-      const fileReader = new FileReader();
-      fileReader.onload = async function(e) {
-        try {
-          const importedData = JSON.parse(e.target.result);
-          if (importedData.productos || importedData.vendedores || importedData.ordenes) {
-            
-            if (importedData.productos && importedData.productos.length) {
-              const formattedProds = importedData.productos.map(p => ({
-                title: p.title, category: p.category, price: p.price, stock: p.stock, image: p.image, image2: p.image2 || null
-              }));
-              await _supabase.from('productos').insert(formattedProds);
-            }
-
-            if (importedData.vendedores && importedData.vendedores.length) {
-              const formattedSellers = importedData.vendedores.map(s => ({
-                name: s.name, commission: s.commission, phone: s.phone
-              }));
-              await _supabase.from('vendedores').insert(formattedSellers);
-            }
-
-            if (importedData.ordenes && importedData.ordenes.length) {
-              const formattedOrders = importedData.ordenes.map(o => ({
-                date: o.date, iso_date: o.isoDate, customer_name: o.customerName,
-                items: JSON.stringify(o.items), total: o.total, payment_ref: o.paymentRef,
-                delivery_address: o.deliveryAddress, seller_id: o.sellerId, seller_name: o.sellerName,
-                commission_amount: o.commissionAmount
-              }));
-              await _supabase.from('ordenes').insert(formattedOrders);
-            }
-
-            await loadData();
-            alert('¡Datos cargados con éxito y sincronizados en Supabase!');
-          } else {
-            alert('El archivo no posee un formato válido.');
-          }
-        } catch (err) {
-          alert('Error al leer e importar el archivo JSON.');
-        }
-      };
-      if (event.target.files[0]) {
-        fileReader.readAsText(event.target.files[0]);
-      }
-    }
-
-    // TIENDA PÚBLICA Y FILTROS
+    // INTERFAZ TIENDA Y CARRITO
     function renderCategoryFilters() {
       const categories = [
         { name: 'Todos', slug: 'all' },
@@ -1247,6 +901,7 @@ async function loadData() {
       ];
 
       const container = document.getElementById('categoryFilters');
+      if (!container) return;
       container.innerHTML = categories.map(cat => `
         <button 
           onclick="setFilter('${cat.slug}')"
@@ -1263,15 +918,270 @@ async function loadData() {
       renderProductos();
     }
 
-    // FUNCIONES DEL VISOR FLOTANTE (LIGHTBOX)
+    function renderProductos() {
+      const searchInput = document.getElementById('searchInput');
+      const search = searchInput ? searchInput.value.toLowerCase() : '';
+      const grid = document.getElementById('productosGrid');
+      if (!grid) return;
+
+      const filtered = productos.filter(p => {
+        const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+        const matchesSearch = p.title.toLowerCase().includes(search);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-8">No hay productos disponibles.</p>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => {
+        const isOut = p.stock <= 0;
+        const priceBs = bcvRate > 0 ? (p.price * bcvRate).toFixed(2) : '0.00';
+        const hasMultipleImages = Boolean(p.image2);
+        const imagenValida = (p.image && p.image !== 'undefined' && p.image !== '') ? p.image : 'LUSH logo.PNG';
+
+        return `
+          <article class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex items-center justify-between gap-4 relative">
+            <div class="flex items-center gap-4 flex-grow">
+              <div onclick="openLightbox('${p.id}')" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-lushBg flex-shrink-0 relative border border-gray-100 cursor-pointer group" title="Ver galería de fotos">
+                <img 
+                  src="${imagenValida}" 
+                  alt="${p.title}" 
+                  onerror="this.onerror=null; this.src='LUSH logo.PNG';"
+                  class="w-full h-full object-cover group-hover:scale-105 transition ${isOut ? 'grayscale opacity-60' : ''}"
+                >
+                ${hasMultipleImages ? `
+                  <div class="absolute bottom-1 right-1 bg-lushDark/80 text-white text-[9px] px-1.5 py-0.5 rounded-md font-mono flex items-center gap-0.5 shadow-sm">
+                    <span>📷</span> 2+
+                  </div>
+                ` : ''}
+                ${isOut ? `
+                  <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
+                    <span class="text-[9px] text-white font-bold uppercase tracking-wider">Agotado</span>
+                  </div>
+                ` : ''}
+              </div>
+
+              <div class="flex flex-col">
+                <span class="text-[10px] text-lushGold font-semibold uppercase tracking-wider mb-0.5">${p.category}</span>
+                <h3 class="font-medium text-sm sm:text-base text-lushDark leading-snug">${p.title}</h3>
+                <div class="flex items-baseline gap-2 mt-1">
+                  <span class="text-sm font-bold text-lushDark">$${parseFloat(p.price).toFixed(2)}</span>
+                  <span class="text-[11px] text-gray-400 font-mono hidden sm:inline">(Bs. ${priceBs})</span>
+                </div>
+                <span class="text-[10px] text-gray-400 mt-0.5">Stock disponible: ${p.stock}</span>
+              </div>
+            </div>
+
+            <div class="flex-shrink-0">
+              <button 
+                onclick="addToCart('${p.id}')"
+                ${isOut ? 'disabled' : ''}
+                class="w-10 h-10 rounded-full bg-lushBg border border-gray-200 text-lushDark flex items-center justify-center hover:bg-lushDark hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                title="Agregar al carrito"
+              >
+                <span class="text-lg font-light leading-none">+</span>
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // MANEJO DE CARRITO
+    function addToCart(productId) {
+      const prod = productos.find(p => String(p.id) === String(productId));
+      if (!prod || prod.stock <= 0) return;
+
+      const existing = cart.find(item => String(item.id) === String(productId));
+      if (existing) {
+        if (existing.qty < prod.stock) {
+          existing.qty += 1;
+        } else {
+          alert("Llegaste al límite de stock disponible para este producto.");
+        }
+      } else {
+        cart.push({ id: prod.id, title: prod.title, price: prod.price, qty: 1 });
+      }
+
+      updateCartBadge();
+      renderCartItems();
+      calculateCartTotal();
+    }
+
+    function updateCartBadge() {
+      const totalQty = cart.reduce((acc, item) => acc + item.qty, 0);
+      document.getElementById('cartCount').innerText = totalQty;
+    }
+
+    function toggleCartModal() {
+      document.getElementById('cartModal').classList.toggle('hidden');
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById('cartItemsList');
+      if (cart.length === 0) {
+        container.innerHTML = `<p class="text-center text-gray-400 text-sm py-8">Tu carrito está vacío.</p>`;
+        return;
+      }
+
+      container.innerHTML = cart.map(item => `
+        <div class="flex items-center justify-between border-b pb-3 text-sm">
+          <div>
+            <h4 class="font-medium text-lushDark">${item.title}</h4>
+            <span class="text-xs text-gray-500 font-mono">$${item.price.toFixed(2)} c/u</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="updateCartQty('${item.id}', -1)" class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center text-xs font-bold">-</button>
+            <span class="font-bold text-xs w-4 text-center">${item.qty}</span>
+            <button onclick="updateCartQty('${item.id}', 1)" class="w-6 h-6 rounded bg-gray-100 flex items-center justify-center text-xs font-bold">+</button>
+            <button onclick="removeFromCart('${item.id}')" class="text-red-500 text-xs ml-2">✕</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateCartQty(id, delta) {
+      const item = cart.find(i => String(i.id) === String(id));
+      const prod = productos.find(p => String(p.id) === String(id));
+
+      if (item && prod) {
+        const newQty = item.qty + delta;
+        if (newQty <= 0) {
+          removeFromCart(id);
+        } else if (newQty <= prod.stock) {
+          item.qty = newQty;
+        } else {
+          alert("Límite de stock alcanzado.");
+        }
+      }
+      updateCartBadge();
+      renderCartItems();
+      calculateCartTotal();
+    }
+
+    function removeFromCart(id) {
+      cart = cart.filter(i => String(i.id) !== String(id));
+      updateCartBadge();
+      renderCartItems();
+      calculateCartTotal();
+    }
+
+    function renderSellerSelectOptions() {
+      const sel = document.getElementById('cartSellerSelect');
+      if (!sel) return;
+      sel.innerHTML = `<option value="">Venta Directa en Línea</option>` + 
+        vendedores.map(s => `<option value="${s.id}">${s.name} (${s.commission}%)</option>`).join('');
+    }
+
+    function calculateCartTotal() {
+      const totalUsd = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      const totalBs = bcvRate > 0 ? (totalUsd * bcvRate) : 0;
+
+      document.getElementById('cartTotal').innerText = `$${totalUsd.toFixed(2)}`;
+      document.getElementById('cartTotalBs').innerText = `Bs. ${totalBs.toFixed(2)}`;
+    }
+
+    function cancelOrder() {
+      if (confirm('¿Deseas vaciar el carrito y cancelar la orden?')) {
+        cart = [];
+        updateCartBadge();
+        renderCartItems();
+        calculateCartTotal();
+        toggleCartModal();
+      }
+    }
+
+    async function checkoutOrder() {
+      if (cart.length === 0) return alert('El carrito está vacío.');
+
+      const customerName = document.getElementById('customerNameInput').value.trim();
+      const paymentRef = document.getElementById('paymentRefInput').value.trim();
+      const deliveryAddress = document.getElementById('deliveryAddressInput').value.trim();
+      const sellerId = document.getElementById('cartSellerSelect').value;
+
+      if (!customerName || !paymentRef || !deliveryAddress) {
+        return alert('Por favor, completa los campos requeridos (*): Nombre, Referencia y Dirección.');
+      }
+
+      const totalUsd = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
+      let sellerName = 'Venta Directa';
+      let commissionAmount = 0;
+
+      if (sellerId) {
+        const seller = vendedores.find(s => String(s.id) === String(sellerId));
+        if (seller) {
+          sellerName = seller.name;
+          commissionAmount = (totalUsd * seller.commission) / 100;
+        }
+      }
+
+      const newOrder = {
+        date: new Date().toLocaleDateString('es-VE'),
+        iso_date: new Date().toISOString(),
+        customer_name: customerName,
+        items: JSON.stringify(cart),
+        total: totalUsd,
+        payment_ref: paymentRef,
+        delivery_address: deliveryAddress,
+        seller_id: sellerId || null,
+        seller_name: sellerName,
+        commission_amount: commissionAmount
+      };
+
+      // Restar stock en Supabase
+      for (const item of cart) {
+        const prod = productos.find(p => String(p.id) === String(item.id));
+        if (prod) {
+          const newStock = Math.max(0, prod.stock - item.qty);
+          await _supabase.from('productos').update({ stock: newStock }).eq('id', prod.id);
+        }
+      }
+
+      // Guardar orden
+      const { error } = await _supabase.from('ordenes').insert([newOrder]);
+
+      if (error) {
+        alert('Error al registrar la orden: ' + error.message);
+        return;
+      }
+
+      // Armar Mensaje de WhatsApp
+      let msg = `🛍️ *NUEVO PEDIDO EN LUSH LECHERÍA*\n`;
+      msg += `👤 *Cliente:* ${customerName}\n`;
+      msg += `📍 *Delivery:* ${deliveryAddress}\n`;
+      msg += `💳 *Ref. Pago Móvil:* ${paymentRef}\n`;
+      if (sellerId) msg += `👥 *Atendido por:* ${sellerName}\n`;
+      msg += `\n📦 *Detalle del Pedido:*\n`;
+
+      cart.forEach(item => {
+        msg += `• ${item.qty}x ${item.title} ($${(item.price * item.qty).toFixed(2)})\n`;
+      });
+
+      const totalBs = bcvRate > 0 ? (totalUsd * bcvRate).toFixed(2) : '0.00';
+      msg += `\n💰 *Total USD:* $${totalUsd.toFixed(2)}\n`;
+      msg += `🇻🇪 *Total Bs:* Bs. ${totalBs}\n\n`;
+      msg += `¡Gracias por tu compra!`;
+
+      await loadData();
+      cart = [];
+      updateCartBadge();
+      renderCartItems();
+      calculateCartTotal();
+      toggleCartModal();
+
+      const encodedMsg = encodeURIComponent(msg);
+      window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodedMsg}`, '_blank');
+    }
+
+    // LIGHTBOX
     function openLightbox(productId) {
       const p = productos.find(item => String(item.id) === String(productId));
       if (!p) return;
 
-      currentLightboxImages = [p.image];
-      if (p.image2) {
-        currentLightboxImages.push(p.image2);
-      }
+      currentLightboxImages = [p.image || 'LUSH logo.PNG'];
+      if (p.image2) currentLightboxImages.push(p.image2);
 
       currentLightboxIndex = 0;
       currentLightboxTitle = p.title;
@@ -1316,138 +1226,7 @@ async function loadData() {
       updateLightboxView();
     }
 
-   function renderProductos() {
-  const searchInput = document.getElementById('searchInput');
-  const search = searchInput ? searchInput.value.toLowerCase() : '';
-  const grid = document.getElementById('productosGrid');
-
-  const filtered = productos.filter(p => {
-    const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
-    const matchesSearch = p.title.toLowerCase().includes(search);
-    return matchesCategory && matchesSearch;
-  });
-
-  if (filtered.length === 0) {
-    grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-8">No hay productos disponibles.</p>`;
-    return;
-  }
-
-  grid.innerHTML = filtered.map(p => {
-    const isOut = p.stock <= 0;
-    const priceBs = bcvRate > 0 ? (p.price * bcvRate).toFixed(2) : '0.00';
-    const hasMultipleImages = Boolean(p.image2);
-
-    // Al renderizar las imágenes de los productos en renderProductos():
-    const imagenValida = (p.image && p.image !== 'undefined' && p.image !== '') 
-      ? p.image 
-      : 'LUSH logo.PNG';
-
-    return `
-      <article class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex items-center justify-between gap-4 relative">
-        
-        <!-- Imagen miniatura cuadrada e indicador interactivo de múltiples fotos -->
-        <div class="flex items-center gap-4 flex-grow">
-          <div onclick="openLightbox('${p.id}')" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-lushBg flex-shrink-0 relative border border-gray-100 cursor-pointer group" title="Ver galería de fotos">
-            <img 
-              src="${imagenValida}" 
-              alt="${p.title}" 
-              onerror="this.onerror=null; this.src='LUSH logo.PNG';"
-              class="w-full h-full object-cover group-hover:scale-105 transition ${isOut ? 'grayscale opacity-60' : ''}"
-            >
-            ${hasMultipleImages ? `
-              <div class="absolute bottom-1 right-1 bg-lushDark/80 text-white text-[9px] px-1.5 py-0.5 rounded-md font-mono flex items-center gap-0.5 shadow-sm">
-                <span>📷</span> 2+
-              </div>
-            ` : ''}
-            ${isOut ? `
-              <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
-                <span class="text-[9px] text-white font-bold uppercase tracking-wider">Agotado</span>
-              </div>
-            ` : ''}
-          </div>
-
-          <!-- Información del producto: Categoría, Título y Precios Pequeños -->
-          <div class="flex flex-col">
-            <span class="text-[10px] text-lushGold font-semibold uppercase tracking-wider mb-0.5">${p.category}</span>
-            <h3 class="font-medium text-sm sm:text-base text-lushDark leading-snug">${p.title}</h3>
-            <div class="flex items-baseline gap-2 mt-1">
-              <span class="text-sm font-bold text-lushDark">$${parseFloat(p.price).toFixed(2)} <span class="text-xs font-normal text-gray-500">Detal</span></span>
-              <span class="text-[11px] text-gray-400 font-mono hidden sm:inline">(Bs. ${priceBs})</span>
-            </div>
-            <span class="text-[10px] text-gray-400 mt-0.5">Stock disponible: ${p.stock}</span>
-          </div>
-        </div>
-
-        <!-- Botón de acción minimalista tipo '+' -->
-        <div class="flex-shrink-0">
-          <button 
-            onclick="addToCart('${p.id}')"
-            ${isOut ? 'disabled' : ''}
-            class="w-10 h-10 rounded-full bg-lushBg border border-gray-200 text-lushDark flex items-center justify-center hover:bg-lushDark hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
-            title="Agregar al carrito"
-          >
-            <span class="text-lg font-light leading-none">+</span>
-          </button>
-        </div>
-
-      </article>
-    `;
-  }).join('');
-}
-	
-	// EJEMPLO DE CÓMO INTEGRARLA EN TU FUNCIÓN DE GUARDAR PRODUCTO
-async function guardarProducto(event) {
-  event.preventDefault();
-
-  const id = document.getElementById('prodId').value || crypto.randomUUID();
-  const title = document.getElementById('prodTitle').value;
-  const category = document.getElementById('prodCategory').value;
-  const price = parseFloat(document.getElementById('prodPrice').value);
-  const stock = parseInt(document.getElementById('prodStock').value);
-
-  // Capturar los archivos seleccionados en los <input type="file">
-  const inputImagen1 = document.getElementById('inputImagen1').files[0];
-  const inputImagen2 = document.getElementById('inputImagen2').files[0];
-
-  let imageUrl = null;
-  let image2Url = null;
-
-  // Función para el input <input type="file" id="inputImagen"> en el Admin
-async function handleSubirImagenProducto(file, productoId) {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${productoId}_${Date.now()}.${fileExt}`;
-
-  // 1. Subir directamente a Supabase Storage
-  const { data, error } = await _supabase.storage
-    .from('productos')
-    .upload(fileName, file);
-
-  if (error) {
-    console.error('Error al subir la imagen:', error);
-    return null;
-  }
-
-  // 2. Obtener y retornar solo la URL pública corta
-  const { data: urlData } = _supabase.storage
-    .from('productos')
-    .getPublicUrl(fileName);
-
-  return urlData.publicUrl; // Guardar este string corto en la BD
-}
-
-  // 3. Guardar en la tabla 'productos' de Supabase
-  const { error } = await _supabase
-    .from('productos')
-    .upsert(productoData);
-
-  if (error) {
-    console.error("Error al guardar producto:", error);
-  } else {
-    alert("Producto guardado exitosamente");
-    loadData(); // Recargar la lista
-  }
-}
-    // PANEL ADMIN Y LOGIN
+    // PANEL ADMIN Y DASHBOARD
     function openAdminModal() { document.getElementById('authModal').classList.remove('hidden'); }
     function closeAdminModal() { 
       document.getElementById('authModal').classList.add('hidden'); 
@@ -1476,7 +1255,83 @@ async function handleSubirImagenProducto(file, productoId) {
       }
     }
 
-    // CAMBIO CLAVE 1 (LÓGICA DE REGISTRO): Procesar ambas imágenes para Supabase
+    function renderAdminDashboard() {
+      const totalSales = ordenes.reduce((acc, o) => acc + o.total, 0);
+      const totalCommissions = ordenes.reduce((acc, o) => acc + o.commissionAmount, 0);
+
+      document.getElementById('metricTotalSales').innerText = `$${totalSales.toFixed(2)}`;
+      document.getElementById('metricTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
+      document.getElementById('metricTotalOrders').innerText = ordenes.length;
+
+      // Tabla de inventario
+      const invBody = document.getElementById('inventoryTableBody');
+      if (invBody) {
+        invBody.innerHTML = productos.map(p => `
+          <tr class="border-b">
+            <td class="p-3 font-semibold text-lushDark">${p.title}</td>
+            <td class="p-3 uppercase text-xs text-gray-500">${p.category}</td>
+            <td class="p-3 font-mono">$${p.price.toFixed(2)}</td>
+            <td class="p-3 font-bold ${p.stock > 0 ? 'text-emerald-600' : 'text-red-500'}">${p.stock} unids.</td>
+            <td class="p-3 text-right space-x-2">
+              <button onclick="openUpdateProductModal('${p.id}')" class="text-blue-600 hover:underline text-xs">✏️ Editar/Stock</button>
+              <button onclick="deleteProduct('${p.id}')" class="text-red-600 hover:underline text-xs">🗑️ Borrar</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Tabla de vendedores
+      const sellBody = document.getElementById('sellerCommissionsTableBody');
+      if (sellBody) {
+        sellBody.innerHTML = vendedores.map(s => {
+          const sellerOrders = ordenes.filter(o => String(o.sellerId) === String(s.id));
+          const totalSold = sellerOrders.reduce((acc, o) => acc + o.total, 0);
+          const commissionEarned = (totalSold * s.commission) / 100;
+
+          return `
+            <tr class="border-b">
+              <td class="p-3 font-semibold text-lushDark">${s.name}</td>
+              <td class="p-3 font-mono">${s.commission}%</td>
+              <td class="p-3">${sellerOrders.length}</td>
+              <td class="p-3 font-medium">$${totalSold.toFixed(2)}</td>
+              <td class="p-3 font-bold text-lushGold">$${commissionEarned.toFixed(2)}</td>
+              <td class="p-3 text-right space-x-2">
+                <button onclick="editSellerCommission('${s.id}')" class="text-blue-600 hover:underline text-xs">✏️ Editar %</button>
+                <button onclick="deleteSeller('${s.id}')" class="text-red-600 hover:underline text-xs">🗑️ Eliminar</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Tabla de órdenes
+      const ordBody = document.getElementById('ordenesHistoryTableBody');
+      if (ordBody) {
+        ordBody.innerHTML = ordenes.map(o => {
+          const itemsStr = Array.isArray(o.items) 
+            ? o.items.map(i => `${i.qty}x ${i.title}`).join(', ')
+            : 'Sin detalle';
+
+          return `
+            <tr class="border-b text-xs">
+              <td class="p-3 font-bold text-lushDark">#${o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
+              <td class="p-3 font-medium">${o.customerName || 'N/A'}</td>
+              <td class="p-3 text-gray-600 max-w-xs truncate">${itemsStr}</td>
+              <td class="p-3 font-mono text-emerald-700">${o.paymentRef}</td>
+              <td class="p-3 text-gray-500">${o.deliveryAddress}</td>
+              <td class="p-3 text-gray-600">${o.sellerName}</td>
+              <td class="p-3 font-bold text-lushDark">$${o.total.toFixed(2)}</td>
+              <td class="p-3 font-bold text-lushGold">$${o.commissionAmount.toFixed(2)}</td>
+              <td class="p-3 text-right space-x-1">
+                <button onclick="openInvoiceModal('${o.id}')" class="text-purple-600 hover:underline">📄 Factura</button>
+                <button onclick="deleteOrder('${o.id}')" class="text-red-600 hover:underline">🗑️</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
     async function handleAddProduct(e) {
       e.preventDefault();
       const fileInput1 = document.getElementById('prodImageFile');
@@ -1547,25 +1402,23 @@ async function handleSubirImagenProducto(file, productoId) {
     }
 
     async function editSellerCommission(id) {
-      const seller = vendedores.find(s => s.id === id);
+      const seller = vendedores.find(s => String(s.id) === String(id));
       if (!seller) return;
 
       const newComm = prompt(`Nuevo % de comisión para ${seller.name}:`, seller.commission);
       if (newComm !== null && !isNaN(parseFloat(newComm)) && parseFloat(newComm) >= 0) {
         const { error } = await _supabase.from('vendedores').update({ commission: parseFloat(newComm) }).eq('id', id);
-
         if (error) {
           alert("Error al actualizar la comisión: " + error.message);
           return;
         }
-
         await loadData();
         alert(`Comisión actualizada a ${newComm}%.`);
       }
     }
 
     async function deleteSeller(id) {
-      const seller = vendedores.find(s => s.id === id);
+      const seller = vendedores.find(s => String(s.id) === String(id));
       if (!seller) return;
 
       if (confirm(`¿Eliminar al vendedor "${seller.name}"?`)) {
@@ -1590,7 +1443,7 @@ async function handleSubirImagenProducto(file, productoId) {
     }
 
     function openUpdateProductModal(id) {
-      const prod = productos.find(p => p.id === id);
+      const prod = productos.find(p => String(p.id) === String(id));
       if (!prod) return;
 
       document.getElementById('updateProdId').value = prod.id;
@@ -1610,7 +1463,7 @@ async function handleSubirImagenProducto(file, productoId) {
       const newPrice = parseFloat(document.getElementById('updateProdPrice').value);
       const stockToAdd = parseInt(document.getElementById('updateProdStockAdd').value) || 0;
 
-      const prod = productos.find(p => p.id === id);
+      const prod = productos.find(p => String(p.id) === String(id));
       if (prod) {
         const updatedStock = prod.stock + stockToAdd;
         const { error } = await _supabase
@@ -1627,6 +1480,212 @@ async function handleSubirImagenProducto(file, productoId) {
         closeUpdateProductModal();
         alert('¡Producto y stock actualizados en Supabase!');
       }
+    }
+
+    // FACTURAS Y REPORTES
+    function openInvoiceModal(orderId) {
+      const order = ordenes.find(o => String(o.id) === String(orderId));
+      if (!order) return;
+
+      document.getElementById('invoiceNumber').innerText = `#${order.id}`;
+      document.getElementById('invoiceDate').innerText = order.date;
+      document.getElementById('invoiceCustomerName').innerText = order.customerName || 'Cliente General';
+      document.getElementById('invoiceDeliveryAddress').innerText = order.deliveryAddress;
+      document.getElementById('invoicePaymentRef').innerText = order.paymentRef;
+      document.getElementById('invoiceSellerName').innerText = order.sellerName || 'Venta Directa';
+
+      const itemsBody = document.getElementById('invoiceItemsTableBody');
+      itemsBody.innerHTML = Array.isArray(order.items) ? order.items.map(item => `
+        <tr class="border-b">
+          <td class="p-2.5 font-bold">${item.qty}</td>
+          <td class="p-2.5">${item.title}</td>
+          <td class="p-2.5 text-right font-mono">$${parseFloat(item.price).toFixed(2)}</td>
+          <td class="p-2.5 text-right font-bold text-lushDark">$${(parseFloat(item.price) * item.qty).toFixed(2)}</td>
+        </tr>
+      `).join('') : '';
+
+      const totalBs = bcvRate > 0 ? (order.total * bcvRate).toFixed(2) : '0.00';
+      document.getElementById('invoiceBcvRate').innerText = bcvRate > 0 ? `Bs. ${bcvRate.toFixed(2)}` : 'N/A';
+      document.getElementById('invoiceTotalUsd').innerText = `$${order.total.toFixed(2)}`;
+      document.getElementById('invoiceTotalBs').innerText = `Bs. ${totalBs}`;
+
+      document.getElementById('invoiceModal').classList.remove('hidden');
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('invoiceModal').classList.add('hidden');
+    }
+
+    async function deleteOrder(orderId) {
+      const orderIndex = ordenes.findIndex(o => String(o.id) === String(orderId));
+      if (orderIndex === -1) return;
+
+      const order = ordenes[orderIndex];
+      const restoreStock = confirm(
+        `¿Desea eliminar la orden #${order.id}?\n\n` +
+        `• 'Aceptar': Elimina la orden y RESTAURA el stock.\n` +
+        `• 'Cancelar': Cancela la acción.`
+      );
+
+      if (restoreStock) {
+        if (Array.isArray(order.items)) {
+          for (const item of order.items) {
+            const prod = productos.find(p => String(p.id) === String(item.id));
+            if (prod) {
+              const newStock = prod.stock + item.qty;
+              await _supabase.from('productos').update({ stock: newStock }).eq('id', prod.id);
+            }
+          }
+        }
+
+        const { error } = await _supabase.from('ordenes').delete().eq('id', orderId);
+        if (error) {
+          alert("Error al borrar la orden en Supabase: " + error.message);
+          return;
+        }
+
+        await loadData();
+        alert(`La orden #${orderId} ha sido eliminada y el stock devuelto.`);
+      }
+    }
+
+    function openMonthlyClosureModal() {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+      
+      document.getElementById('closureMonthPicker').value = `${currentYear}-${currentMonth}`;
+      generateMonthlyClosureReport();
+      document.getElementById('monthlyClosureModal').classList.remove('hidden');
+    }
+
+    function closeMonthlyClosureModal() {
+      document.getElementById('monthlyClosureModal').classList.add('hidden');
+    }
+
+    function generateMonthlyClosureReport() {
+      const selectedYearMonth = document.getElementById('closureMonthPicker').value;
+      if (!selectedYearMonth) return;
+
+      const [year, month] = selectedYearMonth.split('-');
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const monthLabel = `${monthNames[parseInt(month, 10) - 1]} ${year}`;
+
+      document.getElementById('closurePeriodTitle').innerText = `Cierre de Mes: ${monthLabel}`;
+      document.getElementById('closureReportGeneratedAt').innerText = `Generado el: ${new Date().toLocaleString('es-VE')}`;
+
+      const filteredOrders = ordenes.filter(o => {
+        if (!o.isoDate) {
+          const parts = o.date ? o.date.split('/') : [];
+          if (parts.length >= 3) {
+            const day = parts[0].padStart(2, '0');
+            const m = parts[1].padStart(2, '0');
+            const y = parts[2].substring(0, 4);
+            return `${y}-${m}` === selectedYearMonth;
+          }
+          return false;
+        }
+        return o.isoDate.startsWith(selectedYearMonth);
+      });
+
+      const totalSales = filteredOrders.reduce((acc, o) => acc + o.total, 0);
+      const totalCommissions = filteredOrders.reduce((acc, o) => acc + o.commissionAmount, 0);
+      const totalUnits = filteredOrders.reduce((acc, o) => acc + (Array.isArray(o.items) ? o.items.reduce((sum, item) => sum + item.qty, 0) : 0), 0);
+
+      document.getElementById('closureTotalSales').innerText = `$${totalSales.toFixed(2)}`;
+      document.getElementById('closureTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
+      document.getElementById('closureTotalOrdersUnits').innerText = `${filteredOrders.length} órds. / ${totalUnits} unids.`;
+
+      const vendedoresMap = {};
+      vendedores.forEach(s => {
+        vendedoresMap[s.id] = { name: s.name, count: 0, totalSales: 0, totalCommission: 0 };
+      });
+      vendedoresMap['direct'] = { name: 'Venta Directa', count: 0, totalSales: 0, totalCommission: 0 };
+
+      filteredOrders.forEach(o => {
+        const key = o.sellerId || 'direct';
+        if (!vendedoresMap[key]) {
+          vendedoresMap[key] = { name: o.sellerName || 'Vendedor Desconocido', count: 0, totalSales: 0, totalCommission: 0 };
+        }
+        vendedoresMap[key].count += 1;
+        vendedoresMap[key].totalSales += o.total;
+        vendedoresMap[key].totalCommission += o.commissionAmount;
+      });
+
+      const closureSellersBody = document.getElementById('closureSellersTableBody');
+      const activeSellers = Object.values(vendedoresMap).filter(s => s.count > 0);
+
+      if (activeSellers.length === 0) {
+        closureSellersBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin actividad de vendedores en este mes.</td></tr>`;
+      } else {
+        closureSellersBody.innerHTML = activeSellers.map(s => `
+          <tr class="border-b">
+            <td class="p-2.5 font-semibold text-lushDark">${s.name}</td>
+            <td class="p-2.5 text-center">${s.count} pedido(s)</td>
+            <td class="p-2.5 text-right font-medium">$${s.totalSales.toFixed(2)}</td>
+            <td class="p-2.5 text-right font-bold text-lushGold">$${s.totalCommission.toFixed(2)}</td>
+          </tr>
+        `).join('');
+      }
+
+      const closureOrdersBody = document.getElementById('closureOrdersTableBody');
+      if (filteredOrders.length === 0) {
+        closureOrdersBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No se encontraron órdenes en este período.</td></tr>`;
+      } else {
+        closureOrdersBody.innerHTML = filteredOrders.map(o => `
+          <tr class="border-b">
+            <td class="p-2 font-bold text-lushDark">#${o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
+            <td class="p-2">${o.customerName || 'N/A'}</td>
+            <td class="p-2 text-gray-600">${o.sellerName}</td>
+            <td class="p-2 font-mono text-emerald-700">${o.paymentRef}</td>
+            <td class="p-2 text-right font-bold text-lushDark">$${o.total.toFixed(2)}</td>
+            <td class="p-2 text-right font-bold text-lushGold">$${o.commissionAmount.toFixed(2)}</td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function mostrarDesgloseInventario() {
+      document.getElementById('inventoryReportTimestamp').innerText = `Fecha: ${new Date().toLocaleString('es-VE')}`;
+
+      const stockBody = document.getElementById('inventoryStockTableBody');
+      const missingBody = document.getElementById('inventoryMissingTableBody');
+
+      const availableProductos = productos.filter(p => p.stock > 0);
+      const missingProductos = productos.filter(p => p.stock <= 0);
+
+      stockBody.innerHTML = availableProductos.length === 0 
+        ? `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos disponibles.</td></tr>`
+        : availableProductos.map(p => `
+          <tr class="border-b">
+            <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
+            <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
+            <td class="p-2.5 text-center font-medium">$${p.price.toFixed(2)}</td>
+            <td class="p-2.5 text-right font-bold text-emerald-600">${p.stock} unids.</td>
+          </tr>
+        `).join('');
+
+      missingBody.innerHTML = missingProductos.length === 0 
+        ? `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos agotados.</td></tr>`
+        : missingProductos.map(p => `
+          <tr class="border-b">
+            <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
+            <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
+            <td class="p-2.5 text-center font-medium">$${p.price.toFixed(2)}</td>
+            <td class="p-2.5 text-right font-bold text-red-600">AGOTADO (0)</td>
+          </tr>
+        `).join('');
+
+      document.getElementById('inventoryReportModal').classList.remove('hidden');
+    }
+
+    function closeInventoryReportModal() {
+      document.getElementById('inventoryReportModal').classList.add('hidden');
+    }
+
+    function imprimirInventarioDirecto() {
+      mostrarDesgloseInventario();
+      window.print();
     }
 
     function generateDemandReport() {
@@ -1677,256 +1736,67 @@ async function handleSubirImagenProducto(file, productoId) {
       document.getElementById('demandReportModal').classList.add('hidden');
     }
 
-    function renderAdminDashboard() {
-      const totalSales = ordenes.reduce((acc, o) => acc + o.total, 0);
-      const totalCommissions = ordenes.reduce((acc, o) => acc + o.commissionAmount, 0);
-
-      document.getElementById('metricTotalSales').innerText = `$${totalSales.toFixed(2)}`;
-      document.getElementById('metricTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
-      document.getElementById('metricTotalOrders').innerText = ordenes.length;
-
-      const inventoryBody = document.getElementById('inventoryTableBody');
-      inventoryBody.innerHTML = productos.map(p => `
-        <tr class="border-b hover:bg-gray-50">
-          <td class="p-3 font-medium flex items-center gap-2">
-            <img src="${p.image}" onerror="this.onerror=null; this.src='LUSH logo.PNG';" class="w-8 h-8 rounded-full object-cover">
-            <span>${p.title} ${p.image2 ? '<span class="text-[10px] bg-lushRose text-lushDark px-1.5 py-0.5 rounded font-mono ml-1">2 Fotos</span>' : ''}</span>
-          </td>
-          <td class="p-3 uppercase text-xs text-gray-500">${p.category}</td>
-          <td class="p-3 font-semibold text-lushDark">$${p.price.toFixed(2)}</td>
-          <td class="p-3 font-semibold ${p.stock <= 0 ? 'text-red-500 font-bold' : 'text-emerald-600'}">
-            ${p.stock <= 0 ? '0 (AGOTADO)' : p.stock + ' unids.'}
-          </td>
-          <td class="p-3 text-right flex justify-end gap-2">
-            <button onclick="openUpdateProductModal('${p.id}')" class="text-xs bg-gray-100 hover:bg-lushDark hover:text-white text-gray-800 px-3 py-1 rounded font-semibold transition">
-              ➕ Añadir / Edit
-            </button>
-            <button onclick="deleteProduct('${p.id}')" class="text-xs bg-red-50 hover:bg-red-600 hover:text-white text-red-600 px-2.5 py-1 rounded font-semibold transition">
-              🗑️
-            </button>
-          </td>
-        </tr>
-      `).join('');
-
-      const sellerCommissionsBody = document.getElementById('sellerCommissionsTableBody');
-      sellerCommissionsBody.innerHTML = vendedores.map(s => {
-        const sellerOrders = ordenes.filter(o => o.sellerId === s.id);
-        const totalVendido = sellerOrders.reduce((acc, o) => acc + o.total, 0);
-        const comisionGanada = sellerOrders.reduce((acc, o) => acc + o.commissionAmount, 0);
-
-        return `
-          <tr class="border-b hover:bg-gray-50">
-            <td class="p-3 font-semibold">${s.name}</td>
-            <td class="p-3"><span class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-xs">${s.commission}%</span></td>
-            <td class="p-3">${sellerOrders.length} pedido(s)</td>
-            <td class="p-3 font-medium">$${totalVendido.toFixed(2)}</td>
-            <td class="p-3 font-bold text-lushGold">$${comisionGanada.toFixed(2)}</td>
-            <td class="p-3 text-right flex justify-end gap-2">
-              <button onclick="editSellerCommission('${s.id}')" class="text-xs bg-gray-100 hover:bg-lushDark hover:text-white text-gray-700 px-3 py-1 rounded transition">
-                ✏️ Modificar %
-              </button>
-              <button onclick="deleteSeller('${s.id}')" class="text-xs bg-red-50 hover:bg-red-600 hover:text-white text-red-600 px-3 py-1 rounded font-semibold transition">
-                🗑️ Eliminar
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      const ordenesHistoryBody = document.getElementById('ordenesHistoryTableBody');
-      if (ordenes.length === 0) {
-        ordenesHistoryBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-400">No hay órdenes registradas.</td></tr>`;
-      } else {
-        ordenesHistoryBody.innerHTML = ordenes.map(o => `
-          <tr class="border-b hover:bg-gray-50 text-xs">
-            <td class="p-3">
-              <p class="font-bold text-lushDark">#${o.id}</p>
-              <p class="text-gray-400">${o.date}</p>
-            </td>
-            <td class="p-3 font-bold text-lushDark">${o.customerName || 'N/A'}</td>
-            <td class="p-3">
-              <ul class="list-disc list-inside space-y-0.5">
-                ${Array.isArray(o.items) ? o.items.map(i => `<li>${i.title} (x${i.qty})</li>`).join('') : ''}
-              </ul>
-            </td>
-            <td class="p-3 font-bold text-emerald-600">${o.paymentRef}</td>
-            <td class="p-3 text-gray-600">${o.deliveryAddress}</td>
-            <td class="p-3 font-medium text-gray-700">${o.sellerName}</td>
-            <td class="p-3 font-bold text-lushDark">$${o.total.toFixed(2)}</td>
-            <td class="p-3 font-bold text-lushGold">$${o.commissionAmount.toFixed(2)}</td>
-            <td class="p-3 text-right">
-              <div class="flex justify-end gap-1.5">
-                <button onclick="openInvoiceModal('${o.id}')" class="text-xs bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 px-2.5 py-1 rounded font-semibold transition flex items-center gap-1" title="Ver Factura">
-                  📄 Factura
-                </button>
-                <button onclick="printInvoiceDirect('${o.id}')" class="text-xs bg-gray-100 hover:bg-lushDark hover:text-white text-gray-700 px-2.5 py-1 rounded font-semibold transition" title="Imprimir / Guardar PDF">
-                  🖨️
-                </button>
-                <button onclick="deleteOrder('${o.id}')" class="text-xs bg-red-50 hover:bg-red-600 hover:text-white text-red-600 px-2 py-1 rounded font-semibold transition" title="Borrar">
-                  🗑️
-                </button>
-              </div>
-            </td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    // CARRITO Y PROCESAMIENTO CON SUPABASE
-    function addToCart(id) {
-      const prod = productos.find(p => p.id === id);
-      if (!prod || prod.stock <= 0) return;
-
-      const itemInCart = cart.find(c => c.id === id);
-      if (itemInCart) {
-        if (itemInCart.qty < prod.stock) itemInCart.qty++;
-        else alert('Supera el stock disponible.');
-      } else {
-        cart.push({ ...prod, qty: 1 });
-      }
-      updateCartUI();
-    }
-
-    function updateCartUI() {
-      document.getElementById('cartCount').innerText = cart.reduce((acc, c) => acc + c.qty, 0);
-      const container = document.getElementById('cartItemsList');
-      container.innerHTML = cart.map(item => `
-        <div class="flex items-center justify-between border-b pb-3">
-          <div class="flex items-center gap-3">
-            <img src="${item.image}" onerror="this.onerror=null; this.src='LUSH logo.PNG';" class="w-12 h-12 object-cover rounded-lg" alt="">
-            <div>
-              <p class="text-sm font-semibold">${item.title}</p>
-              <p class="text-xs text-gray-500">$${item.price.toFixed(2)} x ${item.qty}</p>
-            </div>
-          </div>
-          <span class="font-bold text-sm">$${(item.price * item.qty).toFixed(2)}</span>
-        </div>
-      `).join('');
-
-      renderSellerSelectOptions();
-      calculateCartTotal();
-    }
-
-    function renderSellerSelectOptions() {
-      const select = document.getElementById('cartSellerSelect');
-      if (!select) return;
-      select.innerHTML = `<option value="">Venta Directa en Línea</option>` + 
-        vendedores.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-    }
-
-    function calculateCartTotal() {
-      const subtotalUSD = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-      const subtotalBs = bcvRate > 0 ? (subtotalUSD * bcvRate).toFixed(2) : '0.00';
-      
-      document.getElementById('cartTotal').innerText = `$${subtotalUSD.toFixed(2)}`;
-      document.getElementById('cartTotalBs').innerText = `Bs. ${subtotalBs}`;
-    }
-
-    function toggleCartModal() { document.getElementById('cartModal').classList.toggle('hidden'); }
-
-    function cancelOrder() {
-      if (cart.length === 0) return toggleCartModal();
-
-      if (confirm('¿Vaciar carrito y cancelar el pedido?')) {
-        cart = [];
-        document.getElementById('customerNameInput').value = '';
-        document.getElementById('paymentRefInput').value = '';
-        document.getElementById('deliveryAddressInput').value = '';
-        updateCartUI();
-        toggleCartModal();
-      }
-    }
-
-    async function checkoutOrder() {
-      if (cart.length === 0) return alert('El carrito está vacío.');
-
-      const customerName = document.getElementById('customerNameInput').value.trim();
-      const paymentRef = document.getElementById('paymentRefInput').value.trim();
-      const deliveryAddress = document.getElementById('deliveryAddressInput').value.trim();
-
-      if (!customerName || !paymentRef || !deliveryAddress) {
-        return alert('Por favor completa todos los campos requeridos (*).');
-      }
-
-      const subtotalUSD = cart.reduce((acc, item) => acc + (item.price * item.qty), 0);
-      const subtotalBs = bcvRate > 0 ? (subtotalUSD * bcvRate).toFixed(2) : '0.00';
-      const sellerId = document.getElementById('cartSellerSelect').value;
-      const seller = vendedores.find(s => s.id === sellerId);
-      const commissionAmount = seller ? (subtotalUSD * seller.commission) / 100 : 0;
-
-      const now = new Date();
-
-      const dbOrder = {
-        date: now.toLocaleString('es-VE'),
-        iso_date: now.toISOString().slice(0, 10),
-        customer_name: customerName,
-        items: JSON.stringify(cart),
-        total: subtotalUSD,
-        payment_ref: paymentRef,
-        delivery_address: deliveryAddress,
-        seller_id: seller ? seller.id : null,
-        seller_name: seller ? seller.name : 'Venta Directa',
-        commission_amount: commissionAmount
+    function exportDataToJSON() {
+      const backupData = {
+        productos: productos,
+        vendedores: vendedores,
+        ordenes: ordenes,
+        exportedAt: new Date().toISOString()
       };
 
-      // Registrar Orden
-      const { data: createdOrder, error: ordError } = await _supabase.from('ordenes').insert([dbOrder]).select();
-
-      if (ordError) {
-        alert("Error al procesar la orden en Supabase: " + ordError.message);
-        return;
-      }
-
-      const newOrderId = createdOrder && createdOrder[0] ? createdOrder[0].id : 'ORD-' + Math.floor(1000 + Math.random() * 9000);
-
-      // Restar Stock
-      for (const cartItem of cart) {
-        const prod = productos.find(p => p.id === cartItem.id);
-        if (prod) {
-          const newStock = Math.max(0, prod.stock - cartItem.qty);
-          await _supabase.from('productos').update({ stock: newStock }).eq('id', prod.id);
-        }
-      }
-
-      const itemsListText = cart.map(i => `• ${i.title} (x${i.qty}) - $${(i.price * i.qty).toFixed(2)}`).join('\n');
-      
-      const rawText = `🛍️ *NUEVA ÓRDEN DE COMPRA - LUSH LECHERIA*\n` +
-        `----------------------------------------\n` +
-        `🆔 *Orden:* #${newOrderId}\n` +
-        `📅 *Fecha:* ${now.toLocaleString('es-VE')}\n` +
-        `👤 *Cliente:* ${customerName}\n` +
-        `👩‍💼 *Vendedor:* ${seller ? seller.name : 'Venta Directa'}\n\n` +
-        `📦 *Productos:*\n${itemsListText}\n\n` +
-        `💵 *TOTAL USD:* $${subtotalUSD.toFixed(2)}\n` +
-        `🇻🇪 *TOTAL BS (Tasa BCV ${bcvRate.toFixed(2)}):* Bs. ${subtotalBs}\n\n` +
-        `💳 *DATOS DE PAGO MÓVIL:*\n` +
-        `• Banco: Bancamiga\n` +
-        `• Teléfono: 04148957830\n` +
-        `• CI/RIF: V-16.845.600\n` +
-        `• *N° Referencia:* ${paymentRef}\n\n` +
-        `📍 *DIRECCIÓN DE DELIVERY:*\n` +
-        `${deliveryAddress}\n` +
-        `----------------------------------------\n` +
-        `Adjunto comprobante de pago. ¡Quedo atento a la confirmación!`;
-
-      const whatsappUrl = `https://api.whatsapp.com/send?phone=${STORE_WHATSAPP}&text=${encodeURIComponent(rawText)}`;
-
-      cart = [];
-      document.getElementById('customerNameInput').value = '';
-      document.getElementById('paymentRefInput').value = '';
-      document.getElementById('deliveryAddressInput').value = '';
-
-      await loadData();
-      updateCartUI();
-      toggleCartModal();
-
-      window.open(whatsappUrl, '_blank');
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `lush_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
     }
 
-    // Inicialización al cargar la página
-    fetchBcvRate();
-    renderCategoryFilters();
-    loadData();
+    async function importDataFromJSON(event) {
+      const fileReader = new FileReader();
+      fileReader.onload = async function(e) {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (importedData.productos || importedData.vendedores || importedData.ordenes) {
+            
+            if (importedData.productos && importedData.productos.length) {
+              const formattedProds = importedData.productos.map(p => ({
+                title: p.title, category: p.category, price: p.price, stock: p.stock, image: p.image, image2: p.image2 || null
+              }));
+              await _supabase.from('productos').insert(formattedProds);
+            }
+
+            if (importedData.vendedores && importedData.vendedores.length) {
+              const formattedSellers = importedData.vendedores.map(s => ({
+                name: s.name, commission: s.commission, phone: s.phone
+              }));
+              await _supabase.from('vendedores').insert(formattedSellers);
+            }
+
+            if (importedData.ordenes && importedData.ordenes.length) {
+              const formattedOrders = importedData.ordenes.map(o => ({
+                date: o.date, iso_date: o.isoDate, customer_name: o.customerName,
+                items: JSON.stringify(o.items), total: o.total, payment_ref: o.paymentRef,
+                delivery_address: o.deliveryAddress, seller_id: o.sellerId, seller_name: o.sellerName,
+                commission_amount: o.commissionAmount
+              }));
+              await _supabase.from('ordenes').insert(formattedOrders);
+            }
+
+            await loadData();
+            alert('¡Datos cargados con éxito y sincronizados en Supabase!');
+          } else {
+            alert('El archivo no posee un formato válido.');
+          }
+        } catch (err) {
+          alert('Error al leer e importar el archivo JSON.');
+        }
+      };
+      if (event.target.files[0]) {
+        fileReader.readAsText(event.target.files[0]);
+      }
+    }
   </script>
 </body>
 </html>
