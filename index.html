@@ -1389,32 +1389,63 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
       }
     }
 
-    async function handleAddProduct(e) {
-      e.preventDefault();
-      const fileInput1 = document.getElementById('prodImageFile');
-      const fileInput2 = document.getElementById('prodImageFile2');
-      const file1 = fileInput1.files[0];
-      const file2 = fileInput2.files[0];
+// ✅ SOLUCIÓN: Subir archivo a Storage y guardar la URL
+async function guardarProducto(evento) {
+  evento.preventDefault();
+  
+  const fileInput = document.querySelector('#input-file-imagen');
+  const file = fileInput.files[0];
+  
+  if (!file) return;
 
-      if (!file1) return alert('Selecciona al menos la primera imagen principal.');
+  // 1. Sanitizar el nombre del archivo para evitar rechazos
+  const fileExt = file.name.split('.').pop();
+  const rawName = file.name.substring(0, file.name.lastIndexOf('.'));
+  const cleanName = rawName
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9_-]/g, '-')
+    .toLowerCase();
 
-      const reader1 = new FileReader();
-      reader1.onload = function(event1) {
-        const image1Base64 = event1.target.result;
+  const fileName = `${Date.now()}-${cleanName}.${fileExt}`;
 
-        if (file2) {
-          const reader2 = new FileReader();
-          reader2.onload = async function(event2) {
-            const image2Base64 = event2.target.result;
-            await saveProductToSupabase(image1Base64, image2Base64);
-          };
-          reader2.readAsDataURL(file2);
-        } else {
-          saveProductToSupabase(image1Base64, null);
-        }
-      };
-      reader1.readAsDataURL(file1);
-    }
+  // 2. Subir la imagen al bucket 'productos' en Storage
+  const { data: storageData, error: storageError } = await supabase.storage
+    .from('productos')
+    .upload(fileName, file, {
+      contentType: file.type,
+      upsert: false
+    });
+
+  if (storageError) {
+    console.error('Error subiendo a Storage:', storageError.message);
+    return;
+  }
+
+  // 3. Obtener la URL pública de la imagen subida
+  const { data: urlData } = supabase.storage
+    .from('productos')
+    .getPublicUrl(fileName);
+
+  const publicUrl = urlData.publicUrl;
+
+  // 4. Guardar en la tabla SQL 'productos' solo la URL ligera
+  const { error: dbError } = await supabase
+    .from('productos')
+    .insert([{
+      title: document.querySelector('#title-input').value,
+      category: document.querySelector('#category-input').value,
+      price: parseFloat(document.querySelector('#price-input').value),
+      stock: parseInt(document.querySelector('#stock-input').value),
+      image: publicUrl // <--- Guarda un texto corto: "https://.../productos/123-gel.png"
+    }]);
+
+  if (dbError) {
+    console.error('Error guardando producto:', dbError.message);
+  } else {
+    console.log('¡Producto e imagen guardados correctamente!');
+  }
+}
 
     async function saveProductToSupabase(img1, img2) {
       const newProduct = {
