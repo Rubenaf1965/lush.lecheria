@@ -1317,78 +1317,83 @@ async function loadData() {
     }
 
    function renderProductos() {
-      const searchInput = document.getElementById('searchInput');
-      const search = searchInput ? searchInput.value.toLowerCase() : '';
-      const grid = document.getElementById('productosGrid');
+  const searchInput = document.getElementById('searchInput');
+  const search = searchInput ? searchInput.value.toLowerCase() : '';
+  const grid = document.getElementById('productosGrid');
 
-      const filtered = productos.filter(p => {
-        const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
-        const matchesSearch = p.title.toLowerCase().includes(search);
-        return matchesCategory && matchesSearch;
-      });
+  const filtered = productos.filter(p => {
+    const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+    const matchesSearch = p.title.toLowerCase().includes(search);
+    return matchesCategory && matchesSearch;
+  });
 
-      if (filtered.length === 0) {
-        grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-8">No hay productos disponibles.</p>`;
-        return;
-      }
+  if (filtered.length === 0) {
+    grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-8">No hay productos disponibles.</p>`;
+    return;
+  }
 
-      grid.innerHTML = filtered.map(p => {
-        const isOut = p.stock <= 0;
-        const priceBs = bcvRate > 0 ? (p.price * bcvRate).toFixed(2) : '0.00';
-        const hasMultipleImages = Boolean(p.image2);
+  grid.innerHTML = filtered.map(p => {
+    const isOut = p.stock <= 0;
+    const priceBs = bcvRate > 0 ? (p.price * bcvRate).toFixed(2) : '0.00';
+    const hasMultipleImages = Boolean(p.image2);
 
-        return `
-          <article class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex items-center justify-between gap-4 relative">
-            
-            <!-- Imagen miniatura cuadrada e indicador interactivo de múltiples fotos -->
-            <div class="flex items-center gap-4 flex-grow">
-              <div onclick="openLightbox('${p.id}')" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-lushBg flex-shrink-0 relative border border-gray-100 cursor-pointer group" title="Ver galería de fotos">
-                <img 
-                  src="${p.image}" 
-                  alt="${p.title}" 
-                  onerror="this.onerror=null; this.src='LUSH logo.PNG';"
-                  class="w-full h-full object-cover group-hover:scale-105 transition ${isOut ? 'grayscale opacity-60' : ''}"
-                >
-                ${hasMultipleImages ? `
-                  <div class="absolute bottom-1 right-1 bg-lushDark/80 text-white text-[9px] px-1.5 py-0.5 rounded-md font-mono flex items-center gap-0.5 shadow-sm">
-                    <span>📷</span> 2+
-                  </div>
-                ` : ''}
-                ${isOut ? `
-                  <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
-                    <span class="text-[9px] text-white font-bold uppercase tracking-wider">Agotado</span>
-                  </div>
-                ` : ''}
+    // Al renderizar las imágenes de los productos en renderProductos():
+    const imagenValida = (p.image && p.image !== 'undefined' && p.image !== '') 
+      ? p.image 
+      : 'LUSH logo.PNG';
+
+    return `
+      <article class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex items-center justify-between gap-4 relative">
+        
+        <!-- Imagen miniatura cuadrada e indicador interactivo de múltiples fotos -->
+        <div class="flex items-center gap-4 flex-grow">
+          <div onclick="openLightbox('${p.id}')" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-lushBg flex-shrink-0 relative border border-gray-100 cursor-pointer group" title="Ver galería de fotos">
+            <img 
+              src="${imagenValida}" 
+              alt="${p.title}" 
+              onerror="this.onerror=null; this.src='LUSH logo.PNG';"
+              class="w-full h-full object-cover group-hover:scale-105 transition ${isOut ? 'grayscale opacity-60' : ''}"
+            >
+            ${hasMultipleImages ? `
+              <div class="absolute bottom-1 right-1 bg-lushDark/80 text-white text-[9px] px-1.5 py-0.5 rounded-md font-mono flex items-center gap-0.5 shadow-sm">
+                <span>📷</span> 2+
               </div>
-
-              <!-- Información del producto: Categoría, Título y Precios Pequeños -->
-              <div class="flex flex-col">
-                <span class="text-[10px] text-lushGold font-semibold uppercase tracking-wider mb-0.5">${p.category}</span>
-                <h3 class="font-medium text-sm sm:text-base text-lushDark leading-snug">${p.title}</h3>
-                <div class="flex items-baseline gap-2 mt-1">
-                  <span class="text-sm font-bold text-lushDark">$${parseFloat(p.price).toFixed(2)} <span class="text-xs font-normal text-gray-500">Detal</span></span>
-                  <span class="text-[11px] text-gray-400 font-mono hidden sm:inline">(Bs. ${priceBs})</span>
-                </div>
-                <span class="text-[10px] text-gray-400 mt-0.5">Stock disponible: ${p.stock}</span>
+            ` : ''}
+            ${isOut ? `
+              <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
+                <span class="text-[9px] text-white font-bold uppercase tracking-wider">Agotado</span>
               </div>
-            </div>
+            ` : ''}
+          </div>
 
-            <!-- Botón de acción minimalista tipo '+' -->
-            <div class="flex-shrink-0">
-              <button 
-                onclick="addToCart('${p.id}')"
-                ${isOut ? 'disabled' : ''}
-                class="w-10 h-10 rounded-full bg-lushBg border border-gray-200 text-lushDark flex items-center justify-center hover:bg-lushDark hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
-                title="Agregar al carrito"
-              >
-                <span class="text-lg font-light leading-none">+</span>
-              </button>
+          <!-- Información del producto: Categoría, Título y Precios Pequeños -->
+          <div class="flex flex-col">
+            <span class="text-[10px] text-lushGold font-semibold uppercase tracking-wider mb-0.5">${p.category}</span>
+            <h3 class="font-medium text-sm sm:text-base text-lushDark leading-snug">${p.title}</h3>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span class="text-sm font-bold text-lushDark">$${parseFloat(p.price).toFixed(2)} <span class="text-xs font-normal text-gray-500">Detal</span></span>
+              <span class="text-[11px] text-gray-400 font-mono hidden sm:inline">(Bs. ${priceBs})</span>
             </div>
+            <span class="text-[10px] text-gray-400 mt-0.5">Stock disponible: ${p.stock}</span>
+          </div>
+        </div>
 
-          </article>
-        `;
-      }).join('');
-    }
+        <!-- Botón de acción minimalista tipo '+' -->
+        <div class="flex-shrink-0">
+          <button 
+            onclick="addToCart('${p.id}')"
+            ${isOut ? 'disabled' : ''}
+            class="w-10 h-10 rounded-full bg-lushBg border border-gray-200 text-lushDark flex items-center justify-center hover:bg-lushDark hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+            title="Agregar al carrito"
+          >
+            <span class="text-lg font-light leading-none">+</span>
+          </button>
+        </div>
+
+      </article>
+    `;
+  }).join('');
+}
 	
 	// EJEMPLO DE CÓMO INTEGRARLA EN TU FUNCIÓN DE GUARDAR PRODUCTO
 async function guardarProducto(event) {
