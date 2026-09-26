@@ -2135,13 +2135,15 @@ function imprimirReporteDemandaDirecto() {
 
 <!-- MODALES EN EL HTML (Antes de </body>) -->
 
-<!-- 1. MODAL DEMANDA -->
+<!-- MODALES DE CONTROL (UBICAR JUSTO ANTES DE </body>) -->
+
+<!-- 1. MODAL REPORTE DE DEMANDA -->
 <div id="modalDemanda" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
     <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
       <div>
         <h3 class="text-xl font-bold text-gray-800">📈 Reporte de Demanda de Productos</h3>
-        <p class="text-xs text-gray-500">Ranking de rotación según órdenes procesadas</p>
+        <p class="text-xs text-gray-500">Ranking de rotación según las órdenes procesadas</p>
       </div>
       <button onclick="cerrarModalDemanda()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold px-2">&times;</button>
     </div>
@@ -2155,13 +2157,13 @@ function imprimirReporteDemandaDirecto() {
   </div>
 </div>
 
-<!-- 2. MODAL INVENTARIO -->
+<!-- 2. MODAL DESGLOSE DE INVENTARIO -->
 <div id="modalInventario" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
     <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
       <div>
         <h3 class="text-xl font-bold text-gray-800">📊 Desglose Completo de Inventario</h3>
-        <p class="text-xs text-gray-500">Estado de stock, disponibilidad y precios</p>
+        <p class="text-xs text-gray-500">Estado de stock, disponibilidad y precios de productos</p>
       </div>
       <button onclick="cerrarModalInventario()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold px-2">&times;</button>
     </div>
@@ -2177,7 +2179,7 @@ function imprimirReporteDemandaDirecto() {
 <script>
 var listaDemandaActual = [];
 
-// REPORTE DE DEMANDA
+// FUNCIONALIDAD 1: REPORTE DE DEMANDA
 function generateDemandReport() {
   let listaOrdenes = [];
   if (typeof ordenes !== 'undefined' && Array.isArray(ordenes) && ordenes.length > 0) {
@@ -2185,7 +2187,11 @@ function generateDemandReport() {
   } else {
     const ordenesGuardadas = localStorage.getItem('lush_ordenes') || localStorage.getItem('ordenes');
     if (ordenesGuardadas) {
-      try { listaOrdenes = JSON.parse(ordenesGuardadas); } catch (e) { console.error(e); }
+      try {
+        listaOrdenes = JSON.parse(ordenesGuardadas);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
@@ -2202,14 +2208,20 @@ function generateDemandReport() {
       const cantidad = parseInt(item.quantity || item.cantidad || 1);
       const precio = parseFloat(item.price || item.precio || 0);
 
-      if (!conteoDemanda[nombre]) conteoDemanda[nombre] = { cantidad: 0, ingresos: 0 };
+      if (!conteoDemanda[nombre]) {
+        conteoDemanda[nombre] = { cantidad: 0, ingresos: 0 };
+      }
       conteoDemanda[nombre].cantidad += cantidad;
       conteoDemanda[nombre].ingresos += cantidad * precio;
     });
   });
 
   listaDemandaActual = Object.keys(conteoDemanda)
-    .map(prod => ({ nombre: prod, cantidad: conteoDemanda[prod].cantidad, ingresos: conteoDemanda[prod].ingresos }))
+    .map(prod => ({
+      nombre: prod,
+      cantidad: conteoDemanda[prod].cantidad,
+      ingresos: conteoDemanda[prod].ingresos
+    }))
     .sort((a, b) => b.cantidad - a.cantidad);
 
   if (listaDemandaActual.length === 0) {
@@ -2283,10 +2295,13 @@ function imprimirReporteDemandaDirecto() {
   printWindow.document.write(content);
   printWindow.document.close();
   printWindow.focus();
-  setTimeout(() => { printWindow.print(); printWindow.close(); }, 250);
+  setTimeout(() => {
+    printWindow.print();
+    printWindow.close();
+  }, 250);
 }
 
-// DESGLOSE DE INVENTARIO
+// FUNCIONALIDAD 2: DESGLOSE DE INVENTARIO EN PANTALLA
 function mostrarDesgloseInventario() {
   let lista = [];
   if (typeof productos !== 'undefined' && Array.isArray(productos) && productos.length > 0) {
@@ -2294,7 +2309,11 @@ function mostrarDesgloseInventario() {
   } else {
     const prodsGuardados = localStorage.getItem('lush_productos') || localStorage.getItem('productos');
     if (prodsGuardados) {
-      try { lista = JSON.parse(prodsGuardados); } catch (e) { console.error(e); }
+      try {
+        lista = JSON.parse(prodsGuardados);
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
