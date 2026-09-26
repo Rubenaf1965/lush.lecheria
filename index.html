@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
+  <script>
     tailwind.config = {
       theme: {
         extend: {
@@ -189,7 +189,7 @@
         <h3 class="text-lg font-semibold text-lushDark mb-4 flex items-center gap-2">
           <span>🛍️</span> Registrar Producto Nuevo
         </h3>
-        <form id="addProductForm" onsubmit="handleAddProduct(event)" class="space-y-4">
+        <form id="addProductForm" onsubmit="handleUploadAndSaveProduct(event)" class="space-y-4">
           <div>
             <label class="block text-xs font-semibold text-gray-600 mb-1">Nombre del Producto</label>
             <input type="text" id="prodTitle" required placeholder="Ej. Anillo Solitario Baño Oro" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
@@ -230,18 +230,7 @@
           </button>
         </form>
       </div>
-<form onsubmit="guardarProducto(event)">
-  <!-- Tus campos de input -->
-  <input type="file" id="input-file-imagen" required />
-  <input type="text" id="input-titulo" placeholder="Nombre producto" required />
-  <input type="text" id="input-categoria" placeholder="Categoría" required />
-  <input type="number" id="input-precio" step="0.01" placeholder="Precio" required />
-  <input type="number" id="input-stock" placeholder="Stock" required />
 
-  <button type="submit" class="bg-black text-white px-4 py-2 rounded">
-    Guardar en Supabase
-  </button>
-</form>
       <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <h3 class="text-lg font-semibold text-lushDark mb-4 flex items-center gap-2">
           <span>👥</span> Vendedores y Porcentajes
@@ -814,79 +803,89 @@
       loadData();
       renderCategoryFilters();
     });
-    // Sanitiza el nombre eliminando acentos, caracteres especiales y espacios
-function formatFileName(filename) {
-  const parts = filename.split('.');
-  const ext = parts.pop();
-  const name = parts.join('.');
 
-  const cleanName = name
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Remueve tildes/acentos
-    .replace(/[^a-zA-Z0-9_-]/g, '-') // Reemplaza espacios y caracteres especiales por guiones
-    .toLowerCase();
+    function formatFileName(filename) {
+      const parts = filename.split('.');
+      const ext = parts.pop();
+      const name = parts.join('.');
 
-  return `${Date.now()}-${cleanName}.${ext}`;
-}
+      const cleanName = name
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-zA-Z0-9_-]/g, '-')
+        .toLowerCase();
 
-async function handleUploadAndSaveProduct(fileInput, productData) {
-  const file = fileInput.files ? fileInput.files[0] : null;
-  if (!file) {
-    alert("Por favor, selecciona una imagen para el producto.");
-    return;
-  }
-
-  try {
-    // 1. Sanitizar el nombre del archivo
-    const fileName = formatFileName(file.name);
-
-    // 2. Subir al Storage usando la instancia _supabase
-    const { data: uploadData, error: uploadError } = await _supabase.storage
-      .from('productos')
-      .upload(fileName, file, {
-        contentType: file.type,
-        upsert: false
-      });
-
-    if (uploadError) {
-      console.error('Error al subir imagen a Storage:', uploadError.message);
-      alert('Error en Storage: ' + uploadError.message);
-      return;
+      return `${Date.now()}-${cleanName}.${ext}`;
     }
 
-    // 3. Obtener la URL Pública mediante _supabase
-    const { data: urlData } = _supabase.storage
-      .from('productos')
-      .getPublicUrl(fileName);
+    async function uploadSingleImage(file) {
+      if (!file) return null;
+      const fileName = formatFileName(file.name);
+      const { data, error } = await _supabase.storage
+        .from('productos')
+        .upload(fileName, file, { contentType: file.type, upsert: false });
 
-    const imageUrl = urlData.publicUrl;
+      if (error) {
+        console.error('Error al subir imagen a Storage:', error.message);
+        throw error;
+      }
 
-    // 4. Guardar en la tabla SQL 'productos' usando la columna 'image'
-    const { data: insertedData, error: dbError } = await _supabase
-      .from('productos')
-      .insert([
-        {
-          title: productData.title,
-          category: productData.category,
-          price: parseFloat(productData.price || 0),
-          stock: parseInt(productData.stock || 0),
-          image: imageUrl // <--- Debe llamarse 'image' para coincidir con tu tabla SQL
+      const { data: urlData } = _supabase.storage.from('productos').getPublicUrl(fileName);
+      return urlData.publicUrl;
+    }
+
+    async function handleUploadAndSaveProduct(event) {
+      if (event) event.preventDefault();
+
+      const title = document.getElementById('prodTitle').value.trim();
+      const category = document.getElementById('prodCategory').value;
+      const price = parseFloat(document.getElementById('prodPrice').value || 0);
+      const stock = parseInt(document.getElementById('prodStock').value || 0);
+
+      const fileInput1 = document.getElementById('prodImageFile');
+      const fileInput2 = document.getElementById('prodImageFile2');
+
+      const file1 = fileInput1?.files?.[0];
+      const file2 = fileInput2?.files?.[0];
+
+      if (!file1) {
+        alert("Por favor, selecciona al menos la imagen principal.");
+        return;
+      }
+
+      try {
+        const imageUrl1 = await uploadSingleImage(file1);
+        const imageUrl2 = file2 ? await uploadSingleImage(file2) : null;
+
+        const { error: dbError } = await _supabase
+          .from('productos')
+          .insert([
+            {
+              title: title,
+              category: category,
+              price: price,
+              stock: stock,
+              image: imageUrl1,
+              image2: imageUrl2
+            }
+          ]);
+
+        if (dbError) {
+          console.error('Error guardando en la BD:', dbError.message);
+          alert('Error en BD: ' + dbError.message);
+          return;
         }
-      ]);
 
-    if (dbError) {
-      console.error('Error guardando en la base de datos:', dbError.message);
-      alert('Error en BD: ' + dbError.message);
-    } else {
-      console.log('Producto cargado con éxito en BD y Storage:', imageUrl);
-      alert('¡Producto agregado con éxito!');
-      await loadData(); // Recarga los datos en pantalla inmediatamente
+        alert('¡Producto guardado exitosamente en Supabase!');
+        document.getElementById('addProductForm').reset();
+        await loadData();
+
+      } catch (err) {
+        console.error('Error procesando la solicitud:', err);
+        alert('Ocurrió un error al procesar las imágenes o los datos.');
+      }
     }
 
-  } catch (err) {
-    console.error('Error inesperado al procesar el producto:', err);
-  }
-}
     async function loadData() {
       try {
         const [prodRes, sellRes, ordRes] = await Promise.all([
@@ -975,7 +974,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
       calculateCartTotal();
     }
 
-    // INTERFAZ TIENDA Y CARRITO
     function renderCategoryFilters() {
       const categories = [
         { name: 'Todos', slug: 'all' },
@@ -1072,7 +1070,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
       }).join('');
     }
 
-    // MANEJO DE CARRITO
     function addToCart(productId) {
       const prod = productos.find(p => String(p.id) === String(productId));
       if (!prod || prod.stock <= 0) return;
@@ -1213,7 +1210,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
         commission_amount: commissionAmount
       };
 
-      // Restar stock en Supabase
       for (const item of cart) {
         const prod = productos.find(p => String(p.id) === String(item.id));
         if (prod) {
@@ -1222,7 +1218,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
         }
       }
 
-      // Guardar orden
       const { error } = await _supabase.from('ordenes').insert([newOrder]);
 
       if (error) {
@@ -1230,7 +1225,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
         return;
       }
 
-      // Armar Mensaje de WhatsApp
       let msg = `🛍️ *NUEVO PEDIDO EN LUSH LECHERÍA*\n`;
       msg += `👤 *Cliente:* ${customerName}\n`;
       msg += `📍 *Delivery:* ${deliveryAddress}\n`;
@@ -1258,7 +1252,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
       window.open(`https://wa.me/${STORE_WHATSAPP}?text=${encodedMsg}`, '_blank');
     }
 
-    // LIGHTBOX
     function openLightbox(productId) {
       const p = productos.find(item => String(item.id) === String(productId));
       if (!p) return;
@@ -1309,7 +1302,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
       updateLightboxView();
     }
 
-    // PANEL ADMIN Y DASHBOARD
     function openAdminModal() { document.getElementById('authModal').classList.remove('hidden'); }
     function closeAdminModal() { 
       document.getElementById('authModal').classList.add('hidden'); 
@@ -1346,7 +1338,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
       document.getElementById('metricTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
       document.getElementById('metricTotalOrders').innerText = ordenes.length;
 
-      // Tabla de inventario
       const invBody = document.getElementById('inventoryTableBody');
       if (invBody) {
         invBody.innerHTML = productos.map(p => `
@@ -1363,7 +1354,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
         `).join('');
       }
 
-      // Tabla de vendedores
       const sellBody = document.getElementById('sellerCommissionsTableBody');
       if (sellBody) {
         sellBody.innerHTML = vendedores.map(s => {
@@ -1387,7 +1377,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
         }).join('');
       }
 
-      // Tabla de órdenes
       const ordBody = document.getElementById('ordenesHistoryTableBody');
       if (ordBody) {
         ordBody.innerHTML = ordenes.map(o => {
@@ -1413,128 +1402,6 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
           `;
         }).join('');
       }
-    }
-
-// Sanitiza el nombre de archivo (tildes, espacios y caracteres raros)
-function formatFileName(filename) {
-  const parts = filename.split('.');
-  const ext = parts.pop();
-  const name = parts.join('.');
-
-  const cleanName = name
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9_-]/g, '-')
-    .toLowerCase();
-
-  return `${Date.now()}-${cleanName}.${ext}`;
-}
-
-  // Función principal para procesar el guardado
-
-  async function handleUploadAndSaveProduct(event) {
-   if (event) event.preventDefault();
-
-  // 1. Capturar el input del archivo
-  const fileInput = document.querySelector('#input-file-imagen') || document.querySelector('#input-imagen');
-  const file = fileInput?.files?.[0];
-
-  if (!file) {
-    alert("Por favor, selecciona una imagen para el producto.");
-    return;
-  }
-
-  try {
-    // 2. Sanitizar el nombre
-    const fileName = formatFileName(file.name);
-    console.log('Nombre de archivo sanitizado listo para Supabase:', fileName);
-
-    // 3. Subir al Storage de Supabase
-    const { data: uploadData, error: uploadError } = await _supabase.storage
-      .from('productos')
-      .upload(fileName, file, {
-        contentType: file.type,
-        cacheControl: '3600',
-        upsert: false
-      });
-
-    if (uploadError) {
-      console.error('Error al subir a Storage:', uploadError.message);
-      alert('Error al subir imagen: ' + uploadError.message);
-      return;
-    }
-
-    // 4. Obtener la URL Pública
-    const { data: urlData } = _supabase.storage
-      .from('productos')
-      .getPublicUrl(fileName);
-
-    const imageUrl = urlData.publicUrl;
-
-    // 5. Capturar los valores de los inputs del producto
-    const titleVal = document.querySelector('#input-titulo')?.value || '';
-    const categoryVal = document.querySelector('#input-categoria')?.value || '';
-    const priceVal = parseFloat(document.querySelector('#input-precio')?.value || 0);
-    const stockVal = parseInt(document.querySelector('#input-stock')?.value || 0);
-
-    // 6. Insertar en la tabla SQL 'productos'
-    const { data: dbData, error: dbError } = await _supabase
-      .from('productos')
-      .insert([
-        {
-          title: titleVal,
-          category: categoryVal,
-          price: priceVal,
-          stock: stockVal,
-          image: imageUrl // <--- Debe coincidir con la columna 'image' de la BD
-        }
-      ]);
-
-    if (dbError) {
-      console.error('Error guardando en la BD:', dbError.message);
-      alert('Error en BD: ' + dbError.message);
-      return;
-    }
-
-    alert('¡Producto e imagen guardados exitosamente!');
-    
-    // Limpiar formulario y recargar datos
-    const form = document.querySelector('#form-producto');
-    if (form) form.reset();
-    if (typeof loadData === 'function') await loadData();
-
-  } catch (err) {
-    console.error('Error inesperado:', err);
-  }
-}
-
-// Hacer la función accesible globalmente
-window.handleUploadAndSaveProduct = handleUploadAndSaveProduct;
-// Vincular el evento al formulario HTML
-const formProducto = document.querySelector('#form-producto');
-if (formProducto) {
-  formProducto.addEventListener('submit', handleUploadAndSaveProduct);
-}
-    async function saveProductToSupabase(img1, img2) {
-      const newProduct = {
-        title: document.getElementById('prodTitle').value,
-        category: document.getElementById('prodCategory').value,
-        price: parseFloat(document.getElementById('prodPrice').value),
-        stock: parseInt(document.getElementById('prodStock').value),
-        image: img1,
-        image2: img2
-      };
-
-      const { error } = await _supabase.from('productos').insert([newProduct]);
-
-      if (error) {
-        alert('Error al guardar el producto en Supabase: ' + error.message);
-        return;
-      }
-
-      await loadData();
-      document.getElementById('addProductForm').reset();
-      alert('¡Producto guardado exitosamente en Supabase!');
     }
 
     async function handleAddSeller(e) {
@@ -1638,7 +1505,6 @@ if (formProducto) {
       }
     }
 
-    // FACTURAS Y REPORTES
     function openInvoiceModal(orderId) {
       const order = ordenes.find(o => String(o.id) === String(orderId));
       if (!order) return;
@@ -1696,261 +1562,12 @@ if (formProducto) {
 
         const { error } = await _supabase.from('ordenes').delete().eq('id', orderId);
         if (error) {
-          alert("Error al borrar la orden en Supabase: " + error.message);
+          alert('Error al eliminar la orden: ' + error.message);
           return;
         }
 
         await loadData();
-        alert(`La orden #${orderId} ha sido eliminada y el stock devuelto.`);
-      }
-    }
-
-    function openMonthlyClosureModal() {
-      const now = new Date();
-      const currentYear = now.getFullYear();
-      const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
-      
-      document.getElementById('closureMonthPicker').value = `${currentYear}-${currentMonth}`;
-      generateMonthlyClosureReport();
-      document.getElementById('monthlyClosureModal').classList.remove('hidden');
-    }
-
-    function closeMonthlyClosureModal() {
-      document.getElementById('monthlyClosureModal').classList.add('hidden');
-    }
-
-    function generateMonthlyClosureReport() {
-      const selectedYearMonth = document.getElementById('closureMonthPicker').value;
-      if (!selectedYearMonth) return;
-
-      const [year, month] = selectedYearMonth.split('-');
-      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-      const monthLabel = `${monthNames[parseInt(month, 10) - 1]} ${year}`;
-
-      document.getElementById('closurePeriodTitle').innerText = `Cierre de Mes: ${monthLabel}`;
-      document.getElementById('closureReportGeneratedAt').innerText = `Generado el: ${new Date().toLocaleString('es-VE')}`;
-
-      const filteredOrders = ordenes.filter(o => {
-        if (!o.isoDate) {
-          const parts = o.date ? o.date.split('/') : [];
-          if (parts.length >= 3) {
-            const day = parts[0].padStart(2, '0');
-            const m = parts[1].padStart(2, '0');
-            const y = parts[2].substring(0, 4);
-            return `${y}-${m}` === selectedYearMonth;
-          }
-          return false;
-        }
-        return o.isoDate.startsWith(selectedYearMonth);
-      });
-
-      const totalSales = filteredOrders.reduce((acc, o) => acc + o.total, 0);
-      const totalCommissions = filteredOrders.reduce((acc, o) => acc + o.commissionAmount, 0);
-      const totalUnits = filteredOrders.reduce((acc, o) => acc + (Array.isArray(o.items) ? o.items.reduce((sum, item) => sum + item.qty, 0) : 0), 0);
-
-      document.getElementById('closureTotalSales').innerText = `$${totalSales.toFixed(2)}`;
-      document.getElementById('closureTotalCommissions').innerText = `$${totalCommissions.toFixed(2)}`;
-      document.getElementById('closureTotalOrdersUnits').innerText = `${filteredOrders.length} órds. / ${totalUnits} unids.`;
-
-      const vendedoresMap = {};
-      vendedores.forEach(s => {
-        vendedoresMap[s.id] = { name: s.name, count: 0, totalSales: 0, totalCommission: 0 };
-      });
-      vendedoresMap['direct'] = { name: 'Venta Directa', count: 0, totalSales: 0, totalCommission: 0 };
-
-      filteredOrders.forEach(o => {
-        const key = o.sellerId || 'direct';
-        if (!vendedoresMap[key]) {
-          vendedoresMap[key] = { name: o.sellerName || 'Vendedor Desconocido', count: 0, totalSales: 0, totalCommission: 0 };
-        }
-        vendedoresMap[key].count += 1;
-        vendedoresMap[key].totalSales += o.total;
-        vendedoresMap[key].totalCommission += o.commissionAmount;
-      });
-
-      const closureSellersBody = document.getElementById('closureSellersTableBody');
-      const activeSellers = Object.values(vendedoresMap).filter(s => s.count > 0);
-
-      if (activeSellers.length === 0) {
-        closureSellersBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin actividad de vendedores en este mes.</td></tr>`;
-      } else {
-        closureSellersBody.innerHTML = activeSellers.map(s => `
-          <tr class="border-b">
-            <td class="p-2.5 font-semibold text-lushDark">${s.name}</td>
-            <td class="p-2.5 text-center">${s.count} pedido(s)</td>
-            <td class="p-2.5 text-right font-medium">$${s.totalSales.toFixed(2)}</td>
-            <td class="p-2.5 text-right font-bold text-lushGold">$${s.totalCommission.toFixed(2)}</td>
-          </tr>
-        `).join('');
-      }
-
-      const closureOrdersBody = document.getElementById('closureOrdersTableBody');
-      if (filteredOrders.length === 0) {
-        closureOrdersBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">No se encontraron órdenes en este período.</td></tr>`;
-      } else {
-        closureOrdersBody.innerHTML = filteredOrders.map(o => `
-          <tr class="border-b">
-            <td class="p-2 font-bold text-lushDark">#${o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
-            <td class="p-2">${o.customerName || 'N/A'}</td>
-            <td class="p-2 text-gray-600">${o.sellerName}</td>
-            <td class="p-2 font-mono text-emerald-700">${o.paymentRef}</td>
-            <td class="p-2 text-right font-bold text-lushDark">$${o.total.toFixed(2)}</td>
-            <td class="p-2 text-right font-bold text-lushGold">$${o.commissionAmount.toFixed(2)}</td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    function mostrarDesgloseInventario() {
-      document.getElementById('inventoryReportTimestamp').innerText = `Fecha: ${new Date().toLocaleString('es-VE')}`;
-
-      const stockBody = document.getElementById('inventoryStockTableBody');
-      const missingBody = document.getElementById('inventoryMissingTableBody');
-
-      const availableProductos = productos.filter(p => p.stock > 0);
-      const missingProductos = productos.filter(p => p.stock <= 0);
-
-      stockBody.innerHTML = availableProductos.length === 0 
-        ? `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos disponibles.</td></tr>`
-        : availableProductos.map(p => `
-          <tr class="border-b">
-            <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
-            <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
-            <td class="p-2.5 text-center font-medium">$${p.price.toFixed(2)}</td>
-            <td class="p-2.5 text-right font-bold text-emerald-600">${p.stock} unids.</td>
-          </tr>
-        `).join('');
-
-      missingBody.innerHTML = missingProductos.length === 0 
-        ? `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos agotados.</td></tr>`
-        : missingProductos.map(p => `
-          <tr class="border-b">
-            <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
-            <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
-            <td class="p-2.5 text-center font-medium">$${p.price.toFixed(2)}</td>
-            <td class="p-2.5 text-right font-bold text-red-600">AGOTADO (0)</td>
-          </tr>
-        `).join('');
-
-      document.getElementById('inventoryReportModal').classList.remove('hidden');
-    }
-
-    function closeInventoryReportModal() {
-      document.getElementById('inventoryReportModal').classList.add('hidden');
-    }
-
-    function imprimirInventarioDirecto() {
-      mostrarDesgloseInventario();
-      window.print();
-    }
-
-    function generateDemandReport() {
-      const demandMap = {};
-
-      ordenes.forEach(order => {
-        if (Array.isArray(order.items)) {
-          order.items.forEach(item => {
-            if (!demandMap[item.title]) {
-              demandMap[item.title] = { title: item.title, qty: 0, totalAmount: 0 };
-            }
-            demandMap[item.title].qty += item.qty;
-            demandMap[item.title].totalAmount += (item.price * item.qty);
-          });
-        }
-      });
-
-      const sortedDemand = Object.values(demandMap).sort((a, b) => b.qty - a.qty);
-      const tableBody = document.getElementById('demandReportTableBody');
-      document.getElementById('reportTimestamp').innerText = `Generado el: ${new Date().toLocaleString('es-VE')}`;
-
-      if (sortedDemand.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-400">Sin datos de ventas disponibles.</td></tr>`;
-      } else {
-        tableBody.innerHTML = sortedDemand.map((item, index) => {
-          let badgeClass = "bg-gray-100 text-gray-600";
-          let label = `#${index + 1}`;
-
-          if (index === 0) { badgeClass = "bg-yellow-100 text-yellow-800 font-bold"; label = "🥇 Alta Demanda (N°1)"; }
-          else if (index === 1) { badgeClass = "bg-gray-200 text-gray-800 font-bold"; label = "🥈 Alta Demanda (N°2)"; }
-          else if (index === 2) { badgeClass = "bg-amber-100 text-amber-800 font-bold"; label = "🥉 Alta Demanda (N°3)"; }
-
-          return `
-            <tr class="border-b">
-              <td class="p-3"><span class="px-2.5 py-1 rounded-md text-xs ${badgeClass}">${label}</span></td>
-              <td class="p-3 font-semibold text-lushDark">${item.title}</td>
-              <td class="p-3 text-center font-bold text-emerald-600">${item.qty} unids.</td>
-              <td class="p-3 text-right font-bold text-lushDark">$${item.totalAmount.toFixed(2)}</td>
-            </tr>
-          `;
-        }).join('');
-      }
-
-      document.getElementById('demandReportModal').classList.remove('hidden');
-    }
-
-    function closeDemandReportModal() {
-      document.getElementById('demandReportModal').classList.add('hidden');
-    }
-
-    function exportDataToJSON() {
-      const backupData = {
-        productos: productos,
-        vendedores: vendedores,
-        ordenes: ordenes,
-        exportedAt: new Date().toISOString()
-      };
-
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `lush_backup_${new Date().toISOString().slice(0,10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-    }
-
-    async function importDataFromJSON(event) {
-      const fileReader = new FileReader();
-      fileReader.onload = async function(e) {
-        try {
-          const importedData = JSON.parse(e.target.result);
-          if (importedData.productos || importedData.vendedores || importedData.ordenes) {
-            
-            if (importedData.productos && importedData.productos.length) {
-              const formattedProds = importedData.productos.map(p => ({
-                title: p.title, category: p.category, price: p.price, stock: p.stock, image: p.image, image2: p.image2 || null
-              }));
-              await _supabase.from('productos').insert(formattedProds);
-            }
-
-            if (importedData.vendedores && importedData.vendedores.length) {
-              const formattedSellers = importedData.vendedores.map(s => ({
-                name: s.name, commission: s.commission, phone: s.phone
-              }));
-              await _supabase.from('vendedores').insert(formattedSellers);
-            }
-
-            if (importedData.ordenes && importedData.ordenes.length) {
-              const formattedOrders = importedData.ordenes.map(o => ({
-                date: o.date, iso_date: o.isoDate, customer_name: o.customerName,
-                items: JSON.stringify(o.items), total: o.total, payment_ref: o.paymentRef,
-                delivery_address: o.deliveryAddress, seller_id: o.sellerId, seller_name: o.sellerName,
-                commission_amount: o.commissionAmount
-              }));
-              await _supabase.from('ordenes').insert(formattedOrders);
-            }
-
-            await loadData();
-            alert('¡Datos cargados con éxito y sincronizados en Supabase!');
-          } else {
-            alert('El archivo no posee un formato válido.');
-          }
-        } catch (err) {
-          alert('Error al leer e importar el archivo JSON.');
-        }
-      };
-      if (event.target.files[0]) {
-        fileReader.readAsText(event.target.files[0]);
+        alert('Orden eliminada exitosamente.');
       }
     }
   </script>
