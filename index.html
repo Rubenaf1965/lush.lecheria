@@ -776,167 +776,194 @@
   </footer>
 
   <!-- SCRIPT LOGIC JAVASCRIPT CON SUPABASE INTEGRADO -->
-  <script>
-    const SUPABASE_URL = "https://cwmehnvcnqxtyllkeejw.supabase.co/";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3bWVobnZjbnF4dHlsbGtlZWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMTg4MjEsImV4cCI6MjEwNDY5NDgyMX0.ln0qABX3k3lpipN_TW97FOqSbYhNwczZg6uU1cjaZMk";
+<script>
+  const SUPABASE_URL = "https://cwmehnvcnqxtyllkeejw.supabase.co/";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN3bWVobnZjbnF4dHlsbGtlZWp3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxMTg4MjEsImV4cCI6MjEwNDY5NDgyMX0.ln0qABX3k3lpipN_TW97FOqSbYhNwczZg6uU1cjaZMk";
 
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Instanciación del cliente global asegurando no chocar con la librería
+  const _supabase = (window.supabaseClient || window.supabase).createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const ADMIN_PASSWORD = "lush1109";
-    const STORE_WHATSAPP = "584148957830";
+  const ADMIN_PASSWORD = "lush1109";
+  const STORE_WHATSAPP = "584148957830";
 
-    let bcvRate = parseFloat(localStorage.getItem('lush_bcv_rate')) || 0;
+  let bcvRate = parseFloat(localStorage.getItem('lush_bcv_rate')) || 0;
 
-    let productos = [];
-    let vendedores = [];
-    let ordenes = [];
+  let productos = [];
+  let vendedores = [];
+  let ordenes = [];
 
-    let cart = [];
-    let selectedCategory = 'all';
+  let cart = [];
+  let selectedCategory = 'all';
 
-    let currentLightboxImages = [];
-    let currentLightboxIndex = 0;
-    let currentLightboxTitle = '';
+  let currentLightboxImages = [];
+  let currentLightboxIndex = 0;
+  let currentLightboxTitle = '';
 
-    window.addEventListener('DOMContentLoaded', () => {
-      fetchBcvRate();
-      loadData();
-      renderCategoryFilters();
-    });
+  window.addEventListener('DOMContentLoaded', () => {
+    if (typeof fetchBcvRate === 'function') fetchBcvRate();
+    loadData();
+    if (typeof renderCategoryFilters === 'function') renderCategoryFilters();
+  });
 
-    function formatFileName(filename) {
-      const parts = filename.split('.');
-      const ext = parts.pop();
-      const name = parts.join('.');
+  function formatFileName(filename) {
+    const parts = filename.split('.');
+    const ext = parts.pop();
+    const name = parts.join('.');
 
-      const cleanName = name
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-zA-Z0-9_-]/g, '-')
-        .toLowerCase();
+    const cleanName = name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9_-]/g, '-')
+      .toLowerCase();
 
-      return `${Date.now()}-${cleanName}.${ext}`;
+    return `${Date.now()}-${cleanName}.${ext}`;
+  }
+
+  async function uploadSingleImage(file) {
+    if (!file) return null;
+    const fileName = formatFileName(file.name);
+    
+    const { data, error } = await _supabase.storage
+      .from('productos')
+      .upload(fileName, file, { contentType: file.type, upsert: false });
+
+    if (error) {
+      console.error('Error al subir imagen a Storage:', error.message);
+      throw error;
     }
 
-    async function uploadSingleImage(file) {
-      if (!file) return null;
-      const fileName = formatFileName(file.name);
-      const { data, error } = await _supabase.storage
+    const { data: urlData } = _supabase.storage
+      .from('productos')
+      .getPublicUrl(fileName);
+
+    return urlData.publicUrl;
+  }
+
+  async function handleUploadAndSaveProduct(event) {
+    if (event) event.preventDefault();
+
+    const titleInput = document.getElementById('prodTitle');
+    const categoryInput = document.getElementById('prodCategory');
+    const priceInput = document.getElementById('prodPrice');
+    const stockInput = document.getElementById('prodStock');
+
+    const title = titleInput ? titleInput.value.trim() : '';
+    const category = categoryInput ? categoryInput.value : '';
+    const price = parseFloat(priceInput?.value || 0);
+    const stock = parseInt(stockInput?.value || 0);
+
+    const fileInput1 = document.getElementById('prodImageFile');
+    const fileInput2 = document.getElementById('prodImageFile2');
+
+    const file1 = fileInput1?.files?.[0];
+    const file2 = fileInput2?.files?.[0];
+
+    if (!title || !price) {
+      alert("Por favor, completa el nombre del producto y el precio.");
+      return;
+    }
+
+    if (!file1) {
+      alert("Por favor, selecciona al menos la imagen principal.");
+      return;
+    }
+
+    try {
+      const imageUrl1 = await uploadSingleImage(file1);
+      const imageUrl2 = file2 ? await uploadSingleImage(file2) : null;
+
+      // Inserción en la tabla de Supabase
+      const { data, error: dbError } = await _supabase
         .from('productos')
-        .upload(fileName, file, { contentType: file.type, upsert: false });
+        .insert([
+          {
+            title: title,
+            category: category,
+            price: price,
+            stock: stock,
+            image: imageUrl1,
+            image2: imageUrl2
+          }
+        ])
+        .select();
 
-      if (error) {
-        console.error('Error al subir imagen a Storage:', error.message);
-        throw error;
-      }
-
-      const { data: urlData } = _supabase.storage.from('productos').getPublicUrl(fileName);
-      return urlData.publicUrl;
-    }
-
-    async function handleUploadAndSaveProduct(event) {
-      if (event) event.preventDefault();
-
-      const title = document.getElementById('prodTitle').value.trim();
-      const category = document.getElementById('prodCategory').value;
-      const price = parseFloat(document.getElementById('prodPrice').value || 0);
-      const stock = parseInt(document.getElementById('prodStock').value || 0);
-
-      const fileInput1 = document.getElementById('prodImageFile');
-      const fileInput2 = document.getElementById('prodImageFile2');
-
-      const file1 = fileInput1?.files?.[0];
-      const file2 = fileInput2?.files?.[0];
-
-      if (!file1) {
-        alert("Por favor, selecciona al menos la imagen principal.");
+      if (dbError) {
+        console.error('Error guardando en la BD:', dbError.message);
+        alert('Error en la base de datos: ' + dbError.message);
         return;
       }
 
-      try {
-        const imageUrl1 = await uploadSingleImage(file1);
-        const imageUrl2 = file2 ? await uploadSingleImage(file2) : null;
+      alert('¡Producto guardado exitosamente!');
+      
+      const form = document.getElementById('addProductForm');
+      if (form) form.reset();
 
-        const { error: dbError } = await _supabase
-          .from('productos')
-          .insert([
-            {
-              title: title,
-              category: category,
-              price: price,
-              stock: stock,
-              image: imageUrl1,
-              image2: imageUrl2
-            }
-          ]);
+      // Recargar datos para refrescar las tablas
+      await loadData();
 
-        if (dbError) {
-          console.error('Error guardando en la BD:', dbError.message);
-          alert('Error en BD: ' + dbError.message);
-          return;
-        }
-
-        alert('¡Producto guardado exitosamente en Supabase!');
-        document.getElementById('addProductForm').reset();
-        await loadData();
-
-      } catch (err) {
-        console.error('Error procesando la solicitud:', err);
-        alert('Ocurrió un error al procesar las imágenes o los datos.');
-      }
+    } catch (err) {
+      console.error('Error procesando la solicitud:', err);
+      alert('Ocurrió un error al procesar las imágenes o los datos.');
     }
+  }
 
-    async function loadData() {
-      try {
-        const [prodRes, sellRes, ordRes] = await Promise.all([
-          _supabase.from('productos').select('*'),
-          _supabase.from('vendedores').select('*'),
-          _supabase.from('ordenes').select('*').order('created_at', { ascending: false })
-        ]);
+  async function loadData() {
+    try {
+      const [prodRes, sellRes, ordRes] = await Promise.all([
+        _supabase.from('productos').select('*'),
+        _supabase.from('vendedores').select('*'),
+        _supabase.from('ordenes').select('*').order('created_at', { ascending: false })
+      ]);
 
-        if (prodRes.error) throw prodRes.error;
-        productos = (prodRes.data || []).map(p => ({
-          id: p.id,
-          title: p.title,
-          category: p.category,
-          price: parseFloat(p.price || 0),
-          stock: parseInt(p.stock || 0),
-          image: p.image,
-          image2: p.image2 || null
-        }));
-
-        if (sellRes.error) throw sellRes.error;
-        vendedores = (sellRes.data || []).map(s => ({
-          id: s.id,
-          name: s.name,
-          commission: parseFloat(s.commission || 0),
-          phone: s.phone
-        }));
-
-        if (ordRes.error) throw ordRes.error;
-        ordenes = (ordRes.data || []).map(o => ({
-          id: o.id,
-          date: o.date,
-          isoDate: o.iso_date,
-          customerName: o.customer_name,
-          items: typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []),
-          total: parseFloat(o.total || 0),
-          paymentRef: o.payment_ref,
-          deliveryAddress: o.delivery_address,
-          sellerId: o.seller_id,
-          sellerName: o.seller_name,
-          commissionAmount: parseFloat(o.commission_amount || 0)
-        }));
-
-        renderProductos();
-        renderSellerSelectOptions();
-        renderAdminDashboard();
-
-      } catch (err) {
-        console.error("Error al cargar datos desde Supabase:", err);
+      if (prodRes.error) {
+        console.error('Error de Supabase al traer productos:', prodRes.error);
+        throw prodRes.error;
       }
-    }
 
+      // Mapeo robusto (soporta si las columnas en la BD se llaman title/nombre o image/imagen_url)
+      productos = (prodRes.data || []).map(p => ({
+        id: p.id,
+        title: p.title || p.nombre || 'Sin Nombre',
+        category: p.category || p.categoria || 'Accesorios',
+        price: parseFloat(p.price || p.precio || 0),
+        stock: parseInt(p.stock || 0),
+        image: p.image || p.imagen_url || p.imagen || '',
+        image2: p.image2 || p.imagen_url2 || null
+      }));
+
+      if (sellRes.error) console.warn('Aviso Vendedores:', sellRes.error.message);
+      vendedores = (sellRes.data || []).map(s => ({
+        id: s.id,
+        name: s.name || s.nombre,
+        commission: parseFloat(s.commission || s.comision || 0),
+        phone: s.phone || s.telefono
+      }));
+
+      if (ordRes.error) console.warn('Aviso Órdenes:', ordRes.error.message);
+      ordenes = (ordRes.data || []).map(o => ({
+        id: o.id,
+        date: o.date || o.created_at,
+        isoDate: o.iso_date || o.created_at,
+        customerName: o.customer_name || o.cliente,
+        items: typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []),
+        total: parseFloat(o.total || 0),
+        paymentRef: o.payment_ref,
+        deliveryAddress: o.delivery_address,
+        sellerId: o.seller_id,
+        sellerName: o.seller_name,
+        commissionAmount: parseFloat(o.commission_amount || 0)
+      }));
+
+      // Renderizar vistas tras cargar los datos
+      if (typeof renderProductos === 'function') renderProductos();
+      if (typeof renderSellerSelectOptions === 'function') renderSellerSelectOptions();
+      if (typeof renderAdminDashboard === 'function') renderAdminDashboard();
+
+    } catch (err) {
+      console.error("Error crítico al cargar datos desde Supabase:", err);
+    }
+  }
+</script>
     async function fetchBcvRate() {
       const todayStr = new Date().toISOString().slice(0, 10);
       const cachedDate = localStorage.getItem('lush_bcv_date');
