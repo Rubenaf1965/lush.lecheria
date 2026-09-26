@@ -1762,14 +1762,16 @@ async function openMonthlyClosureModal() {
     alert("Ocurrió un error al procesar el cierre mensual.");
   }
 }
-// 1. Generar Reporte de Demanda (Productos más vendidos según órdenes)
+// Variable global temporal para guardar la lista durante la sesión del modal
+let listaDemandaActual = [];
+
+// 1. Mostrar Modal de Demanda en Pantalla
 function generateDemandReport() {
   if (!ordenes || ordenes.length === 0) {
     alert("No hay registro de órdenes para calcular la demanda de productos.");
     return;
   }
 
-  // Conteo de unidades vendidas por producto
   const conteoDemanda = {};
 
   ordenes.forEach(orden => {
@@ -1786,8 +1788,7 @@ function generateDemandReport() {
     });
   });
 
-  // Ordenar de mayor a menor demanda
-  const listaDemanda = Object.keys(conteoDemanda)
+  listaDemandaActual = Object.keys(conteoDemanda)
     .map(prod => ({
       nombre: prod,
       cantidad: conteoDemanda[prod].cantidad,
@@ -1795,17 +1796,64 @@ function generateDemandReport() {
     }))
     .sort((a, b) => b.cantidad - a.cantidad);
 
-  if (listaDemanda.length === 0) {
-    alert("No se encontraron ítems detallados en el historial de órdenes.");
+  if (listaDemandaActual.length === 0) {
+    alert("No se encontraron productos detallados en las órdenes registradas.");
     return;
   }
 
-  // Abrir ventana limpia con el reporte de demanda
+  // Generar tabla en pantalla
+  let filasHTML = listaDemandaActual.map((item, index) => {
+    const esTop = index === 0;
+    return `
+      <tr class="border-b border-gray-100 hover:bg-gray-50 transition ${esTop ? 'bg-emerald-50/50' : ''}">
+        <td class="py-3 px-4 text-sm font-bold ${esTop ? 'text-emerald-600' : 'text-gray-500'}">
+          #${index + 1}
+        </td>
+        <td class="py-3 px-4 text-sm font-medium text-gray-800">
+          ${item.nombre} ${esTop ? '<span class="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-semibold">🏆 Más Vendido</span>' : ''}
+        </td>
+        <td class="py-3 px-4 text-sm font-bold text-gray-700">${item.cantidad} unids.</td>
+        <td class="py-3 px-4 text-sm font-semibold text-emerald-600">$${item.ingresos.toFixed(2)}</td>
+      </tr>
+    `;
+  }).join('');
+
+  const renderHTML = `
+    <div class="overflow-x-auto rounded-xl border border-gray-200">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-gray-100 text-xs font-bold text-gray-600 uppercase">
+            <th class="py-3 px-4">Posición</th>
+            <th class="py-3 px-4">Producto</th>
+            <th class="py-3 px-4">Unidades Vendidas</th>
+            <th class="py-3 px-4">Total Generado</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filasHTML}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById('contenidoDemanda').innerHTML = renderHTML;
+  document.getElementById('modalDemanda').classList.remove('hidden');
+}
+
+// 2. Cerrar Modal
+function cerrarModalDemanda() {
+  document.getElementById('modalDemanda').classList.add('hidden');
+}
+
+// 3. Función exclusiva para cuando el usuario presiona "Imprimir Reporte"
+function imprimirReporteDemandaDirecto() {
+  if (!listaDemandaActual || listaDemandaActual.length === 0) return;
+
   const printWindow = window.open('', '_blank');
   let content = `
     <html>
       <head>
-        <title>Reporte de Demanda y Rotación - LUSH</title>
+        <title>Reporte de Demanda - LUSH</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
           h2 { text-align: center; margin-bottom: 5px; }
@@ -1831,7 +1879,7 @@ function generateDemandReport() {
           <tbody>
   `;
 
-  listaDemanda.forEach((item, index) => {
+  listaDemandaActual.forEach((item, index) => {
     content += `
       <tr class="${index === 0 ? 'top-sell' : ''}">
         <td>#${index + 1}</td>
@@ -2034,8 +2082,38 @@ function importDataFromJSON() {
         Cerrar
       </button>
     </div>
+<!-- MODAL DE REPORTE DE DEMANDA -->
+<div id="modalDemanda" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    
+    <!-- Encabezado -->
+    <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+      <div>
+        <h3 class="text-xl font-bold text-gray-800">📈 Reporte de Demanda de Productos</h3>
+        <p class="text-xs text-gray-500">Ranking de rotación según las órdenes procesadas</p>
+      </div>
+      <button onclick="cerrarModalDemanda()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold px-2">&times;</button>
+    </div>
+
+    <!-- Cuerpos de Datos con Scroll -->
+    <div class="p-6 overflow-y-auto flex-1">
+      <div id="contenidoDemanda">
+        <!-- Contenido generado por JavaScript -->
+      </div>
+    </div>
+
+    <!-- Acciones (Imprimir y Cerrar) -->
+    <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+      <button onclick="cerrarModalDemanda()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-300 text-sm font-semibold transition">
+        Cerrar
+      </button>
+      <button onclick="imprimirReporteDemandaDirecto()" class="bg-amber-500 text-white px-5 py-2 rounded-xl hover:bg-amber-600 text-sm font-semibold transition flex items-center gap-2">
+        🖨️ Imprimir Reporte
+      </button>
+    </div>
 
   </div>
+</div>
 </div>
 </body>
 </html>
