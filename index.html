@@ -1443,10 +1443,47 @@ async function handleUploadAndSaveProduct(event) {
   console.log('Archivo detectado:', file.name);
 
   try {
-    // 2. Sanitizar nombre del archivo
+    // Sanitizar nombre de archivo
+function formatFileName(filename) {
+  const parts = filename.split('.');
+  const ext = parts.pop();
+  const name = parts.join('.');
+
+  const cleanName = name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9_-]/g, '-')
+    .toLowerCase();
+
+  return `${Date.now()}-${cleanName}.${ext}`;
+}
+
+// Hacer la función global asignándola a window
+window.guardarProducto = async function(event) {
+  if (event) event.preventDefault();
+
+  console.log('Iniciando proceso de guardado...');
+
+  // Capturar los elementos del DOM (soporta múltiples IDs comunes)
+  const fileInput = document.querySelector('#input-file-imagen') || document.querySelector('#input-imagen');
+  const titleInput = document.querySelector('#input-titulo') || document.querySelector('#title');
+  const categoryInput = document.querySelector('#input-categoria') || document.querySelector('#category');
+  const priceInput = document.querySelector('#input-precio') || document.querySelector('#price');
+  const stockInput = document.querySelector('#input-stock') || document.querySelector('#stock');
+
+  const file = fileInput?.files?.[0];
+
+  if (!file) {
+    alert('Por favor selecciona una imagen para el producto.');
+    return;
+  }
+
+  console.log('Archivo detectado:', file.name);
+
+  try {
     const fileName = formatFileName(file.name);
 
-    // 3. Subir archivo físico a Supabase Storage con la instancia _supabase
+    // 1. Subir imagen a Supabase Storage
     const { data: uploadData, error: uploadError } = await _supabase.storage
       .from('productos')
       .upload(fileName, file, {
@@ -1456,21 +1493,20 @@ async function handleUploadAndSaveProduct(event) {
       });
 
     if (uploadError) {
-      console.error('Error al subir a Storage:', uploadError);
-      alert(`Error en Storage: ${uploadError.message}`);
+      console.error('Error al subir a Storage:', uploadError.message);
+      alert('Error en Storage: ' + uploadError.message);
       return;
     }
 
-    // 4. Obtener la URL Pública mediante _supabase
+    // 2. Obtener URL pública
     const { data: urlData } = _supabase.storage
       .from('productos')
       .getPublicUrl(fileName);
 
     const publicUrl = urlData.publicUrl;
-    console.log('Imagen subida con éxito. URL:', publicUrl);
 
-    // 5. Insertar el registro en la tabla SQL 'productos'
-    const { data: dbData, error: dbError } = await _supabase
+    // 3. Insertar en PostgreSQL
+    const { error: dbError } = await _supabase
       .from('productos')
       .insert([
         {
@@ -1478,23 +1514,23 @@ async function handleUploadAndSaveProduct(event) {
           category: categoryInput ? categoryInput.value : '',
           price: priceInput ? parseFloat(priceInput.value || 0) : 0,
           stock: stockInput ? parseInt(stockInput.value || 0) : 0,
-          image: publicUrl // <--- Guarda únicamente la URL liviana
+          image: publicUrl
         }
       ]);
 
     if (dbError) {
-      console.error('Error al guardar en la base de datos:', dbError);
-      alert(`Error en BD: ${dbError.message}`);
+      console.error('Error al guardar en la BD:', dbError.message);
+      alert('Error en BD: ' + dbError.message);
       return;
     }
 
-    alert('¡Producto guardado e imagen alojada en Storage con éxito!');
-    if (typeof loadData === 'function') await loadData(); // Recarga la vista automáticamente
+    alert('¡Producto e imagen guardados exitosamente en Supabase!');
+    if (typeof loadData === 'function') await loadData();
 
   } catch (err) {
-    console.error('Error inesperado durante la ejecución:', err);
+    console.error('Error inesperado:', err);
   }
-}
+};
 
 // Vincular el evento al formulario HTML
 const formProducto = document.querySelector('#form-producto');
