@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
+    <script>
     tailwind.config = {
       theme: {
         extend: {
@@ -803,7 +803,7 @@
       loadData();
       renderCategoryFilters();
     });
-	// Sanitiza el nombre eliminando acentos, caracteres especiales y espacios
+    // Sanitiza el nombre eliminando acentos, caracteres especiales y espacios
 function formatFileName(filename) {
   const parts = filename.split('.');
   const ext = parts.pop();
@@ -819,46 +819,61 @@ function formatFileName(filename) {
 }
 
 async function handleUploadAndSaveProduct(fileInput, productData) {
-  const file = fileInput.files[0];
-  if (!file) return;
-
-  // 1. Sanitizar el nombre del archivo (ej: "Blush-Liquido-Dolce-bella.png")
-  const fileName = formatFileName(file.name);
-
-  // 2. Subir al Storage de Supabase
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('productos')
-    .upload(fileName, file, {
-      contentType: file.type,
-      upsert: true
-    });
-
-  if (uploadError) {
-    console.error('Error al subir imagen:', uploadError.message);
+  const file = fileInput.files ? fileInput.files[0] : null;
+  if (!file) {
+    alert("Por favor, selecciona una imagen para el producto.");
     return;
   }
 
-  // 3. Obtener la URL Pública
-  const { data: urlData } = supabase.storage
-    .from('productos')
-    .getPublicUrl(fileName);
+  try {
+    // 1. Sanitizar el nombre del archivo
+    const fileName = formatFileName(file.name);
 
-  const imageUrl = urlData.publicUrl;
+    // 2. Subir al Storage usando la instancia _supabase
+    const { data: uploadData, error: uploadError } = await _supabase.storage
+      .from('productos')
+      .upload(fileName, file, {
+        contentType: file.type,
+        upsert: false
+      });
 
-  // 4. Guardar o actualizar el producto en la tabla SQL con la URL obtenida
-  const { error: dbError } = await supabase
-    .from('productos')
-    .insert([
-      {
-        ...productData,
-        imagen_url: imageUrl // Guardas la URL exacta en la BD
-      }
-    ]);
+    if (uploadError) {
+      console.error('Error al subir imagen a Storage:', uploadError.message);
+      alert('Error en Storage: ' + uploadError.message);
+      return;
+    }
 
-  if (dbError) {
-    console.error('Error guardando en la base de datos:', dbError.message);
-  } else {
-    console.log('Producto cargado con éxito con su URL:', imageUrl);
+    // 3. Obtener la URL Pública mediante _supabase
+    const { data: urlData } = _supabase.storage
+      .from('productos')
+      .getPublicUrl(fileName);
+
+    const imageUrl = urlData.publicUrl;
+
+    // 4. Guardar en la tabla SQL 'productos' usando la columna 'image'
+    const { data: insertedData, error: dbError } = await _supabase
+      .from('productos')
+      .insert([
+        {
+          title: productData.title,
+          category: productData.category,
+          price: parseFloat(productData.price || 0),
+          stock: parseInt(productData.stock || 0),
+          image: imageUrl // <--- Debe llamarse 'image' para coincidir con tu tabla SQL
+        }
+      ]);
+
+    if (dbError) {
+      console.error('Error guardando en la base de datos:', dbError.message);
+      alert('Error en BD: ' + dbError.message);
+    } else {
+      console.log('Producto cargado con éxito en BD y Storage:', imageUrl);
+      alert('¡Producto agregado con éxito!');
+      await loadData(); // Recarga los datos en pantalla inmediatamente
+    }
+
+  } catch (err) {
+    console.error('Error inesperado al procesar el producto:', err);
   }
 }
     async function loadData() {
