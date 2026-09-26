@@ -1601,51 +1601,45 @@
 // Función para el botón "Desglose en Pantalla" del Inventario
 
 function desglosarEnPantalla() {
-  // 1. Obtener la lista de productos actual desde Supabase/LocalStorage/Variable global
-  let listaProductos = [];
+  function mostrarDesgloseInventario() {
+  // 1. Obtener productos de la variable local o localStorage/Supabase
+  let lista = [];
   if (typeof productos !== 'undefined' && Array.isArray(productos) && productos.length > 0) {
-    listaProductos = productos;
+    lista = productos;
   } else {
     const prodsGuardados = localStorage.getItem('lush_productos') || localStorage.getItem('productos');
     if (prodsGuardados) {
-      try {
-        listaProductos = JSON.parse(prodsGuardados);
-      } catch (e) {
-        console.error("Error al parsear productos localmente", e);
-      }
+      try { lista = JSON.parse(prodsGuardados); } catch (e) { console.error(e); }
     }
   }
 
-  if (!listaProductos || listaProductos.length === 0) {
-    alert("No hay productos en el inventario para mostrar.");
+  if (!lista || lista.length === 0) {
+    alert("No hay productos registrados para mostrar.");
     return;
   }
 
-  // 2. Generar el HTML con la lista completa de inventario
-  let filasHTML = listaProductos.map((p, index) => {
+  // 2. Construcción de filas
+  let filas = lista.map((p, idx) => {
     const stock = parseInt(p.stock || 0);
     const agotado = stock === 0;
-    const bajoStock = stock > 0 && stock <= 2;
+    const bajo = stock > 0 && stock <= 2;
 
-    let badgeStock = `<span class="text-emerald-600 font-bold">${stock} unids.</span>`;
-    if (agotado) {
-      badgeStock = `<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-bold">Agotado (0)</span>`;
-    } else if (bajoStock) {
-      badgeStock = `<span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-bold">Bajo Stock (${stock})</span>`;
-    }
+    let badge = `<span class="text-emerald-600 font-bold">${stock} unids.</span>`;
+    if (agotado) badge = `<span class="bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full text-xs font-bold">Agotado (0)</span>`;
+    else if (bajo) badge = `<span class="bg-amber-100 text-amber-700 px-2.5 py-0.5 rounded-full text-xs font-bold">Bajo Stock (${stock})</span>`;
 
     return `
       <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
-        <td class="py-3 px-4 text-sm font-medium text-gray-500">#${index + 1}</td>
-        <td class="py-3 px-4 text-sm font-semibold text-gray-800">${p.nombre || p.title || 'Sin nombre'}</td>
+        <td class="py-3 px-4 text-xs font-bold text-gray-400">#${idx + 1}</td>
+        <td class="py-3 px-4 text-sm font-semibold text-gray-800">${p.nombre || p.title || 'Sin Nombre'}</td>
         <td class="py-3 px-4 text-xs font-bold text-gray-500 uppercase">${p.categoria || 'General'}</td>
         <td class="py-3 px-4 text-sm font-semibold text-gray-800">$${parseFloat(p.precio || p.price || 0).toFixed(2)}</td>
-        <td class="py-3 px-4 text-sm">${badgeStock}</td>
+        <td class="py-3 px-4 text-sm">${badge}</td>
       </tr>
     `;
   }).join('');
 
-  const renderHTML = `
+  const render = `
     <div class="overflow-x-auto rounded-xl border border-gray-200">
       <table class="w-full text-left border-collapse">
         <thead>
@@ -1654,27 +1648,32 @@ function desglosarEnPantalla() {
             <th class="py-3 px-4">Producto</th>
             <th class="py-3 px-4">Categoría</th>
             <th class="py-3 px-4">Precio ($)</th>
-            <th class="py-3 px-4">Stock Disponibilidad</th>
+            <th class="py-3 px-4">Stock</th>
           </tr>
         </thead>
-        <tbody>
-          ${filasHTML}
-        </tbody>
+        <tbody>${filas}</tbody>
       </table>
     </div>
   `;
 
-  // 3. Insertar el contenido y mostrar el modal de inventario
-  const modalInv = document.getElementById('modalInventario') || document.getElementById('modalDesglose');
-  const contenidoInv = document.getElementById('contenidoInventario') || document.getElementById('contenidoDesglose');
+  // 3. Renderizado directo
+  const modalEl = document.getElementById('modalInventario');
+  const contenidoEl = document.getElementById('contenidoInventario');
 
-  if (modalInv && contenidoInv) {
-    contenidoInv.innerHTML = renderHTML;
-    modalInv.classList.remove('hidden');
-  } else {
-    // Si no existe un modal exclusivo de inventario, reutiliza la estructura modal en pantalla
-    alert("Revisando modal... Si no abre, verifica que el ID del modal de inventario coincida con 'modalInventario'.");
+  if (modalEl && contenidoEl) {
+    contenidoEl.innerHTML = render;
+    modalEl.classList.remove('hidden');
   }
+}
+
+function cerrarModalInventario() {
+  const modalEl = document.getElementById('modalInventario');
+  if (modalEl) modalEl.classList.add('hidden');
+}
+
+// Alias por si el HTML del botón llama a desglosarEnPantalla()
+function desglosarEnPantalla() {
+  mostrarDesgloseInventario();
 }
 
 function cerrarModalInventario() {
@@ -2159,6 +2158,31 @@ function imprimirReporteDemandaDirecto() {
       </button>
       <button onclick="imprimirReporteDemandaDirecto()" class="bg-amber-500 text-white px-5 py-2 rounded-xl hover:bg-amber-600 text-sm font-semibold transition flex items-center gap-2">
         🖨️ Imprimir Reporte
+      </button>
+    </div>
+
+<!-- MODAL DE DESGLOSE DE INVENTARIO EN PANTALLA -->
+<div id="modalInventario" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+    
+    <!-- Encabezado -->
+    <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+      <div>
+        <h3 class="text-xl font-bold text-gray-800">📊 Desglose Completo de Inventario</h3>
+        <p class="text-xs text-gray-500">Estado de stock, disponibilidad y precios de productos</p>
+      </div>
+      <button onclick="cerrarModalInventario()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold px-2">&times;</button>
+    </div>
+
+    <!-- Contenido -->
+    <div class="p-6 overflow-y-auto flex-1">
+      <div id="contenidoInventario"></div>
+    </div>
+
+    <!-- Cierre -->
+    <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
+      <button onclick="cerrarModalInventario()" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-xl text-sm font-semibold hover:bg-gray-300 transition">
+        Cerrar
       </button>
     </div>
 
