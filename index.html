@@ -1762,7 +1762,252 @@ async function openMonthlyClosureModal() {
     alert("Ocurrió un error al procesar el cierre mensual.");
   }
 }
-  </script>
+// 1. Generar Reporte de Demanda (Productos más vendidos según órdenes)
+function generateDemandReport() {
+  if (!ordenes || ordenes.length === 0) {
+    alert("No hay registro de órdenes para calcular la demanda de productos.");
+    return;
+  }
+
+  // Conteo de unidades vendidas por producto
+  const conteoDemanda = {};
+
+  ordenes.forEach(orden => {
+    const items = Array.isArray(orden.items) ? orden.items : [];
+    items.forEach(item => {
+      const nombre = item.title || item.nombre || 'Producto Desconocido';
+      const cantidad = parseInt(item.quantity || item.cantidad || 1);
+      
+      if (!conteoDemanda[nombre]) {
+        conteoDemanda[nombre] = { cantidad: 0, ingresos: 0 };
+      }
+      conteoDemanda[nombre].cantidad += cantidad;
+      conteoDemanda[nombre].ingresos += cantidad * parseFloat(item.price || item.precio || 0);
+    });
+  });
+
+  // Ordenar de mayor a menor demanda
+  const listaDemanda = Object.keys(conteoDemanda)
+    .map(prod => ({
+      nombre: prod,
+      cantidad: conteoDemanda[prod].cantidad,
+      ingresos: conteoDemanda[prod].ingresos
+    }))
+    .sort((a, b) => b.cantidad - a.cantidad);
+
+  if (listaDemanda.length === 0) {
+    alert("No se encontraron ítems detallados en el historial de órdenes.");
+    return;
+  }
+
+  // Abrir ventana limpia con el reporte de demanda
+  const printWindow = window.open('', '_blank');
+  let content = `
+    <html>
+      <head>
+        <title>Reporte de Demanda y Rotación - LUSH</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+          h2 { text-align: center; margin-bottom: 5px; }
+          .sub { text-align: center; color: #666; font-size: 12px; margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+          th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 13px; }
+          th { background-color: #f3f4f6; text-transform: uppercase; font-size: 11px; }
+          .top-sell { background-color: #f0fdf4; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <h2>LUSH LECHERIA - Reporte de Demanda de Productos</h2>
+        <p class="sub">Generado el: ${new Date().toLocaleString('es-VE')}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Posición</th>
+              <th>Producto</th>
+              <th>Unidades Vendidas</th>
+              <th>Total Generado ($)</th>
+            </tr>
+          </thead>
+          <tbody>
+  `;
+
+  listaDemanda.forEach((item, index) => {
+    content += `
+      <tr class="${index === 0 ? 'top-sell' : ''}">
+        <td>#${index + 1}</td>
+        <td>${item.nombre} ${index === 0 ? '🏆 (Más Vendido)' : ''}</td>
+        <td>${item.cantidad} unids.</td>
+        <td>$${item.ingresos.toFixed(2)}</td>
+      </tr>
+    `;
+  });
+
+  content += `
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `;
+
+  printWindow.document.write(content);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => {
+    printWindow.print();
+    printWindow.close();
+  }, 250);
+}
+
+// 2. Exportar Respaldo completo a JSON
+function exportDataToJSON() {
+  const respaldo = {
+    fecha: new Date().toISOString(),
+    productos: productos,
+    vendedores: vendedores,
+    ordenes: ordenes
+  };
+
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(respaldo, null, 2));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", `respaldo_lush_${new Date().toISOString().slice(0, 10)}.json`);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
+}
+
+// 3. Cargar Respaldo JSON
+function importDataFromJSON() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data.productos) {
+          alert("Archivo leído correctamente. Sincronizando respaldo...");
+          // Recargar interfaz local
+          if (data.productos) productos = data.productos;
+          if (data.vendedores) vendedores = data.vendedores;
+          if (data.ordenes) ordenes = data.ordenes;
+          
+          if (typeof renderProductos === 'function') renderProductos();
+          if (typeof renderAdminDashboard === 'function') renderAdminDashboard();
+          alert("¡Datos restaurados en pantalla con éxito!");
+        } else {
+          alert("El archivo JSON no tiene un formato de respaldo válido para LUSH.");
+        }
+      } catch (err) {
+        alert("Error al leer el archivo JSON: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  input.click();
+}
+
+// ===== COPIA Y PEGA AQUÍ LA FUNCIÓN DEL REPORTE DE DEMANDA =====
+  function generateDemandReport() {
+    if (!ordenes || ordenes.length === 0) {
+      alert("No hay registro de órdenes para calcular la demanda de productos.");
+      return;
+    }
+
+    const conteoDemanda = {};
+
+    ordenes.forEach(orden => {
+      const items = Array.isArray(orden.items) ? orden.items : [];
+      items.forEach(item => {
+        const nombre = item.title || item.nombre || 'Producto Desconocido';
+        const cantidad = parseInt(item.quantity || item.cantidad || 1);
+        
+        if (!conteoDemanda[nombre]) {
+          conteoDemanda[nombre] = { cantidad: 0, ingresos: 0 };
+        }
+        conteoDemanda[nombre].cantidad += cantidad;
+        conteoDemanda[nombre].ingresos += cantidad * parseFloat(item.price || item.precio || 0);
+      });
+    });
+
+    const listaDemanda = Object.keys(conteoDemanda)
+      .map(prod => ({
+        nombre: prod,
+        cantidad: conteoDemanda[prod].cantidad,
+        ingresos: conteoDemanda[prod].ingresos
+      }))
+      .sort((a, b) => b.cantidad - a.cantidad);
+
+    if (listaDemanda.length === 0) {
+      alert("No se encontraron productos detallados en las órdenes registradas.");
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    let content = `
+      <html>
+        <head>
+          <title>Reporte de Demanda - LUSH</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+            h2 { text-align: center; margin-bottom: 5px; }
+            .sub { text-align: center; color: #666; font-size: 12px; margin-bottom: 20px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 13px; }
+            th { background-color: #f3f4f6; text-transform: uppercase; font-size: 11px; }
+            .top-sell { background-color: #f0fdf4; font-weight: bold; }
+          </style>
+        </head>
+        <body>
+          <h2>LUSH LECHERIA - Reporte de Demanda de Productos</h2>
+          <p class="sub">Generado el: ${new Date().toLocaleString('es-VE')}</p>
+          <table>
+            <thead>
+              <tr>
+                <th>Posición</th>
+                <th>Producto</th>
+                <th>Unidades Vendidas</th>
+                <th>Total Generado ($)</th>
+              </tr>
+            </thead>
+            <tbody>
+    `;
+
+    listaDemanda.forEach((item, index) => {
+      content += `
+        <tr class="${index === 0 ? 'top-sell' : ''}">
+          <td>#${index + 1}</td>
+          <td>${item.nombre} ${index === 0 ? '🏆 (Más Vendido)' : ''}</td>
+          <td>${item.cantidad} unids.</td>
+          <td>$${item.ingresos.toFixed(2)}</td>
+        </tr>
+      `;
+    });
+
+    content += `
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(content);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 250);
+  }
+</script>
+
+
 <!-- MODAL DE DESGLOSE EN PANTALLA -->
 <div id="modalDesgloseInventario" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
