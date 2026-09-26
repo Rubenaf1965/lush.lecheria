@@ -1404,34 +1404,51 @@ async function handleUploadAndSaveProduct(fileInput, productData) {
       }
     }
 
-// ✅ SOLUCIÓN: Subir archivo a Storage y guardar la URL
-async function guardarProducto(event) {
-  event.preventDefault();
+// Sanitiza el nombre de archivo (tildes, espacios y caracteres raros)
+function formatFileName(filename) {
+  const parts = filename.split('.');
+  const ext = parts.pop();
+  const name = parts.join('.');
 
-  // 1. Obtener la referencia al archivo seleccionado
-  const fileInput = document.querySelector('#input-imagen'); // Ajusta el ID según tu HTML
-  const file = fileInput?.files[0];
+  const cleanName = name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9_-]/g, '-')
+    .toLowerCase();
+
+  return `${Date.now()}-${cleanName}.${ext}`;
+}
+
+// Función principal para procesar el guardado
+async function handleUploadAndSaveProduct(event) {
+  if (event) event.preventDefault();
+
+  console.log('Iniciando proceso de guardado...');
+
+  // 1. Obtener los inputs del DOM (Ajusta los IDs si difieren en tu HTML)
+  const fileInput = document.querySelector('#input-file-imagen') || document.querySelector('#input-imagen');
+  const titleInput = document.querySelector('#input-titulo') || document.querySelector('#title');
+  const categoryInput = document.querySelector('#input-categoria') || document.querySelector('#category');
+  const priceInput = document.querySelector('#input-precio') || document.querySelector('#price');
+  const stockInput = document.querySelector('#input-stock') || document.querySelector('#stock');
+
+  const file = fileInput?.files?.[0];
 
   if (!file) {
+    console.error('No se seleccionó ningún archivo de imagen.');
     alert('Por favor selecciona una imagen para el producto.');
     return;
   }
 
+  console.log('Archivo detectado:', file.name);
+
   try {
-    // 2. Sanitizar el nombre del archivo (elimina espacios y tildes)
-    const fileExt = file.name.split('.').pop();
-    const rawName = file.name.substring(0, file.name.lastIndexOf('.'));
-    const cleanName = rawName
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-zA-Z0-9_-]/g, '-')
-      .toLowerCase();
+    // 2. Sanitizar nombre del archivo
+    const fileName = formatFileName(file.name);
 
-    const fileName = `${Date.now()}-${cleanName}.${fileExt}`;
-
-    // 3. Subir el archivo binario a Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('productos') // Debe ser en minúsculas como tu bucket
+    // 3. Subir archivo físico a Supabase Storage con la instancia _supabase
+    const { data: uploadData, error: uploadError } = await _supabase.storage
+      .from('productos')
       .upload(fileName, file, {
         cacheControl: '3600',
         upsert: false,
@@ -1444,40 +1461,46 @@ async function guardarProducto(event) {
       return;
     }
 
-    // 4. Obtener la URL Pública de la imagen subida
-    const { data: urlData } = supabase.storage
+    // 4. Obtener la URL Pública mediante _supabase
+    const { data: urlData } = _supabase.storage
       .from('productos')
       .getPublicUrl(fileName);
 
     const publicUrl = urlData.publicUrl;
+    console.log('Imagen subida con éxito. URL:', publicUrl);
 
-    // 5. Insertar los datos en la tabla 'productos' usando la URL pública
-    const { data: dbData, error: dbError } = await supabase
+    // 5. Insertar el registro en la tabla SQL 'productos'
+    const { data: dbData, error: dbError } = await _supabase
       .from('productos')
       .insert([
         {
-          title: document.querySelector('#input-titulo').value,
-          category: document.querySelector('#input-categoria').value,
-          price: parseFloat(document.querySelector('#input-precio').value),
-          stock: parseInt(document.querySelector('#input-stock').value),
-          image: publicUrl // Guarda la URL corta: "https://.../productos/123-nombre.png"
+          title: titleInput ? titleInput.value : '',
+          category: categoryInput ? categoryInput.value : '',
+          price: priceInput ? parseFloat(priceInput.value || 0) : 0,
+          stock: stockInput ? parseInt(stockInput.value || 0) : 0,
+          image: publicUrl // <--- Guarda únicamente la URL liviana
         }
       ]);
 
     if (dbError) {
-      console.error('Error al insertar en la base de datos:', dbError);
+      console.error('Error al guardar en la base de datos:', dbError);
       alert(`Error en BD: ${dbError.message}`);
       return;
     }
 
-    alert('¡Producto guardado e imagen subida al Storage con éxito!');
-    location.reload(); // Recargar para refrescar el catálogo
+    alert('¡Producto guardado e imagen alojada en Storage con éxito!');
+    if (typeof loadData === 'function') await loadData(); // Recarga la vista automáticamente
 
   } catch (err) {
-    console.error('Error inesperado:', err);
+    console.error('Error inesperado durante la ejecución:', err);
   }
 }
 
+// Vincular el evento al formulario HTML
+const formProducto = document.querySelector('#form-producto');
+if (formProducto) {
+  formProducto.addEventListener('submit', handleUploadAndSaveProduct);
+}
     async function saveProductToSupabase(img1, img2) {
       const newProduct = {
         title: document.getElementById('prodTitle').value,
