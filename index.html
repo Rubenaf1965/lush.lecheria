@@ -1959,30 +1959,45 @@ function importDataFromJSON() {
   input.click();
 }
 // Declarar la variable una sola vez al inicio de las funciones
-if (typeof listaDemandaActual === 'undefined') {
-  var listaDemandaActual = [];
-}
+var listaDemandaActual = [];
 
-// 1. Mostrar ÚNICAMENTE en Pantalla
 function generateDemandReport() {
-  if (!ordenes || ordenes.length === 0) {
-    alert("No hay registro de órdenes para calcular la demanda de productos.");
+  console.log("Ejecutando Reporte de Demanda...");
+
+  // Intentar obtener órdenes desde la variable global o desde localStorage
+  let listaOrdenes = [];
+  if (typeof ordenes !== 'undefined' && Array.isArray(ordenes) && ordenes.length > 0) {
+    listaOrdenes = ordenes;
+  } else {
+    const ordenesGuardadas = localStorage.getItem('lush_ordenes') || localStorage.getItem('ordenes');
+    if (ordenesGuardadas) {
+      try {
+        listaOrdenes = JSON.parse(ordenesGuardadas);
+      } catch (e) {
+        console.error("Error al parsear ordenes de localStorage", e);
+      }
+    }
+  }
+
+  if (!listaOrdenes || listaOrdenes.length === 0) {
+    alert("No hay registro de órdenes registradas para calcular la demanda de productos.");
     return;
   }
 
   const conteoDemanda = {};
 
-  ordenes.forEach(orden => {
-    const items = Array.isArray(orden.items) ? orden.items : [];
+  listaOrdenes.forEach(orden => {
+    const items = Array.isArray(orden.items) ? orden.items : (orden.productos || []);
     items.forEach(item => {
-      const nombre = item.title || item.nombre || 'Producto Desconocido';
+      const nombre = item.title || item.nombre || item.producto || 'Producto Desconocido';
       const cantidad = parseInt(item.quantity || item.cantidad || 1);
-      
+      const precio = parseFloat(item.price || item.precio || 0);
+
       if (!conteoDemanda[nombre]) {
         conteoDemanda[nombre] = { cantidad: 0, ingresos: 0 };
       }
       conteoDemanda[nombre].cantidad += cantidad;
-      conteoDemanda[nombre].ingresos += cantidad * parseFloat(item.price || item.precio || 0);
+      conteoDemanda[nombre].ingresos += cantidad * precio;
     });
   });
 
@@ -1995,11 +2010,11 @@ function generateDemandReport() {
     .sort((a, b) => b.cantidad - a.cantidad);
 
   if (listaDemandaActual.length === 0) {
-    alert("No se encontraron productos detallados en las órdenes.");
+    alert("No se encontraron ítems válidos en las órdenes procesadas.");
     return;
   }
 
-  // Generar filas para la vista previa
+  // Generar tabla en pantalla
   let filasHTML = listaDemandaActual.map((item, index) => {
     const esTop = index === 0;
     return `
@@ -2034,16 +2049,22 @@ function generateDemandReport() {
     </div>
   `;
 
-  document.getElementById('contenidoDemanda').innerHTML = renderHTML;
-  document.getElementById('modalDemanda').classList.remove('hidden');
+  const modalEl = document.getElementById('modalDemanda');
+  const contenidoEl = document.getElementById('contenidoDemanda');
+
+  if (modalEl && contenidoEl) {
+    contenidoEl.innerHTML = renderHTML;
+    modalEl.classList.remove('hidden');
+  } else {
+    alert("Error: No se encontró el contenedor HTML del modal '#modalDemanda'. Revisa que el código HTML esté agregado antes de </body>.");
+  }
 }
 
-// 2. Cerrar Modal
 function cerrarModalDemanda() {
-  document.getElementById('modalDemanda').classList.add('hidden');
+  const modalEl = document.getElementById('modalDemanda');
+  if (modalEl) modalEl.classList.add('hidden');
 }
 
-// 3. Función exclusiva para imprimir al pulsar el botón
 function imprimirReporteDemandaDirecto() {
   if (!listaDemandaActual || listaDemandaActual.length === 0) return;
 
@@ -2102,8 +2123,7 @@ function imprimirReporteDemandaDirecto() {
     printWindow.print();
     printWindow.close();
   }, 250);
-}
-</script>
+}</script>
 
 
 <!-- MODAL DE DESGLOSE EN PANTALLA -->
@@ -2147,12 +2167,12 @@ function imprimirReporteDemandaDirecto() {
       <button onclick="cerrarModalDemanda()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold px-2">&times;</button>
     </div>
 
-    <!-- Contenido con Scroll -->
+    <!-- Cuerpos de Datos con Scroll -->
     <div class="p-6 overflow-y-auto flex-1">
       <div id="contenidoDemanda"></div>
     </div>
 
-    <!-- Acciones -->
+    <!-- Acciones (Cerrar e Imprimir) -->
     <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
       <button onclick="cerrarModalDemanda()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-300 text-sm font-semibold transition">
         Cerrar
@@ -2163,7 +2183,6 @@ function imprimirReporteDemandaDirecto() {
     </div>
 
   </div>
-</div>
 </div>
 </body>
 </html>
