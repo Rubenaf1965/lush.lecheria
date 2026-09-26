@@ -1765,7 +1765,7 @@ async function openMonthlyClosureModal() {
 // Variable global temporal para guardar la lista durante la sesión del modal
 let listaDemandaActual = [];
 
-// 1. Mostrar Modal de Demanda en Pantalla
+// 1. Mostrar ÚNICAMENTE en Pantalla
 function generateDemandReport() {
   if (!ordenes || ordenes.length === 0) {
     alert("No hay registro de órdenes para calcular la demanda de productos.");
@@ -1797,11 +1797,11 @@ function generateDemandReport() {
     .sort((a, b) => b.cantidad - a.cantidad);
 
   if (listaDemandaActual.length === 0) {
-    alert("No se encontraron productos detallados en las órdenes registradas.");
+    alert("No se encontraron productos detallados en las órdenes.");
     return;
   }
 
-  // Generar tabla en pantalla
+  // Construir vista previa en pantalla
   let filasHTML = listaDemandaActual.map((item, index) => {
     const esTop = index === 0;
     return `
@@ -1845,7 +1845,7 @@ function cerrarModalDemanda() {
   document.getElementById('modalDemanda').classList.add('hidden');
 }
 
-// 3. Función exclusiva para cuando el usuario presiona "Imprimir Reporte"
+// 3. Imprimir solo cuando se hace clic explícito en "Imprimir Reporte"
 function imprimirReporteDemandaDirecto() {
   if (!listaDemandaActual || listaDemandaActual.length === 0) return;
 
@@ -1905,7 +1905,6 @@ function imprimirReporteDemandaDirecto() {
     printWindow.close();
   }, 250);
 }
-
 // 2. Exportar Respaldo completo a JSON
 function exportDataToJSON() {
   const respaldo = {
@@ -2084,7 +2083,7 @@ function importDataFromJSON() {
       </button>
      </div>
 
-<!-- MODAL DE REPORTES DE DEMANDA -->
+<!-- MODAL DE REPORTE DE DEMANDA -->
 <div id="modalDemanda" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
     
@@ -2097,14 +2096,12 @@ function importDataFromJSON() {
       <button onclick="cerrarModalDemanda()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold px-2">&times;</button>
     </div>
 
-    <!-- Cuerpos de Datos con Scroll -->
+    <!-- Contenido con Scroll -->
     <div class="p-6 overflow-y-auto flex-1">
-      <div id="contenidoDemanda">
-        <!-- Contenido generado por JavaScript -->
-      </div>
+      <div id="contenidoDemanda"></div>
     </div>
 
-    <!-- Acciones (Imprimir y Cerrar) -->
+    <!-- Acciones -->
     <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
       <button onclick="cerrarModalDemanda()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-300 text-sm font-semibold transition">
         Cerrar
