@@ -224,13 +224,24 @@
             <label class="block text-xs font-semibold text-gray-600 mb-1">2da Imagen (Opcional)</label>
             <input type="file" id="prodImageFile2" accept="image/*" class="w-full p-1.5 border rounded-lg text-xs bg-white focus:outline-none focus:border-lushGold">
           </div>
-
+	
           <button type="submit" class="w-full bg-lushDark text-white py-2.5 rounded-lg text-sm font-medium hover:bg-lushGold hover:text-lushDark transition">
             Guardar en Supabase
           </button>
         </form>
       </div>
+<form onsubmit="guardarProducto(event)">
+  <!-- Tus campos de input -->
+  <input type="file" id="input-file-imagen" required />
+  <input type="text" id="input-titulo" placeholder="Nombre producto" required />
+  <input type="text" id="input-categoria" placeholder="Categoría" required />
+  <input type="number" id="input-precio" step="0.01" placeholder="Precio" required />
+  <input type="number" id="input-stock" placeholder="Stock" required />
 
+  <button type="submit" class="bg-black text-white px-4 py-2 rounded">
+    Guardar en Supabase
+  </button>
+</form>
       <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <h3 class="text-lg font-semibold text-lushDark mb-4 flex items-center gap-2">
           <span>👥</span> Vendedores y Porcentajes
@@ -561,7 +572,7 @@
           <label class="block text-xs font-semibold text-gray-600 mb-1">Precio Unitario ($ USD)</label>
           <input type="number" step="0.01" id="updateProdPrice" required class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
         </div>
-
+	
         <div>
           <label class="block text-xs font-semibold text-gray-600 mb-1">Añadir Unidades al Stock Existente (+)</label>
           <input type="number" id="updateProdStockAdd" value="0" min="0" class="w-full p-2.5 border rounded-lg text-sm focus:outline-none focus:border-lushGold">
@@ -1419,119 +1430,86 @@ function formatFileName(filename) {
   return `${Date.now()}-${cleanName}.${ext}`;
 }
 
-// Función principal para procesar el guardado
-async function handleUploadAndSaveProduct(event) {
-  if (event) event.preventDefault();
+  // Función principal para procesar el guardado
 
-  console.log('Iniciando proceso de guardado...');
+  async function handleUploadAndSaveProduct(event) {
+   if (event) event.preventDefault();
 
-  // 1. Obtener los inputs del DOM (Ajusta los IDs si difieren en tu HTML)
+  // 1. Capturar el input del archivo
   const fileInput = document.querySelector('#input-file-imagen') || document.querySelector('#input-imagen');
-  const titleInput = document.querySelector('#input-titulo') || document.querySelector('#title');
-  const categoryInput = document.querySelector('#input-categoria') || document.querySelector('#category');
-  const priceInput = document.querySelector('#input-precio') || document.querySelector('#price');
-  const stockInput = document.querySelector('#input-stock') || document.querySelector('#stock');
-
   const file = fileInput?.files?.[0];
 
   if (!file) {
-    console.error('No se seleccionó ningún archivo de imagen.');
-    alert('Por favor selecciona una imagen para el producto.');
+    alert("Por favor, selecciona una imagen para el producto.");
     return;
   }
 
-  console.log('Archivo detectado:', file.name);
-
   try {
-    // Sanitizar nombre de archivo
-function formatFileName(filename) {
-  const parts = filename.split('.');
-  const ext = parts.pop();
-  const name = parts.join('.');
-
-  const cleanName = name
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9_-]/g, '-')
-    .toLowerCase();
-
-  return `${Date.now()}-${cleanName}.${ext}`;
-}
-
-// Hacer la función global asignándola a window
-window.guardarProducto = async function(event) {
-  if (event) event.preventDefault();
-
-  console.log('Iniciando proceso de guardado...');
-
-  // Capturar los elementos del DOM (soporta múltiples IDs comunes)
-  const fileInput = document.querySelector('#input-file-imagen') || document.querySelector('#input-imagen');
-  const titleInput = document.querySelector('#input-titulo') || document.querySelector('#title');
-  const categoryInput = document.querySelector('#input-categoria') || document.querySelector('#category');
-  const priceInput = document.querySelector('#input-precio') || document.querySelector('#price');
-  const stockInput = document.querySelector('#input-stock') || document.querySelector('#stock');
-
-  const file = fileInput?.files?.[0];
-
-  if (!file) {
-    alert('Por favor selecciona una imagen para el producto.');
-    return;
-  }
-
-  console.log('Archivo detectado:', file.name);
-
-  try {
+    // 2. Sanitizar el nombre
     const fileName = formatFileName(file.name);
+    console.log('Nombre de archivo sanitizado listo para Supabase:', fileName);
 
-    // 1. Subir imagen a Supabase Storage
+    // 3. Subir al Storage de Supabase
     const { data: uploadData, error: uploadError } = await _supabase.storage
       .from('productos')
       .upload(fileName, file, {
+        contentType: file.type,
         cacheControl: '3600',
-        upsert: false,
-        contentType: file.type
+        upsert: false
       });
 
     if (uploadError) {
       console.error('Error al subir a Storage:', uploadError.message);
-      alert('Error en Storage: ' + uploadError.message);
+      alert('Error al subir imagen: ' + uploadError.message);
       return;
     }
 
-    // 2. Obtener URL pública
+    // 4. Obtener la URL Pública
     const { data: urlData } = _supabase.storage
       .from('productos')
       .getPublicUrl(fileName);
 
-    const publicUrl = urlData.publicUrl;
+    const imageUrl = urlData.publicUrl;
 
-    // 3. Insertar en PostgreSQL
-    const { error: dbError } = await _supabase
+    // 5. Capturar los valores de los inputs del producto
+    const titleVal = document.querySelector('#input-titulo')?.value || '';
+    const categoryVal = document.querySelector('#input-categoria')?.value || '';
+    const priceVal = parseFloat(document.querySelector('#input-precio')?.value || 0);
+    const stockVal = parseInt(document.querySelector('#input-stock')?.value || 0);
+
+    // 6. Insertar en la tabla SQL 'productos'
+    const { data: dbData, error: dbError } = await _supabase
       .from('productos')
       .insert([
         {
-          title: titleInput ? titleInput.value : '',
-          category: categoryInput ? categoryInput.value : '',
-          price: priceInput ? parseFloat(priceInput.value || 0) : 0,
-          stock: stockInput ? parseInt(stockInput.value || 0) : 0,
-          image: publicUrl
+          title: titleVal,
+          category: categoryVal,
+          price: priceVal,
+          stock: stockVal,
+          image: imageUrl // <--- Debe coincidir con la columna 'image' de la BD
         }
       ]);
 
     if (dbError) {
-      console.error('Error al guardar en la BD:', dbError.message);
+      console.error('Error guardando en la BD:', dbError.message);
       alert('Error en BD: ' + dbError.message);
       return;
     }
 
-    alert('¡Producto e imagen guardados exitosamente en Supabase!');
+    alert('¡Producto e imagen guardados exitosamente!');
+    
+    // Limpiar formulario y recargar datos
+    const form = document.querySelector('#form-producto');
+    if (form) form.reset();
     if (typeof loadData === 'function') await loadData();
 
   } catch (err) {
     console.error('Error inesperado:', err);
   }
-};
+}
 
+// Hacer la función accesible globalmente
+window.handleUploadAndSaveProduct = handleUploadAndSaveProduct;
 // Vincular el evento al formulario HTML
 const formProducto = document.querySelector('#form-producto');
 if (formProducto) {
