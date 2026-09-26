@@ -1598,65 +1598,63 @@
         alert('Orden eliminada exitosamente.');
       }
     }
-// 1. Mostrar Desglose en Pantalla (Modal Elegante)
-function mostrarDesgloseInventario() {
-  if (!productos || productos.length === 0) {
-    alert("No hay productos registrados en el inventario.");
+// Función para el botón "Desglose en Pantalla" del Inventario
+
+function desglosarEnPantalla() {
+  // 1. Obtener la lista de productos actual desde Supabase/LocalStorage/Variable global
+  let listaProductos = [];
+  if (typeof productos !== 'undefined' && Array.isArray(productos) && productos.length > 0) {
+    listaProductos = productos;
+  } else {
+    const prodsGuardados = localStorage.getItem('lush_productos') || localStorage.getItem('productos');
+    if (prodsGuardados) {
+      try {
+        listaProductos = JSON.parse(prodsGuardados);
+      } catch (e) {
+        console.error("Error al parsear productos localmente", e);
+      }
+    }
+  }
+
+  if (!listaProductos || listaProductos.length === 0) {
+    alert("No hay productos en el inventario para mostrar.");
     return;
   }
 
-  let totalPiezas = 0;
-  let valorTotalUSD = 0;
+  // 2. Generar el HTML con la lista completa de inventario
+  let filasHTML = listaProductos.map((p, index) => {
+    const stock = parseInt(p.stock || 0);
+    const agotado = stock === 0;
+    const bajoStock = stock > 0 && stock <= 2;
 
-  let filasHTML = productos.map(p => {
-    const subtotal = p.price * p.stock;
-    totalPiezas += p.stock;
-    valorTotalUSD += subtotal;
-
-    const esAlerta = p.stock <= 2;
+    let badgeStock = `<span class="text-emerald-600 font-bold">${stock} unids.</span>`;
+    if (agotado) {
+      badgeStock = `<span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-bold">Agotado (0)</span>`;
+    } else if (bajoStock) {
+      badgeStock = `<span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-bold">Bajo Stock (${stock})</span>`;
+    }
 
     return `
       <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
-        <td class="py-3 px-4 text-sm font-medium text-gray-800">${p.title}</td>
-        <td class="py-3 px-4 text-xs font-semibold text-pink-500 uppercase">${p.category}</td>
-        <td class="py-3 px-4 text-sm text-gray-600">$${p.price.toFixed(2)}</td>
-        <td class="py-3 px-4 text-sm font-bold ${esAlerta ? 'text-red-500' : 'text-emerald-600'}">
-          ${p.stock} unids.
-        </td>
-        <td class="py-3 px-4 text-sm font-semibold text-gray-900">$${subtotal.toFixed(2)}</td>
+        <td class="py-3 px-4 text-sm font-medium text-gray-500">#${index + 1}</td>
+        <td class="py-3 px-4 text-sm font-semibold text-gray-800">${p.nombre || p.title || 'Sin nombre'}</td>
+        <td class="py-3 px-4 text-xs font-bold text-gray-500 uppercase">${p.categoria || 'General'}</td>
+        <td class="py-3 px-4 text-sm font-semibold text-gray-800">$${parseFloat(p.precio || p.price || 0).toFixed(2)}</td>
+        <td class="py-3 px-4 text-sm">${badgeStock}</td>
       </tr>
     `;
   }).join('');
 
-  const resumenHTML = `
-    <!-- Tarjetas Resumen -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-      <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
-        <p class="text-xs text-gray-500 font-medium">Total Unidades</p>
-        <p class="text-2xl font-bold text-gray-800">${totalPiezas} pcs.</p>
-      </div>
-      <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
-        <p class="text-xs text-emerald-600 font-medium">Valor Total (USD)</p>
-        <p class="text-2xl font-bold text-emerald-700">$${valorTotalUSD.toFixed(2)}</p>
-      </div>
-      <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-        <p class="text-xs text-blue-600 font-medium">Valor Estimado (Bs)</p>
-        <p class="text-2xl font-bold text-blue-700">
-          ${bcvRate > 0 ? 'Bs. ' + (valorTotalUSD * bcvRate).toFixed(2) : 'Sin tasa BCV'}
-        </p>
-      </div>
-    </div>
-
-    <!-- Tabla de Productos -->
+  const renderHTML = `
     <div class="overflow-x-auto rounded-xl border border-gray-200">
       <table class="w-full text-left border-collapse">
         <thead>
           <tr class="bg-gray-100 text-xs font-bold text-gray-600 uppercase">
+            <th class="py-3 px-4">#</th>
             <th class="py-3 px-4">Producto</th>
             <th class="py-3 px-4">Categoría</th>
-            <th class="py-3 px-4">Precio</th>
-            <th class="py-3 px-4">Stock</th>
-            <th class="py-3 px-4">Subtotal</th>
+            <th class="py-3 px-4">Precio ($)</th>
+            <th class="py-3 px-4">Stock Disponibilidad</th>
           </tr>
         </thead>
         <tbody>
@@ -1666,15 +1664,23 @@ function mostrarDesgloseInventario() {
     </div>
   `;
 
-  document.getElementById('contenidoDesglose').innerHTML = resumenHTML;
-  document.getElementById('modalDesgloseInventario').classList.remove('hidden');
+  // 3. Insertar el contenido y mostrar el modal de inventario
+  const modalInv = document.getElementById('modalInventario') || document.getElementById('modalDesglose');
+  const contenidoInv = document.getElementById('contenidoInventario') || document.getElementById('contenidoDesglose');
+
+  if (modalInv && contenidoInv) {
+    contenidoInv.innerHTML = renderHTML;
+    modalInv.classList.remove('hidden');
+  } else {
+    // Si no existe un modal exclusivo de inventario, reutiliza la estructura modal en pantalla
+    alert("Revisando modal... Si no abre, verifica que el ID del modal de inventario coincida con 'modalInventario'.");
+  }
 }
 
-// Cierre del Modal
-function cerrarModalDesglose() {
-  document.getElementById('modalDesgloseInventario').classList.add('hidden');
+function cerrarModalInventario() {
+  const modalInv = document.getElementById('modalInventario') || document.getElementById('modalDesglose');
+  if (modalInv) modalInv.classList.add('hidden');
 }
-
 // 2. Imprimir Stock y Faltantes (Ventana limpia independiente)
 function imprimirInventarioDirecto() {
   if (!productos || productos.length === 0) {
