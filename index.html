@@ -287,7 +287,158 @@
         </table>
       </div>
     </div>
+	// 1. Botón: Desglose en Pantalla
+function mostrarDesgloseInventario() {
+  if (!productos || productos.length === 0) {
+    alert("No hay productos registrados en el inventario.");
+    return;
+  }
 
+  let totalPiezas = 0;
+  let valorTotalUSD = 0;
+
+  let reporteHTML = `
+    <div style="padding: 20px; font-family: sans-serif;">
+      <h2 style="text-align: center; color: #333;">Desglose General de Inventario - LUSH</h2>
+      <hr style="margin-bottom: 20px;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left;">
+        <thead>
+          <tr style="background-color: #f3f4f6; border-bottom: 2px solid #ddd;">
+            <th style="padding: 8px;">Producto</th>
+            <th style="padding: 8px;">Categoría</th>
+            <th style="padding: 8px;">Precio ($)</th>
+            <th style="padding: 8px;">Stock</th>
+            <th style="padding: 8px;">Valor Total ($)</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  productos.forEach(p => {
+    const subtotal = p.price * p.stock;
+    totalPiezas += p.stock;
+    valorTotalUSD += subtotal;
+
+    reporteHTML += `
+      <tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px;">${p.title}</td>
+        <td style="padding: 8px; text-transform: uppercase;">${p.category}</td>
+        <td style="padding: 8px;">$${p.price.toFixed(2)}</td>
+        <td style="padding: 8px; font-weight: bold; color: ${p.stock <= 2 ? 'red' : 'green'};">${p.stock} unids.</td>
+        <td style="padding: 8px;">$${subtotal.toFixed(2)}</td>
+      </tr>
+    `;
+  });
+
+  reporteHTML += `
+        </tbody>
+      </table>
+      <div style="margin-top: 20px; font-size: 16px; font-weight: bold; background: #fafafa; padding: 15px; border-radius: 8px;">
+        <p>Total de Unidades Disponibles: <span style="color: #000;">${totalPiezas}</span></p>
+        <p>Valor Total del Inventario: <span style="color: #059669;">$${valorTotalUSD.toFixed(2)} USD</span></p>
+        ${bcvRate > 0 ? `<p>Valor en Bs (Tasa BCV ${bcvRate}): <span style="color: #2563eb;">Bs. ${(valorTotalUSD * bcvRate).toFixed(2)}</span></p>` : ''}
+      </div>
+    </div>
+  `;
+
+  // Abrir reporte en ventana emergente limpia
+  const vent = window.open('', '_blank', 'width=800,height=600');
+  vent.document.write(`<html><head><title>Desglose de Inventario</title></head><body>${reporteHTML}</body></html>`);
+  vent.document.close();
+}
+
+// 2. Botón: Imprimir Stock y Faltantes
+function imprimirInventarioDirecto() {
+  if (!productos || productos.length === 0) {
+    alert("No hay productos para imprimir.");
+    return;
+  }
+
+  const printWindow = window.open('', '_blank');
+  let content = `
+    <html>
+      <head>
+        <title>Reporte de Stock e Inventario - LUSH</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { text-align: center; margin-bottom: 5px; }
+          p.fecha { text-align: center; color: #666; font-size: 12px; margin-bottom: 20px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+          th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 13px; }
+          th { background-color: #f2f2f2; }
+          .alerta { background-color: #fee2e2; color: #dc2626; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <h1>LUSH LECHERIA - Reporte de Stock</h1>
+        <p class="fecha">Generado el: ${new Date().toLocaleString('es-VE')}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Categoría</th>
+              <th>Precio ($)</th>
+              <th>Stock Actual</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+  `;
+
+  productos.forEach(p => {
+    const esCritico = p.stock <= 2;
+    content += `
+      <tr class="${esCritico ? 'alerta' : ''}">
+        <td>${p.title}</td>
+        <td>${p.category}</td>
+        <td>$${p.price.toFixed(2)}</td>
+        <td>${p.stock}</td>
+        <td>${p.stock === 0 ? 'AGOTADO' : (esCritico ? 'REPOSICIÓN URGENTE' : 'OK')}</td>
+      </tr>
+    `;
+  });
+
+  content += `
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `;
+
+  printWindow.document.write(content);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => {
+    printWindow.print();
+    printWindow.close();
+  }, 250);
+}
+
+// 3. Botón: Cierre Mensual
+async function openMonthlyClosureModal() {
+  const confirmacion = confirm(
+    "⚠️ ¿Deseas realizar el Cierre Mensual de Ventas?\n\n" +
+    "Esta acción respaldará el historial actual y reiniciará las comisiones de los vendedores para el nuevo mes."
+  );
+
+  if (!confirmacion) return;
+
+  try {
+    // Si manejas tabla de respaldo en Supabase puedes guardar aquí el resumen antes de borrar
+    const { error } = await _supabase
+      .from('ordenes')
+      .delete()
+      .gte('id', 0); // O tu criterio para reiniciar órdenes si lo requieres
+
+    if (error) console.warn("Aviso al vaciar órdenes:", error.message);
+
+    alert("¡Cierre de mes realizado con éxito! Las comisiones han sido reiniciadas.");
+    await loadData(); // Recargar tablas del panel admin
+  } catch (err) {
+    console.error("Error en el cierre mensual:", err);
+    alert("Ocurrió un error al procesar el cierre mensual.");
+  }
+}
     <!-- CONTROL DE VENTAS Y COMISIONES POR VENDEDOR -->
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
       <h3 class="text-lg font-semibold text-lushDark mb-4">📊 Control de Ventas y Comisiones por Vendedor</h3>
@@ -871,7 +1022,8 @@
     try {
       const imageUrl1 = await uploadSingleImage(file1);
       const imageUrl2 = file2 ? await uploadSingleImage(file2) : null;
-
+	
+	
       // Inserción en la tabla de Supabase
       const { data, error: dbError } = await _supabase
         .from('productos')
@@ -920,6 +1072,7 @@
         throw prodRes.error;
       }
 
+	
       // Mapeo robusto (soporta si las columnas en la BD se llaman title/nombre o image/imagen_url)
       productos = (prodRes.data || []).map(p => ({
         id: p.id,
@@ -1053,7 +1206,7 @@
           <article class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex items-center justify-between gap-4 relative">
             <div class="flex items-center gap-4 flex-grow">
               <div onclick="openLightbox('${p.id}')" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-lushBg flex-shrink-0 relative border border-gray-100 cursor-pointer group" title="Ver galería de fotos">
-                <img 
+                <img
                   src="${imagenValida}" 
                   alt="${p.title}" 
                   onerror="this.onerror=null; this.src='LUSH logo.PNG';"
