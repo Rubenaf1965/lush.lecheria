@@ -1959,12 +1959,12 @@ function importDataFromJSON() {
   input.click();
 }
 // Declarar la variable una sola vez al inicio de las funciones
+
 var listaDemandaActual = [];
 
 function generateDemandReport() {
   console.log("Ejecutando Reporte de Demanda...");
 
-  // Intentar obtener órdenes desde la variable global o desde localStorage
   let listaOrdenes = [];
   if (typeof ordenes !== 'undefined' && Array.isArray(ordenes) && ordenes.length > 0) {
     listaOrdenes = ordenes;
@@ -1974,13 +1974,13 @@ function generateDemandReport() {
       try {
         listaOrdenes = JSON.parse(ordenesGuardadas);
       } catch (e) {
-        console.error("Error al parsear ordenes de localStorage", e);
+        console.error("Error al leer ordenes guardadas", e);
       }
     }
   }
 
   if (!listaOrdenes || listaOrdenes.length === 0) {
-    alert("No hay registro de órdenes registradas para calcular la demanda de productos.");
+    alert("No hay registro de órdenes para calcular la demanda de productos.");
     return;
   }
 
@@ -2010,11 +2010,11 @@ function generateDemandReport() {
     .sort((a, b) => b.cantidad - a.cantidad);
 
   if (listaDemandaActual.length === 0) {
-    alert("No se encontraron ítems válidos en las órdenes procesadas.");
+    alert("No se encontraron productos válidos en las órdenes procesadas.");
     return;
   }
 
-  // Generar tabla en pantalla
+  // Generar tabla dinámica
   let filasHTML = listaDemandaActual.map((item, index) => {
     const esTop = index === 0;
     return `
@@ -2056,7 +2056,7 @@ function generateDemandReport() {
     contenidoEl.innerHTML = renderHTML;
     modalEl.classList.remove('hidden');
   } else {
-    alert("Error: No se encontró el contenedor HTML del modal '#modalDemanda'. Revisa que el código HTML esté agregado antes de </body>.");
+    alert("No se encontró el elemento HTML #modalDemanda en la página.");
   }
 }
 
@@ -2123,36 +2123,10 @@ function imprimirReporteDemandaDirecto() {
     printWindow.print();
     printWindow.close();
   }, 250);
-}</script>
+}
 
+</script>
 
-<!-- MODAL DE DESGLOSE EN PANTALLA -->
-
-<div id="modalDesgloseInventario" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
-  <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
-    
-    <!-- Encabezado del Modal -->
-    <div class="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-      <div>
-        <h3 class="text-xl font-bold text-gray-800">📊 Desglose de Inventario</h3>
-        <p class="text-xs text-gray-500">Resumen detallado de existencias y valorización</p>
-      </div>
-      <button onclick="cerrarModalDesglose()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold px-2">&times;</button>
-    </div>
-
-    <!-- Contenido con Scroll -->
-    <div class="p-6 overflow-y-auto flex-1">
-      <div id="contenidoDesglose" class="space-y-4">
-        <!-- Se llena dinámicamente desde JS -->
-      </div>
-    </div>
-
-    <!-- Pie del Modal -->
-    <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end">
-      <button onclick="cerrarModalDesglose()" class="bg-gray-900 text-white px-5 py-2 rounded-xl hover:bg-gray-800 text-sm font-semibold transition">
-        Cerrar
-      </button>
-     </div>
 
 <!-- MODAL DE REPORTE DE DEMANDA -->
 <div id="modalDemanda" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
@@ -2167,12 +2141,12 @@ function imprimirReporteDemandaDirecto() {
       <button onclick="cerrarModalDemanda()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold px-2">&times;</button>
     </div>
 
-    <!-- Cuerpos de Datos con Scroll -->
+    <!-- Contenido con Scroll -->
     <div class="p-6 overflow-y-auto flex-1">
       <div id="contenidoDemanda"></div>
     </div>
 
-    <!-- Acciones (Cerrar e Imprimir) -->
+    <!-- Botones de Acción -->
     <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
       <button onclick="cerrarModalDemanda()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl hover:bg-gray-300 text-sm font-semibold transition">
         Cerrar
@@ -2182,6 +2156,8 @@ function imprimirReporteDemandaDirecto() {
       </button>
     </div>
 
+  </div>
+</div>
   </div>
 </div>
 </body>
