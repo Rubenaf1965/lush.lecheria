@@ -921,6 +921,7 @@
     }
   }
 
+  // 1. Mapeo robusto en loadData con ID y Fecha limpios
   async function loadData() {
     try {
       const [prodRes, sellRes, ordRes] = await Promise.all([
@@ -956,7 +957,8 @@
       if (ordRes.error) console.warn('Aviso Órdenes:', ordRes.error.message);
       ordenes = (ordRes.data || []).map(o => ({
         id: o.id,
-        date: o.date || o.created_at,
+        shortId: formatShortId(o.id),
+        date: formatDateOnly(o.date || o.created_at),
         isoDate: o.iso_date || o.created_at,
         customerName: o.customer_name || o.cliente,
         items: typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []),
@@ -976,6 +978,27 @@
     } catch (err) {
       console.error("Error crítico al cargar datos desde Supabase:", err);
     }
+  }
+
+  // 2. Auxiliares de formato
+  function formatShortId(id) {
+    if (!id) return '00000';
+    const strId = String(id);
+    if (strId.length > 5) {
+      const numOnly = strId.replace(/\D/g, '');
+      return numOnly.length >= 5 ? numOnly.slice(-5) : strId.slice(-5).toUpperCase();
+    }
+    return strId;
+  }
+
+  function formatDateOnly(dateStr) {
+    if (!dateStr) return '';
+    const cleanDate = dateStr.split('T')[0];
+    if (cleanDate.includes('-')) {
+      const [y, m, d] = cleanDate.split('-');
+      return `${d}/${m}/${y}`;
+    }
+    return dateStr;
   }
 
   async function fetchBcvRate() {
@@ -1040,7 +1063,6 @@
     renderProductos();
   }
 
-  // 1. renderProductos con el badge visible de Stock disponible / Agotado sobre la imagen
   function renderProductos() {
     const searchInput = document.getElementById('searchInput');
     const search = searchInput ? searchInput.value.toLowerCase() : '';
@@ -1122,7 +1144,6 @@
     }).join('');
   }
 
-  // 2. Diálogo de confirmación antes de agregar
   function confirmAddToCart(productId) {
     const prod = productos.find(p => String(p.id) === String(productId));
     if (!prod || prod.stock <= 0) return;
@@ -1134,7 +1155,6 @@
     }
   }
 
-  // 3. Inserción al carrito tras confirmar
   function addToCart(productId) {
     const prod = productos.find(p => String(p.id) === String(productId));
     if (!prod) return;
@@ -1396,6 +1416,7 @@
     }
   }
 
+  // 3. Renderizado de tabla en el Historial de Órdenes con ID corto y Fecha única
   function renderAdminDashboard() {
     const totalSales = ordenes.reduce((acc, o) => acc + o.total, 0);
     const totalCommissions = ordenes.reduce((acc, o) => acc + o.commissionAmount, 0);
@@ -1452,7 +1473,7 @@
 
         return `
           <tr class="border-b text-xs">
-            <td class="p-3 font-bold text-lushDark">#${o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
+            <td class="p-3 font-bold text-lushDark">#${o.shortId || o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
             <td class="p-3 font-medium">${o.customerName || 'N/A'}</td>
             <td class="p-3 text-gray-600 max-w-xs truncate">${itemsStr}</td>
             <td class="p-3 font-mono text-emerald-700">${o.paymentRef}</td>
@@ -1575,7 +1596,7 @@
     const order = ordenes.find(o => String(o.id) === String(orderId));
     if (!order) return;
 
-    document.getElementById('invoiceNumber').innerText = `#${order.id}`;
+    document.getElementById('invoiceNumber').innerText = `#${order.shortId || order.id}`;
     document.getElementById('invoiceDate').innerText = order.date;
     document.getElementById('invoiceCustomerName').innerText = order.customerName || 'Cliente General';
     document.getElementById('invoiceDeliveryAddress').innerText = order.deliveryAddress;
@@ -1610,7 +1631,7 @@
 
     const order = ordenes[orderIndex];
     const restoreStock = confirm(
-      `¿Desea eliminar la orden #${order.id}?\n\n` +
+      `¿Desea eliminar la orden #${order.shortId || order.id}?\n\n` +
       `• 'Aceptar': Elimina la orden y RESTAURA el stock.\n` +
       `• 'Cancelar': Cancela la acción.`
     );
@@ -1814,7 +1835,7 @@
     if (ordersBody) {
       ordersBody.innerHTML = filteredOrders.length > 0 ? filteredOrders.map(o => `
         <tr class="border-b">
-          <td class="p-2 font-bold">#${o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
+          <td class="p-2 font-bold">#${o.shortId || o.id}<br><span class="font-normal text-gray-400">${o.date}</span></td>
           <td class="p-2">${o.customerName || 'N/A'}</td>
           <td class="p-2">${o.sellerName}</td>
           <td class="p-2 font-mono text-emerald-700">${o.paymentRef}</td>
