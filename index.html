@@ -1040,7 +1040,7 @@
     renderProductos();
   }
 
-  // FUNCIÓN CORRECTAMENTE INCORPORADA Y ADAPTADA A "productos"
+  // 1. renderProductos con el badge visible de Stock disponible / Agotado sobre la imagen
   function renderProductos() {
     const searchInput = document.getElementById('searchInput');
     const search = searchInput ? searchInput.value.toLowerCase() : '';
@@ -1066,7 +1066,7 @@
       return `
         <article class="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm flex flex-col justify-between relative">
           <div>
-            <!-- Imagen del producto con visor Lightbox -->
+            <!-- Imagen del producto con badge de Stock / Agotado -->
             <div onclick="openLightbox('${p.id}')" class="aspect-square rounded-xl overflow-hidden mb-3 bg-lushBg relative cursor-pointer group">
               <img 
                 src="${p.image || 'LUSH logo.PNG'}" 
@@ -1074,13 +1074,20 @@
                 onerror="this.onerror=null; this.src='LUSH logo.PNG';"
                 class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${isOut ? 'grayscale opacity-60' : ''}"
               >
+              
+              <!-- Badge flotante de Stock / Agotado sobre la imagen -->
               ${isOut ? `
                 <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
                   <span class="bg-red-600 text-white text-[10px] font-black uppercase px-2 py-1 rounded tracking-widest shadow-lg">
                     AGOTADO
                   </span>
                 </div>
-              ` : ''}
+              ` : `
+                <span class="absolute top-2 left-2 bg-black/60 text-white text-[9px] px-2 py-0.5 rounded-full font-bold shadow-sm backdrop-blur-[2px]">
+                  Stock: ${p.stock} unids.
+                </span>
+              `}
+
               ${p.image2 ? `
                 <span class="absolute bottom-1.5 right-1.5 bg-black/60 text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold">
                   📷 2 fotos
@@ -1099,9 +1106,9 @@
             </div>
           </div>
 
-          <!-- Botón melón claro con ícono de carrito -->
+          <!-- Botón Agregar con ventana de confirmación -->
           <button 
-            onclick="addToCart('${p.id}')"
+            onclick="confirmAddToCart('${p.id}')"
             ${isOut ? 'disabled' : ''}
             class="w-full bg-[#F7EBE8] hover:bg-[#f0d8d2] text-[#1A1A1A] font-semibold py-2 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
@@ -1115,9 +1122,22 @@
     }).join('');
   }
 
-  function addToCart(productId) {
+  // 2. Diálogo de confirmación antes de agregar
+  function confirmAddToCart(productId) {
     const prod = productos.find(p => String(p.id) === String(productId));
     if (!prod || prod.stock <= 0) return;
+
+    const confirmAction = confirm(`¿Deseas agregar "${prod.title}" ($${prod.price.toFixed(2)}) al carrito de compras?`);
+    
+    if (confirmAction) {
+      addToCart(productId);
+    }
+  }
+
+  // 3. Inserción al carrito tras confirmar
+  function addToCart(productId) {
+    const prod = productos.find(p => String(p.id) === String(productId));
+    if (!prod) return;
 
     const existing = cart.find(item => String(item.id) === String(productId));
     if (existing) {
@@ -1125,6 +1145,7 @@
         existing.qty += 1;
       } else {
         alert("Llegaste al límite de stock disponible para este producto.");
+        return;
       }
     } else {
       cart.push({ id: prod.id, title: prod.title, price: prod.price, qty: 1 });
