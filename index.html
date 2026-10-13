@@ -140,7 +140,7 @@
     </section>
 
     <!-- Grid de Productos -->
-    <section id="productosGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10"></section>
+    <section id="productsGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6"></section>
   </main>
 
   <!-- SECCIÓN PANEL ADMINISTRATIVO COMPLETO -->
@@ -1040,77 +1040,70 @@
     renderProductos();
   }
 
-  function renderProductos() {
-    const searchInput = document.getElementById('searchInput');
-    const search = searchInput ? searchInput.value.toLowerCase() : '';
-    const grid = document.getElementById('productosGrid');
-    if (!grid) return;
+function renderProducts() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const grid = document.getElementById('productsGrid');
 
-    const filtered = productos.filter(p => {
-      const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
-      const matchesSearch = p.title.toLowerCase().includes(search);
-      return matchesCategory && matchesSearch;
-    });
+  const filtered = products.filter(p => {
+    const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+    const matchesSearch = p.title.toLowerCase().includes(search);
+    return matchesCategory && matchesSearch;
+  });
 
-    if (filtered.length === 0) {
-      grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-8">No hay productos disponibles.</p>`;
-      return;
-    }
-
-    grid.innerHTML = filtered.map(p => {
-      const isOut = p.stock <= 0;
-      const priceBs = bcvRate > 0 ? (p.price * bcvRate).toFixed(2) : '0.00';
-      const hasMultipleImages = Boolean(p.image2);
-      const imagenValida = (p.image && p.image !== 'undefined' && p.image !== '') ? p.image : 'LUSH logo.PNG';
-
-      return `
-        <article class="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex items-center justify-between gap-4 relative">
-          <div class="flex items-center gap-4 flex-grow">
-            <div onclick="openLightbox('${p.id}')" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-lushBg flex-shrink-0 relative border border-gray-100 cursor-pointer group" title="Ver galería de fotos">
-              <img
-                src="${imagenValida}" 
-                alt="${p.title}" 
-                onerror="this.onerror=null; this.src='LUSH logo.PNG';"
-                class="w-full h-full object-cover group-hover:scale-105 transition ${isOut ? 'grayscale opacity-60' : ''}"
-              >
-              ${hasMultipleImages ? `
-                <div class="absolute bottom-1 right-1 bg-lushDark/80 text-white text-[9px] px-1.5 py-0.5 rounded-md font-mono flex items-center gap-0.5 shadow-sm">
-                  <span>📷</span> 2+
-                </div>
-              ` : ''}
-              ${isOut ? `
-                <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
-                  <span class="text-[9px] text-white font-bold uppercase tracking-wider">Agotado</span>
-                </div>
-              ` : ''}
-            </div>
-
-            <div class="flex flex-col">
-              <span class="text-[10px] text-lushGold font-semibold uppercase tracking-wider mb-0.5">${p.category}</span>
-              <h3 class="font-medium text-sm sm:text-base text-lushDark leading-snug">${p.title}</h3>
-              <div class="flex items-baseline gap-2 mt-1">
-                <span class="text-sm font-bold text-lushDark">$${parseFloat(p.price).toFixed(2)}</span>
-                <span class="text-[11px] text-gray-400 font-mono hidden sm:inline">(Bs. ${priceBs})</span>
-              </div>
-              <span class="text-[10px] text-gray-400 mt-0.5">Stock disponible: ${p.stock}</span>
-            </div>
-          </div>
-
-          <div class="flex-shrink-0">
-            <button 
-              onclick="addToCart('${p.id}')"
-              ${isOut ? 'disabled' : ''}
-              class="w-10 h-10 rounded-full bg-lushBg border border-gray-200 text-lushDark flex items-center justify-center hover:bg-lushDark hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
-              title="Agregar al carrito"
-            >
-              <span class="text-lg font-light leading-none">+</span>
-            </button>
-          </div>
-        </article>
-      `;
-    }).join('');
+  if (filtered.length === 0) {
+    grid.innerHTML = `<p class="col-span-full text-center text-gray-400 py-8">No hay productos disponibles en esta categoría.</p>`;
+    return;
   }
 
+  grid.innerHTML = filtered.map(p => {
+    const isOut = p.stock <= 0;
+    const priceBs = bcvRate > 0 ? (p.price * bcvRate).toFixed(2) : '0.00';
+    return `
+      <article class="bg-white rounded-2xl p-3 border border-gray-100 shadow-sm flex flex-col justify-between relative">
+        <div>
+          <!-- Imagen del producto -->
+          <div class="aspect-square rounded-xl overflow-hidden mb-3 bg-lushBg relative">
+            <img 
+              src="${p.image}" 
+              alt="${p.title}" 
+              onerror="this.onerror=null; this.src='LUSH logo.png';"
+              class="w-full h-full object-cover ${isOut ? 'grayscale opacity-60' : ''}"
+            >
+            ${isOut ? `
+              <div class="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex items-center justify-center">
+                <span class="bg-red-600 text-white text-[10px] font-black uppercase px-2 py-1 rounded tracking-widest shadow-lg">
+                  AGOTADO
+                </span>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Categoría y Título -->
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">${p.category}</span>
+          <h3 class="font-medium text-lushDark text-xs sm:text-sm mt-0.5 line-clamp-2 min-h-[2.25rem]">${p.title}</h3>
+          
+          <!-- Precio -->
+          <div class="mt-2 mb-3">
+            <span class="text-sm sm:text-base font-bold text-lushDark block">$${parseFloat(p.price).toFixed(2)}</span>
+            <span class="text-[10px] text-gray-400 font-mono block">Bs. ${priceBs}</span>
+          </div>
+        </div>
+
+        <!-- Botón en color melón claro con ícono de carrito -->
+        <button 
+          onclick="addToCart('${p.id}')"
+          ${isOut ? 'disabled' : ''}
+          class="w-full bg-[#F7EBE8] hover:bg-[#f0d8d2] text-[#1A1A1A] font-semibold py-2 px-3 rounded-xl text-xs transition flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        >
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+          </svg>
+          <span>${!isOut ? 'Agregar' : 'Agotado'}</span>
+        </button>
+      </article>
+    `;
+  }).join('');
+}
   function addToCart(productId) {
     const prod = productos.find(p => String(p.id) === String(productId));
     if (!prod || prod.stock <= 0) return;
