@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -91,7 +91,7 @@
         </button>
         <button onclick="toggleCartModal()" class="relative bg-lushDark text-white px-5 py-2 rounded-full text-sm hover:bg-black transition flex items-center gap-2">
           <span>Carrito</span>
-          <span id="cartCount" class="bg-lushGold text-lushDark text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+          <span id="cartCount" class="bg-lushGold text-lushDark text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center transition-transform duration-300">0</span>
         </button>
       </div>
     </div>
@@ -1151,6 +1151,7 @@
     const confirmAction = confirm(`¿Deseas agregar "${prod.title}" ($${prod.price.toFixed(2)}) al carrito de compras?`);
     
     if (confirmAction) {
+      // Pasar el ID para activar la animación de vuelo
       addToCart(productId);
     }
   }
@@ -1171,9 +1172,77 @@
       cart.push({ id: prod.id, title: prod.title, price: prod.price, qty: 1 });
     }
 
+    // Activar animación visual del producto volando
+    animateFlyToCart(productId);
+
     updateCartBadge();
     renderCartItems();
     calculateCartTotal();
+  }
+
+  function animateFlyToCart(productId) {
+    // 1. Obtener la tarjeta del producto y el icono del carrito
+    const productArticles = document.querySelectorAll('article');
+    let targetImg = null;
+
+    productArticles.forEach(article => {
+      if (article.querySelector(`button[onclick*="'${productId}'"]`)) {
+        targetImg = article.querySelector('img');
+      }
+    });
+
+    const cartBtn = document.getElementById('cartCount')?.parentElement;
+
+    if (!targetImg || !cartBtn) return;
+
+    // 2. Obtener coordenadas en pantalla de la imagen y del carrito
+    const imgRect = targetImg.getBoundingClientRect();
+    const cartRect = cartBtn.getBoundingClientRect();
+
+    // 3. Crear el clon volador
+    const flyingImg = targetImg.cloneNode(true);
+    flyingImg.classList.remove('group-hover:scale-105', 'transition-transform');
+    
+    // Estilos del elemento flotante en posición fija
+    Object.assign(flyingImg.style, {
+      position: 'fixed',
+      top: `${imgRect.top}px`,
+      left: `${imgRect.left}px`,
+      width: `${imgRect.width}px`,
+      height: `${imgRect.height}px`,
+      zIndex: '9999',
+      pointerEvents: 'none',
+      borderRadius: '1rem',
+      boxShadow: '0 20px 25px -5px rgba(0,0,0,0.3)',
+      transition: 'all 0.8s cubic-bezier(0.42, 0, 0.58, 1)'
+    });
+
+    document.body.appendChild(flyingImg);
+
+    // 4. Forzar un reflow y desencadenar el vuelo hacia el carrito
+    requestAnimationFrame(() => {
+      Object.assign(flyingImg.style, {
+        top: `${cartRect.top + 5}px`,
+        left: `${cartRect.left + 10}px`,
+        width: '30px',
+        height: '30px',
+        opacity: '0.2',
+        transform: 'rotate(360deg) scale(0.5)'
+      });
+    });
+
+    // 5. Eliminar la imagen al finalizar y dar efecto de rebote al contador
+    setTimeout(() => {
+      flyingImg.remove();
+      
+      const cartCountEl = document.getElementById('cartCount');
+      if (cartCountEl) {
+        cartCountEl.classList.add('scale-125', 'bg-emerald-400');
+        setTimeout(() => {
+          cartCountEl.classList.remove('scale-125', 'bg-emerald-400');
+        }, 300);
+      }
+    }, 800);
   }
 
   function updateCartBadge() {
