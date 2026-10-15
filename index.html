@@ -555,7 +555,7 @@
       </div>
 
       <div class="flex justify-between items-center pt-4 border-t no-print">
-        <button onclick="closeInventoryReportModal()" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg text-sm font-medium">Cerrar</button>
+        <button onclick="closeInventoryReportModal()" class="bg-gray-200 text-gray-700 px-5 py-2 rounded-lg text-sm font-medium hover:bg-gray-300 transition">Cerrar</button>
         <button onclick="window.print()" class="bg-lushDark text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-lushGold hover:text-lushDark transition flex items-center gap-2">
           <span>🖨️</span> Imprimir Reporte / PDF
         </button>
@@ -1725,74 +1725,77 @@
     if (modalEl) modalEl.classList.add('hidden');
   }
 
-function imprimirInventarioDirecto() {
-  const timestampEl = document.getElementById('inventoryReportTimestamp');
-  if (timestampEl) timestampEl.innerText = new Date().toLocaleString('es-VE');
+  function imprimirInventarioDirecto() {
+    const timestampEl = document.getElementById('inventoryReportTimestamp');
+    if (timestampEl) timestampEl.innerText = new Date().toLocaleString('es-VE');
 
-  const stockBody = document.getElementById('inventoryStockTableBody');
-  const missingBody = document.getElementById('inventoryMissingTableBody');
+    const stockBody = document.getElementById('inventoryStockTableBody');
+    const missingBody = document.getElementById('inventoryMissingTableBody');
 
-  if (stockBody) {
-    const disponibles = productos.filter(p => p.stock > 0);
-    
-    if (disponibles.length > 0) {
-      const totalUnits = disponibles.reduce((sum, p) => sum + p.stock, 0);
-      const totalUsd = disponibles.reduce((sum, p) => sum + (p.price * p.stock), 0);
+    if (stockBody) {
+      const disponibles = productos.filter(p => p.stock > 0);
+      
+      if (disponibles.length > 0) {
+        const totalUnits = disponibles.reduce((sum, p) => sum + p.stock, 0);
+        const totalUsd = disponibles.reduce((sum, p) => sum + (p.price * p.stock), 0);
 
-      let rowsHtml = disponibles.map(p => `
-        <tr class="border-b">
-          <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
-          <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
-          <td class="p-2.5 text-center font-mono">$${p.price.toFixed(2)}</td>
-          <td class="p-2.5 text-right font-bold text-emerald-600">${p.stock} unids.</td>
-        </tr>
-      `).join('');
+        let rowsHtml = disponibles.map(p => `
+          <tr class="border-b">
+            <td class="p-2.5 font-semibold text-lushDark">${p.title}</td>
+            <td class="p-2.5 uppercase text-xs text-gray-500">${p.category}</td>
+            <td class="p-2.5 text-center font-mono">$${p.price.toFixed(2)}</td>
+            <td class="p-2.5 text-right font-bold text-emerald-600">${p.stock} unids.</td>
+          </tr>
+        `).join('');
 
-      // Fila de Total
-      rowsHtml += `
-        <tr class="bg-emerald-100/70 border-t-2 border-emerald-500 font-bold text-emerald-950">
-          <td colspan="2" class="p-2.5 uppercase text-xs">Total Inventario Disponible</td>
-          <td class="p-2.5 text-center font-mono text-sm">$${totalUsd.toFixed(2)}</td>
-          <td class="p-2.5 text-right text-sm">${totalUnits} unids.</td>
-        </tr>
-      `;
-      stockBody.innerHTML = rowsHtml;
-    } else {
-      stockBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin stock disponible.</td></tr>`;
+        rowsHtml += `
+          <tr class="bg-emerald-100/70 border-t-2 border-emerald-500 font-bold text-emerald-950">
+            <td colspan="2" class="p-2.5 uppercase text-xs">Total Inventario Disponible</td>
+            <td class="p-2.5 text-center font-mono text-sm">$${totalUsd.toFixed(2)}</td>
+            <td class="p-2.5 text-right text-sm">${totalUnits} unids.</td>
+          </tr>
+        `;
+        stockBody.innerHTML = rowsHtml;
+      } else {
+        stockBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">Sin stock disponible.</td></tr>`;
+      }
     }
+
+    if (missingBody) {
+      const agotados = productos.filter(p => p.stock <= 0);
+
+      if (agotados.length > 0) {
+        const totalMissingUsd = agotados.reduce((sum, p) => sum + p.price, 0);
+
+        let rowsHtml = agotados.map(p => `
+          <tr class="border-b bg-red-50/50">
+            <td class="p-2.5 font-semibold text-red-900">${p.title}</td>
+            <td class="p-2.5 uppercase text-xs text-red-700">${p.category}</td>
+            <td class="p-2.5 text-center font-mono text-red-900">$${p.price.toFixed(2)}</td>
+            <td class="p-2.5 text-right font-bold text-red-600">0 unids.</td>
+          </tr>
+        `).join('');
+
+        rowsHtml += `
+          <tr class="bg-red-100/80 border-t-2 border-red-500 font-bold text-red-950">
+            <td colspan="2" class="p-2.5 uppercase text-xs">Total Productos Agotados</td>
+            <td class="p-2.5 text-center font-mono text-sm">$${totalMissingUsd.toFixed(2)}</td>
+            <td class="p-2.5 text-right text-sm">${agotados.length} ítems</td>
+          </tr>
+        `;
+        missingBody.innerHTML = rowsHtml;
+      } else {
+        missingBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos agotados.</td></tr>`;
+      }
+    }
+
+    document.getElementById('inventoryReportModal').classList.remove('hidden');
   }
 
-  if (missingBody) {
-    const agotados = productos.filter(p => p.stock <= 0);
-
-    if (agotados.length > 0) {
-      const totalMissingUnits = agotados.length;
-
-      let rowsHtml = agotados.map(p => `
-        <tr class="border-b bg-red-50/50">
-          <td class="p-2.5 font-semibold text-red-900">${p.title}</td>
-          <td class="p-2.5 uppercase text-xs text-red-700">${p.category}</td>
-          <td class="p-2.5 text-center font-mono text-red-900">$${p.price.toFixed(2)}</td>
-          <td class="p-2.5 text-right font-bold text-red-600">0 unids.</td>
-        </tr>
-      `).join('');
-
-      // Fila de Total
-      rowsHtml += `
-        <tr class="bg-red-100/80 border-t-2 border-red-500 font-bold text-red-950">
-          <td colspan="2" class="p-2.5 uppercase text-xs">Total Productos Agotados</td>
-          <td class="p-2.5 text-center font-mono text-sm">$0.00</td>
-          <td class="p-2.5 text-right text-sm">${totalMissingUnits} ítems</td>
-        </tr>
-      `;
-      missingBody.innerHTML = rowsHtml;
-    } else {
-      missingBody.innerHTML = `<tr><td colspan="4" class="p-3 text-center text-gray-400">No hay productos agotados.</td></tr>`;
-    }
+  function closeInventoryReportModal() {
+    document.getElementById('inventoryReportModal').classList.add('hidden');
   }
 
-  document.getElementById('inventoryReportModal').classList.remove('hidden');
-}
   function openMonthlyClosureModal() {
     const picker = document.getElementById('closureMonthPicker');
     if (picker) {
